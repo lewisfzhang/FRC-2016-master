@@ -1,6 +1,5 @@
 package org.usfirst.frc.team254.robot;
 
-import com.sun.istack.internal.Nullable;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
@@ -98,7 +97,7 @@ public class SendThread implements Runnable, MqttCallback {
         StringBuilder builder = new StringBuilder("[");
         boolean firstElement = true;
         for (int i = 0; i < MAX_MESSAGES_PER_MQTT_MESSAGE; ++i) {
-            @Nullable Map<String, String> nextMessage = mMessageQueue.poll();
+            Map<String, String> nextMessage = mMessageQueue.poll();
             if (nextMessage == null) {
                 break;
             }
