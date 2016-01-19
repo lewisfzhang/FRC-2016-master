@@ -1,6 +1,8 @@
 var client;
+var logDiv;
 
 $(document).ready(function() {
+	logDiv = $("#log_div");
     client = new Paho.MQTT.Client('localhost', 11883, "clienId");
 
     // set callback handlers
@@ -9,7 +11,7 @@ $(document).ready(function() {
 
     connect();
 
-    $("div").text("I'm ready!");
+    logDiv.text("I'm ready!");
 });
 
 function connect() {
@@ -38,6 +40,9 @@ function onConnectionLost(responseObject) {
 
 // called when a message arrives
 function onMessageArrived(message) {
-    logMessageArray = JSON.parse(message.payloadString);
+    var logMessageArray = JSON.parse(message.payloadString);
+	for (var i = 0; i < logMessageArray.length; ++i) {
+		logDiv.append($("<div/>").text(JSON.stringify(logMessageArray[i])));
+	}
     console.log(logMessageArray);
 }
