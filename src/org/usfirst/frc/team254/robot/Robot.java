@@ -18,10 +18,18 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
  */
 public class Robot extends IterativeRobot {
 
+    private final CheesyLogger mCheesyLogger;
+
+    public Robot() {
+        mCheesyLogger = CheesyLogger.makeCheesyLogger();
+    }
+
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
+    @Override
     public void robotInit() {
+        mCheesyLogger.sendLogMessage("Robot Inited");
     }
 }

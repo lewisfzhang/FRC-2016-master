@@ -13,7 +13,8 @@ public class CheesyLogger {
 
     public static CheesyLogger makeCheesyLogger() {
         try {
-            return new CheesyLogger(new SendThread("tcp://localhost:1883"));
+            // TODO: unbreak mDNS and put a hostname here
+            return new CheesyLogger(new SendThread("tcp://10.2.52.21:1883"));
         } catch (MqttException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
