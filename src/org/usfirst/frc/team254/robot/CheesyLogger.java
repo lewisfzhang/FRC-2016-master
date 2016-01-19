@@ -1,5 +1,7 @@
 package org.usfirst.frc.team254.robot;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.util.HashMap;
 
 /**
@@ -10,7 +12,12 @@ public class CheesyLogger {
     private final SendThread mSendThread;
 
     public static CheesyLogger makeCheesyLogger() {
-        return new CheesyLogger(new SendThread());
+        try {
+            return new CheesyLogger(new SendThread("tcp://localhost:1883"));
+        } catch (MqttException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     private CheesyLogger(SendThread sendThread) {
