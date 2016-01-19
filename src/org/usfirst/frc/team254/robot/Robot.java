@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,6 +27,15 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
+        try {
+            // TODO: actually connect the client to something
+            MqttClient mqttClient = new MqttClient(
+                    "tcp://leighpauls-mbp.local:1883",
+                    "robot_id",
+                    new MemoryPersistence());
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
