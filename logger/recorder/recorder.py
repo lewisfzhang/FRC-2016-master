@@ -9,11 +9,14 @@ import paho.mqtt.client as mqtt
 def onConnect(client, userData, flags, resultCode):
     print("Connected with result code "+str(resultCode))
     client.subscribe("/robot_logging")
+    client.subscribe("/replay_log_request")
 
 def onMessage(client, userData, msg):
     msgPayloadJson = json.loads(msg.payload)
     if msg.topic == '/robot_logging':
         saveLogMessage(userData, msgPayloadJson)
+    elif msg.topic == '/replay_log_request':
+        replayLogs(client, userData, msgPayloadJson)
 
 def saveLogMessage(sqlSession, msgPayloadArray):
     print msgPayloadArray
@@ -22,6 +25,20 @@ def saveLogMessage(sqlSession, msgPayloadArray):
             "INSERT INTO logs (walltime, jsonPayload) VALUES (?, ?)",
             (jsonObject["walltime"], json.dumps(jsonObject)))
     sqlSession.connection.commit()
+
+def replayLogs(client, sqlSession, msgPayloadObject):
+    numLogsToReplay = int(msgPayloadObject["numlogs"])
+    print numLogsToReplay
+    replayMessageArray = []
+    sqlSession.cursor.execute(
+        "SELECT jsonPayload FROM logs ORDER BY walltime DESC LIMIT ?",
+        (numLogsToReplay,))
+    while True:
+        row = sqlSession.cursor.fetchone()
+        if row is None:
+            break
+        replayMessageArray.append(json.loads(row[0]))
+    client.publish('/replay_logging', payload=json.dumps(replayMessageArray))
 
 def onDisconnect(client, userData, resultCode):
     print "disconnected: ", resultCode
