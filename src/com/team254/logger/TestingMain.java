@@ -1,4 +1,6 @@
-package org.usfirst.frc.team254.robot;
+package com.team254.logger;
+
+import com.team254.logger.CheesyLogger;
 
 /**
  * A java main method implementation for testing code by running it on your laptop

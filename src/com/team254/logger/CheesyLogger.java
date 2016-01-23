@@ -1,4 +1,4 @@
-package org.usfirst.frc.team254.robot;
+package com.team254.logger;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -14,7 +14,7 @@ public class CheesyLogger {
     public static CheesyLogger makeCheesyLogger() {
         try {
             // TODO: unbreak mDNS and put a hostname here
-            return new CheesyLogger(new SendThread("tcp://10.2.52.21:1883"));
+            return new CheesyLogger(new SendThread("tcp://localhost:1883"));
         } catch (MqttException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

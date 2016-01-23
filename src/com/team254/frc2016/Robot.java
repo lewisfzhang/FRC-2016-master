@@ -1,13 +1,8 @@
 
-package org.usfirst.frc.team254.robot;
+package com.team254.frc2016;
 
+import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 /**
  * The VM is configured to automatically run this class, and to call the
