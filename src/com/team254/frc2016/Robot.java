@@ -27,4 +27,19 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
         mCheesyLogger.sendLogMessage("Robot Inited");
     }
+
+    @Override
+    public void disabledInit() {
+        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
+    }
+
+    @Override
+    public void autonomousInit() {
+        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
+    }
+
+    @Override
+    public void teleopInit() {
+        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
+    }
 }

@@ -3,26 +3,39 @@ package com.team254.logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SendThread implements Runnable, MqttCallback {
+public class MqttSender implements Runnable, MqttCallback {
+
+    public enum QOS {
+        BEST_EFFORT(0),
+        AT_LEAST_ONCE(1),
+        EXACTLY_ONCE(2);
+
+        private final int mQosValue;
+
+        QOS(int qosValue) {
+            mQosValue = qosValue;
+        }
+    }
 
     /** Limits the size of a single MQTT message */
-    private static final int MAX_MESSAGES_PER_MQTT_MESSAGE = 10;
+    private static final int MAX_LOGS_PER_MESSAGE = 50;
 
     /** Limits the number of messages which will be enqeued in memory */
     private static final int MAX_MESSAGES_QUEUE_LENGTH = 200;
 
-    private final ConcurrentLinkedQueue<Map<String, String>> mMessageQueue;
+    private final ConcurrentLinkedQueue<LogElement> mLogQueue;
     private final Thread mThread;
 
     /** Guarded by "this" */
     private final MqttClient mMqttClient;
 
-    public SendThread(String mqttBrokerServer) throws MqttException {
-        mMessageQueue = new ConcurrentLinkedQueue<>();
+    public MqttSender(String mqttBrokerServer) throws MqttException {
+        mLogQueue = new ConcurrentLinkedQueue<>();
         synchronized (this) {
             mMqttClient = new MqttClient(
                     mqttBrokerServer,
@@ -35,9 +48,9 @@ public class SendThread implements Runnable, MqttCallback {
         mThread.start();
     }
 
-    public void sendPayload(Map<String, String> payload) {
-        if (mMessageQueue.size() < MAX_MESSAGES_QUEUE_LENGTH) {
-            mMessageQueue.add(payload);
+    public void sendPayload(Map<String, String> payload, QOS qos) {
+        if (mLogQueue.size() < MAX_MESSAGES_QUEUE_LENGTH) {
+            mLogQueue.add(new LogElement(payload, qos));
         } else {
             System.out.println("CheesyLogger Message Queue full");
         }
@@ -47,7 +60,6 @@ public class SendThread implements Runnable, MqttCallback {
     public void connectionLost(Throwable throwable) {
         throwable.printStackTrace();
         forceMqttConnect();
-
     }
 
     @Override
@@ -61,12 +73,9 @@ public class SendThread implements Runnable, MqttCallback {
         forceMqttConnect();
 
         while (true) {
-            if (!mMessageQueue.isEmpty()) {
-                drainQueue();
-            }
-
+            maybeSendMessage();
             try {
-                Thread.sleep(50);
+                Thread.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -93,20 +102,29 @@ public class SendThread implements Runnable, MqttCallback {
         }
     }
 
-    private void drainQueue() {
+    private void maybeSendMessage() {
+        LogElement firstElement = mLogQueue.peek();
+        if (firstElement == null) {
+            return;
+        }
+        // A single MQTT message must all have the same QOS
+        QOS curQos = firstElement.mQOS;
         StringBuilder builder = new StringBuilder("[");
-        boolean firstElement = true;
-        for (int i = 0; i < MAX_MESSAGES_PER_MQTT_MESSAGE; ++i) {
-            Map<String, String> nextMessage = mMessageQueue.poll();
-            if (nextMessage == null) {
+        boolean isFirstMessage = true;
+        int numLogs = 0;
+        while (numLogs < MAX_LOGS_PER_MESSAGE) {
+            LogElement nextObject = mLogQueue.peek();
+            if (nextObject == null || nextObject.mQOS != curQos) {
                 break;
             }
-            if (firstElement) {
-                firstElement = false;
+            if (isFirstMessage) {
+                isFirstMessage = false;
             } else {
                 builder.append(",");
             }
-            appendMessage(builder, nextMessage);
+            mLogQueue.remove();
+            nextObject.appendToMessage(builder);
+            numLogs++;
         }
         builder.append("]");
 
@@ -114,31 +132,40 @@ public class SendThread implements Runnable, MqttCallback {
             String payload = builder.toString();
             System.out.println(payload);
             synchronized (this) {
-                mMqttClient.publish("/robot_logging", payload.getBytes(), 0, false);
+                mMqttClient.publish("/robot_logging", payload.getBytes(), curQos.mQosValue, false);
             }
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
-    private void appendMessage(StringBuilder builder, Map<String, String> message) {
-        builder.append("{");
-        boolean firstField = true;
-        for (Map.Entry<String, String> field : message.entrySet()) {
-            if (firstField) {
-                firstField = false;
-            } else {
-                builder.append(",");
-            }
-            builder.append("\"")
-                    .append(field.getKey())
-                    .append("\":\"")
-                    .append(field.getValue())
-                    .append("\"");
+    private static class LogElement {
+        private final Map<String, String> mPayload;
+        private final QOS mQOS;
 
+        private LogElement(Map<String, String> payload, QOS qos) {
+            mPayload = payload;
+            mQOS = qos;
         }
-        builder.append("}");
+
+        void appendToMessage(StringBuilder messageBuilder) {
+            messageBuilder.append("{");
+            boolean firstField = true;
+            for (Map.Entry<String, String> field : mPayload.entrySet()) {
+                if (firstField) {
+                    firstField = false;
+                } else {
+                    messageBuilder.append(",");
+                }
+                messageBuilder
+                        .append("\"")
+                        .append(field.getKey())
+                        .append("\":\"")
+                        .append(field.getValue())
+                        .append("\"");
+
+            }
+            messageBuilder.append("}");
+        }
     }
-
-
 }
