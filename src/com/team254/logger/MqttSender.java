@@ -2,6 +2,8 @@ package com.team254.logger;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -109,27 +111,20 @@ public class MqttSender implements Runnable, MqttCallback {
         }
         // A single MQTT message must all have the same QOS
         QOS curQos = firstElement.mQOS;
-        StringBuilder builder = new StringBuilder("[");
-        boolean isFirstMessage = true;
+        JSONArray jsonMessages = new JSONArray();
         int numLogs = 0;
         while (numLogs < MAX_LOGS_PER_MESSAGE) {
             LogElement nextObject = mLogQueue.peek();
             if (nextObject == null || nextObject.mQOS != curQos) {
                 break;
             }
-            if (isFirstMessage) {
-                isFirstMessage = false;
-            } else {
-                builder.append(",");
-            }
             mLogQueue.remove();
-            nextObject.appendToMessage(builder);
+            jsonMessages.add(new JSONObject(nextObject.mPayload));
             numLogs++;
         }
-        builder.append("]");
 
         try {
-            String payload = builder.toString();
+            String payload = jsonMessages.toJSONString();
             System.out.println(payload);
             synchronized (this) {
                 mMqttClient.publish("/robot_logging", payload.getBytes(), curQos.mQosValue, false);
@@ -146,26 +141,6 @@ public class MqttSender implements Runnable, MqttCallback {
         private LogElement(Map<String, String> payload, QOS qos) {
             mPayload = payload;
             mQOS = qos;
-        }
-
-        void appendToMessage(StringBuilder messageBuilder) {
-            messageBuilder.append("{");
-            boolean firstField = true;
-            for (Map.Entry<String, String> field : mPayload.entrySet()) {
-                if (firstField) {
-                    firstField = false;
-                } else {
-                    messageBuilder.append(",");
-                }
-                messageBuilder
-                        .append("\"")
-                        .append(field.getKey())
-                        .append("\":\"")
-                        .append(field.getValue())
-                        .append("\"");
-
-            }
-            messageBuilder.append("}");
         }
     }
 }
