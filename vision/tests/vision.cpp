@@ -34,7 +34,7 @@ void App::run() {
 
   webcam.StartStreaming(std::move(callback));
   while (true) {
-    cv::Mat frame = webcam.DecodeLatestFrame();
+    cv::Mat frame = webcam.DecodeLatestFrame().second;
     cv::cvtColor(frame, frame_hsv, cv::COLOR_BGR2HSV);
     cv::inRange(frame_hsv, cv::Scalar(52, 117, 76), cv::Scalar(101, 255, 255),
                 frame_threshold);
@@ -45,7 +45,6 @@ void App::run() {
                      cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)),
                      cv::Point(-1, -1), 1);
 
-    // INSERT OPENCV CALLS HERE
     std::cout << "Frame is " << frame.cols << " x " << frame.rows << std::endl;
     cv::imshow("opencv_webcam", frame_morphology2);
     cv::waitKey(1);

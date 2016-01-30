@@ -123,6 +123,7 @@ void V4LWebcam::Configure(bool calibration = false) {
   for (size_t i = 0; i < kNumBuffers; ++i) {
     capture_buffers_[i] = mmap(NULL, bufferinfo.length, PROT_READ | PROT_WRITE,
                                MAP_SHARED, descriptor_, bufferinfo.m.offset);
+    capture_times_[i] = TimePoint::min();
     ++bufferinfo.index;
 
     if (capture_buffers_[i] == MAP_FAILED) {
@@ -183,11 +184,13 @@ void V4LWebcam::StartStream() {
           perror("VIDIOC_QBUF");
           exit(1);
         }
+        const auto capture_time = std::chrono::steady_clock::now();
 
         {
           // Update the latest buffer.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
           latest_capture_buffer_ = bufferinfo.index;
+          capture_times_[i] = capture_time;
         }
         bufferinfo.index = (bufferinfo.index + 1) % kNumBuffers;
       }
@@ -209,20 +212,21 @@ void V4LWebcam::StopStream() {
   }
 }
 
-cv::Mat V4LWebcam::DecodeLatestFrame() {
-  cv::Mat decoded;
+std::pair<TimePoint, cv::Mat> V4LWebcam::DecodeLatestFrame() {
+  std::pair<TimePoint, cv::Mat> rv = std::make_pair(TimePoint::min(), cv::Mat());
   int buffer = -1;
   {
     std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
     if (processing_buffer_ == -1) {
       std::cerr << "Can only decode one frame at a time" << std::endl;
-      return decoded;
+      return rv;
     }
     // Lock the processing buffer
     processing_buffer_ = latest_capture_buffer_;
     buffer = processing_buffer_;
+    rv.first = capture_times_[buffer];
   }
-  decoded = cv::imdecode(
+  rv.second = cv::imdecode(
       cv::Mat(kRowsPixels, kColsPixels, CV_8UC3, capture_buffers_[buffer]),
       CV_LOAD_IMAGE_COLOR);
   {
@@ -230,8 +234,7 @@ cv::Mat V4LWebcam::DecodeLatestFrame() {
     std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
     processing_buffer_ = -1;
   }
-
-  return decoded;
+  return rv;
 }
 
 void V4LWebcam::SetCameraSettings(const v4l2_control& control) {

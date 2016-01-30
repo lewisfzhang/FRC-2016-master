@@ -19,6 +19,8 @@ const int kNumBuffers = 16;
 
 namespace team254 {
 
+using TimePoint = std::chrono::steady_clock::time_point;
+
 class V4LWebcam {
  public:
   V4LWebcam(const std::string& device);
@@ -30,7 +32,7 @@ class V4LWebcam {
 
   void StopStream();
 
-  cv::Mat DecodeLatestFrame();
+  std::pair<TimePoint, cv::Mat> DecodeLatestFrame();
 
  private:
   // State
@@ -49,6 +51,7 @@ class V4LWebcam {
   const std::string device_;
   int descriptor_;
   std::array<void*, kNumBuffers> capture_buffers_;
+  std::array<TimePoint, kNumBuffers> capture_times_;
   size_t buffer_length_;
 
   void SetCameraSettings(const v4l2_control& control);
