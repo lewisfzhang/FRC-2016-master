@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 def hasScreen():
-  return platform.system() == "Darwin"
+  return platform.system() == "Darwin"# or platform.system() == "Linux"
 
 from pkg_resources import parse_version
 OPCV3 = parse_version(cv2.__version__) >= parse_version('3')
