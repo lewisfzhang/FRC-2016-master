@@ -25,7 +25,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void robotInit() {
-        mCheesyLogger.sendLogMessage("Robot Inited");
+        mCheesyLogger.sendLogMessage("Robot Init-ed");
     }
 
     @Override
