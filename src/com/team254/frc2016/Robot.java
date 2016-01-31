@@ -1,6 +1,8 @@
 
 package com.team254.frc2016;
 
+import com.team254.frc2016.subsystems.Drive;
+import com.team254.frc2016.subsystems.Turret;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
 
@@ -14,6 +16,10 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 public class Robot extends IterativeRobot {
 
     private final CheesyLogger mCheesyLogger;
+    Turret turret = Turret.getInstance();
+    Drive drive = Drive.getInstance();
+    CheesyDriveHelper cdh = new CheesyDriveHelper();
+    ControlBoard controls = ControlBoard.getInstance();
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger();
@@ -41,5 +47,15 @@ public class Robot extends IterativeRobot {
     @Override
     public void teleopInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
+    }
+
+    @Override
+    public void disabledInit() {
+        drive.stop();
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        drive.set(cdh.cheesyDrive(controls.getThrottle(), controls.getTurn(), controls.getQuickTurn(),false));
     }
 }
