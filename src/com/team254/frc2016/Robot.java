@@ -37,6 +37,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
+        drive.stop();
     }
 
     @Override
@@ -50,12 +51,11 @@ public class Robot extends IterativeRobot {
     }
 
     @Override
-    public void disabledInit() {
-        drive.stop();
-    }
-
-    @Override
     public void teleopPeriodic() {
-        drive.set(cdh.cheesyDrive(controls.getThrottle(), controls.getTurn(), controls.getQuickTurn(),false));
+        double throttle = controls.getThrottle();
+        double turn = controls.getTurn();
+        drive.set(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn(),false));
+        mCheesyLogger.sendTimePlotPoint("throttle", throttle);
+        mCheesyLogger.sendTimePlotPoint("turn", turn);
     }
 }
