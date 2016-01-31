@@ -1,6 +1,8 @@
 
 package com.team254.frc2016;
 
+import com.team254.frc2016.subsystems.Drive;
+import com.team254.frc2016.subsystems.Turret;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
 
@@ -14,6 +16,10 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 public class Robot extends IterativeRobot {
 
     private final CheesyLogger mCheesyLogger;
+    Turret turret = Turret.getInstance();
+    Drive drive = Drive.getInstance();
+    CheesyDriveHelper cdh = new CheesyDriveHelper();
+    ControlBoard controls = ControlBoard.getInstance();
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger();
@@ -25,6 +31,31 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void robotInit() {
-        mCheesyLogger.sendLogMessage("Robot Inited");
+        mCheesyLogger.sendLogMessage("Robot Init-ed");
+    }
+
+    @Override
+    public void disabledInit() {
+        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
+        drive.stop();
+    }
+
+    @Override
+    public void autonomousInit() {
+        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
+    }
+
+    @Override
+    public void teleopInit() {
+        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        double throttle = controls.getThrottle();
+        double turn = controls.getTurn();
+        drive.set(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn(), false));
+        mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle);
+        mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn);
     }
 }

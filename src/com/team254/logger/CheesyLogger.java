@@ -9,20 +9,32 @@ import java.util.HashMap;
  */
 public class CheesyLogger {
 
-    private final SendThread mSendThread;
+    public static enum CompetitionState {
+        DISABLED("disabled"),
+        TELEOP("teleop"),
+        AUTO("auto");
+
+        private final String mWireValue;
+
+        CompetitionState(String wireValue) {
+            mWireValue = wireValue;
+        }
+    }
+
+    private final MqttSender mMqttSender;
 
     public static CheesyLogger makeCheesyLogger() {
         try {
             // TODO: unbreak mDNS and put a hostname here
-            return new CheesyLogger(new SendThread("tcp://localhost:1883"));
+            return new CheesyLogger(new MqttSender("tcp://localhost:1883"));
         } catch (MqttException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private CheesyLogger(SendThread sendThread) {
-        mSendThread = sendThread;
+    private CheesyLogger(MqttSender mqttSender) {
+        mMqttSender = mqttSender;
     }
 
     /**
@@ -32,33 +44,28 @@ public class CheesyLogger {
     public void sendLogMessage(String message) {
         HashMap<String, String> payload = makeEmptyLogPayload("log");
         payload.put("message", message);
-        mSendThread.sendPayload(payload);
+        mMqttSender.sendPayload(payload, MqttSender.QOS.BEST_EFFORT);
     }
 
     /**
      * Send a value point which should be plotted against the current time in a time-series plot.
-     * @param category
-     * @param value
+     * @param category Which plot this data should go on
+     * @param field Which data in this line this point is assocaited with (aka, which line it
+     *              belongs to)
+     * @param value The poisition of the point on the plot
      */
-    public void sendTimePlotPoint(String category, double value) {
+    public void sendTimePlotPoint(String category, String field, double value) {
         HashMap<String, String> payload = makeEmptyLogPayload("timeplot");
         payload.put("category", category);
+        payload.put("field", field);
         payload.put("value", Double.toString(value));
-        mSendThread.sendPayload(payload);
+        mMqttSender.sendPayload(payload, MqttSender.QOS.BEST_EFFORT);
     }
 
-    /**
-     * Send an x/y pair to plot on a scatter-plot graph.
-     * @param category
-     * @param x
-     * @param y
-     */
-    public void sendScatterPlotPoint(String category, double x, double y) {
-        HashMap<String, String> payload = makeEmptyLogPayload("scatterplot");
-        payload.put("category", category);
-        payload.put("x", Double.toString(x));
-        payload.put("y", Double.toString(y));
-        mSendThread.sendPayload(payload);
+    public void sendCompetitionState(CompetitionState competitionState) {
+        HashMap<String, String> payload = makeEmptyLogPayload("competitionstate");
+        payload.put("state", competitionState.mWireValue);
+        mMqttSender.sendPayload(payload, MqttSender.QOS.AT_LEAST_ONCE);
     }
 
     private HashMap<String, String> makeEmptyLogPayload(String type) {

@@ -1,0 +1,5 @@
+1. When flash is seemingly done, Crtl+d to get CUDA/Opencv to install
+2. Run:
+sudo apt-get update
+sudo apt-get install git v4l-utils libv4l-dev cmake libssl-dev libc-ares-dev uuid-dev
+
