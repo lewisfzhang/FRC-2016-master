@@ -9,6 +9,7 @@ V4LWebcam::V4LWebcam(const std::string& device)
       processing_buffer_(-1),
       latest_capture_buffer_(-1),
       device_(device) {
+  static_assert(kNumBuffers > 1, "Must have at least 2 capture buffers");
   descriptor_ = v4l2_open(device_.c_str(), O_RDWR);
   if (descriptor_ < 0) {
     perror("v4l2_open");
@@ -44,12 +45,12 @@ V4LWebcam::~V4LWebcam() {
 void V4LWebcam::Configure(bool calibration) {
   is_configured_ = true;
   if (streaming_thread_) {
-    std::cout << "Capture thread running; cannot configure camera";
+    std::cout << "Capture thread running; cannot configure camera" << std::endl;
   }
   is_calibration_ = calibration;
-  v4l2_control c;
 
   // set manual white balance
+  v4l2_control c;
   c.id = V4L2_CID_AUTO_WHITE_BALANCE;
   c.value = 0;
   SetAndCheckCameraSettings(c);
@@ -103,47 +104,40 @@ void V4LWebcam::Configure(bool calibration) {
   }
   if (bufrequest.count != kNumBuffers) {
     std::cerr << "Asked for " << kNumBuffers << " but only got "
-              << bufrequest.count;
+              << bufrequest.count << std::endl;
     exit(1);
   }
 
-  // allocate buffers
-  v4l2_buffer bufferinfo;
-  memset(&bufferinfo, 0, sizeof(bufferinfo));
-
-  bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  bufferinfo.memory = V4L2_MEMORY_MMAP;
-  bufferinfo.index = 0;
-
-  if (ioctl(descriptor_, VIDIOC_QUERYBUF, &bufferinfo) < 0) {
-    perror("VIDIOC_QUERYBUF");
-    exit(1);
-  }
-
-  buffer_length_ = bufferinfo.length;
   for (size_t i = 0; i < kNumBuffers; ++i) {
+    // allocate buffers
+    v4l2_buffer bufferinfo;
+    memset(&bufferinfo, 0, sizeof(bufferinfo));
+
+    bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    bufferinfo.memory = V4L2_MEMORY_MMAP;
+    bufferinfo.index = i;
+
+    if (ioctl(descriptor_, VIDIOC_QUERYBUF, &bufferinfo) < 0) {
+      perror("VIDIOC_QUERYBUF");
+      exit(1);
+    }
     capture_buffers_[i] = mmap(NULL, bufferinfo.length, PROT_READ | PROT_WRITE,
                                MAP_SHARED, descriptor_, bufferinfo.m.offset);
     capture_times_[i] = TimePoint::min();
-    ++bufferinfo.index;
 
     if (capture_buffers_[i] == MAP_FAILED) {
       std::cerr << "Could not set map buffer" << std::endl;
       exit(1);
     }
     memset(capture_buffers_[i], 0, bufferinfo.length);
+    buffer_length_ = bufferinfo.length;
   }
 }
 
 void V4LWebcam::StartStream() {
   if (!streaming_thread_) {
     // Activate streaming
-    v4l2_buffer bufferinfo;
-    memset(&bufferinfo, 0, sizeof(bufferinfo));
-    bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    bufferinfo.memory = V4L2_MEMORY_MMAP;
-    bufferinfo.index = 0;
-    int type = bufferinfo.type;
+    int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(descriptor_, VIDIOC_STREAMON, &type) < 0) {
       std::cerr << "Could not start streaming" << std::endl;
       return;
@@ -164,18 +158,29 @@ void V4LWebcam::StartStream() {
     c.value = 10;
     SetCameraSettings(c);
 
-    streaming_thread_.reset(new std::thread([this, bufferinfo]() mutable {
+    streaming_thread_.reset(new std::thread([this]() mutable {
+      v4l2_buffer bufferinfo;
+      memset(&bufferinfo, 0, sizeof(bufferinfo));
+      bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+      bufferinfo.memory = V4L2_MEMORY_MMAP;
+      bufferinfo.index = 0;
       while (!stop_streaming_) {
         {
           // Figure out which buffer to read into.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
           if (processing_buffer_ == static_cast<int>(bufferinfo.index)) {
+            std::cerr << "Capture buffer wrapped around" << std::endl;
             bufferinfo.index = (bufferinfo.index + 1) % kNumBuffers;
-            std::cerr << "Capture buffer wrapped around";
+          }
+          if (latest_capture_buffer_ == static_cast<int>(bufferinfo.index)) {
+            // If we have wrapped around to the latest capture buffer, first
+            // invalidate it.
+            latest_capture_buffer_ = -1;
           }
         }
 
         // Enqueue the buffer
+        std::cout << "Enqueue buffer " << bufferinfo.index << std::endl;
         if (ioctl(descriptor_, VIDIOC_QBUF, &bufferinfo) < 0) {
           perror("VIDIOC_QBUF");
           exit(1);
@@ -186,6 +191,7 @@ void V4LWebcam::StartStream() {
           perror("VIDIOC_QBUF");
           exit(1);
         }
+        std::cout << "Dequeue buffer " << bufferinfo.index << std::endl;
         const auto capture_time = std::chrono::steady_clock::now();
 
         {
@@ -221,8 +227,8 @@ std::pair<TimePoint, cv::Mat> V4LWebcam::DecodeLatestFrame() {
   int buffer = -1;
   {
     std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
-    if (processing_buffer_ == -1) {
-      std::cerr << "Can only decode one frame at a time" << std::endl;
+    if (processing_buffer_ != -1 || latest_capture_buffer_ == -1) {
+      // std::cerr << "Can only decode one frame at a time" << std::endl;
       return rv;
     }
     // Lock the processing buffer
@@ -230,9 +236,12 @@ std::pair<TimePoint, cv::Mat> V4LWebcam::DecodeLatestFrame() {
     buffer = processing_buffer_;
     rv.first = capture_times_[buffer];
   }
+  std::cout << "Decoding frame from buffer " << buffer << std::endl;
   rv.second = cv::imdecode(
       cv::Mat(kRowsPixels, kColsPixels, CV_8UC3, capture_buffers_[buffer]),
       CV_LOAD_IMAGE_COLOR);
+  std::cout << "Size is " << rv.second.cols << " by " << rv.second.rows
+            << std::endl;
   {
     // Release the processing buffer
     std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);

@@ -35,7 +35,11 @@ void App::run() {
   webcam.StartStream();
   while (true) {
     cv::Mat frame = webcam.DecodeLatestFrame().second;
-    cv::cvtColor(frame, frame_hsv, cv::COLOR_BGR2HSV);
+    if (frame.rows == 0 || frame.cols == 0) {
+      cv::waitKey(1);
+      continue;
+    }
+    /*cv::cvtColor(frame, frame_hsv, cv::COLOR_BGR2HSV);
     cv::inRange(frame_hsv, cv::Scalar(52, 117, 76), cv::Scalar(101, 255, 255),
                 frame_threshold);
     cv::morphologyEx(frame_threshold, frame_morphology, cv::MORPH_OPEN,
@@ -44,9 +48,9 @@ void App::run() {
     cv::morphologyEx(frame_morphology, frame_morphology2, cv::MORPH_CLOSE,
                      cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)),
                      cv::Point(-1, -1), 1);
-
+*/
     std::cout << "Frame is " << frame.cols << " x " << frame.rows << std::endl;
-    cv::imshow("opencv_webcam", frame_morphology2);
+    cv::imshow("opencv_webcam", frame);
     cv::waitKey(1);
   };
 }

@@ -16,7 +16,7 @@
 
 const int kRowsPixels = 1080;
 const int kColsPixels = 1920;
-const int kNumBuffers = 4;
+const int kNumBuffers = 2;
 
 namespace team254 {
 
