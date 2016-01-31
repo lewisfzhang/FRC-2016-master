@@ -14,9 +14,9 @@
 #include "opencv2/gpu/gpu.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-const int kRowsPixels = 1080;
-const int kColsPixels = 1920;
-const int kNumBuffers = 2;
+const int kRowsPixels = 960;
+const int kColsPixels = 1280;
+const int kNumBuffers = 6;
 
 namespace team254 {
 
@@ -27,9 +27,9 @@ class V4LWebcam {
   V4LWebcam(const std::string& device);
   ~V4LWebcam();
 
-  void Configure(bool calibration = false);
+  void Configure();
 
-  void StartStream();
+  void StartStream(bool calibration = false);
 
   void StopStream();
 
@@ -55,7 +55,7 @@ class V4LWebcam {
   std::array<TimePoint, kNumBuffers> capture_times_;
   size_t buffer_length_;
 
+  void LoadSettings();
   void SetCameraSettings(const v4l2_control& control);
-  bool SetAndCheckCameraSettings(const v4l2_control& control);
 };
 }

@@ -42,43 +42,11 @@ V4LWebcam::~V4LWebcam() {
   v4l2_close(descriptor_);
 }
 
-void V4LWebcam::Configure(bool calibration) {
+void V4LWebcam::Configure() {
   is_configured_ = true;
   if (streaming_thread_) {
     std::cout << "Capture thread running; cannot configure camera" << std::endl;
   }
-  is_calibration_ = calibration;
-
-  // set manual white balance
-  v4l2_control c;
-  c.id = V4L2_CID_AUTO_WHITE_BALANCE;
-  c.value = 0;
-  SetAndCheckCameraSettings(c);
-
-  // set color temperature
-  c.id = V4L2_CID_WHITE_BALANCE_TEMPERATURE;
-  c.value = 4000;
-  SetAndCheckCameraSettings(c);
-
-  // manual exposure control
-  c.id = V4L2_CID_EXPOSURE_AUTO;
-  c.value = (calibration ? V4L2_EXPOSURE_AUTO : V4L2_EXPOSURE_MANUAL);
-  SetAndCheckCameraSettings(c);
-
-  // set exposure time
-  c.id = V4L2_CID_EXPOSURE_ABSOLUTE;
-  c.value = 10;
-  SetAndCheckCameraSettings(c);
-
-  // set manual focus
-  c.id = V4L2_CID_FOCUS_AUTO;
-  c.value = 0;
-  SetAndCheckCameraSettings(c);
-
-  // set focus
-  c.id = V4L2_CID_FOCUS_ABSOLUTE;
-  c.value = 0;
-  SetAndCheckCameraSettings(c);
 
   // set format
   v4l2_format format;
@@ -134,8 +102,9 @@ void V4LWebcam::Configure(bool calibration) {
   }
 }
 
-void V4LWebcam::StartStream() {
+void V4LWebcam::StartStream(bool calibration) {
   if (!streaming_thread_) {
+    is_calibration_ = calibration;
     // Activate streaming
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(descriptor_, VIDIOC_STREAMON, &type) < 0) {
@@ -146,17 +115,9 @@ void V4LWebcam::StartStream() {
     // For some reason, the c920 camera tends to reset exposure upon beginning
     // streaming
     // See: https://patchwork.linuxtv.org/patch/22822/
-    // As a workaround, force the ioctl update here.
-    // exposure control
-    v4l2_control c;
-    c.id = V4L2_CID_EXPOSURE_AUTO;
-    c.value = (is_calibration_ ? V4L2_EXPOSURE_AUTO : V4L2_EXPOSURE_MANUAL);
-    SetCameraSettings(c);
-
-    // set exposure time
-    c.id = V4L2_CID_EXPOSURE_ABSOLUTE;
-    c.value = 10;
-    SetCameraSettings(c);
+    // As a workaround, force the ioctl update here rather than before beginning
+    // streaming.
+    LoadSettings();
 
     streaming_thread_.reset(new std::thread([this]() mutable {
       v4l2_buffer bufferinfo;
@@ -180,7 +141,8 @@ void V4LWebcam::StartStream() {
         }
 
         // Enqueue the buffer
-        std::cout << "Enqueue buffer " << bufferinfo.index << std::endl;
+        // std::cout << "Enqueue buffer " << bufferinfo.index << std::endl;
+        // const auto capture_start_time = std::chrono::steady_clock::now();
         if (ioctl(descriptor_, VIDIOC_QBUF, &bufferinfo) < 0) {
           perror("VIDIOC_QBUF");
           exit(1);
@@ -191,14 +153,13 @@ void V4LWebcam::StartStream() {
           perror("VIDIOC_QBUF");
           exit(1);
         }
-        std::cout << "Dequeue buffer " << bufferinfo.index << std::endl;
-        const auto capture_time = std::chrono::steady_clock::now();
-
+        // std::cout << "Dequeue buffer " << bufferinfo.index << std::endl;
+        const auto capture_end_time = std::chrono::steady_clock::now();
         {
           // Update the latest buffer.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
           latest_capture_buffer_ = bufferinfo.index;
-          capture_times_[bufferinfo.index] = capture_time;
+          capture_times_[bufferinfo.index] = capture_end_time;
         }
         bufferinfo.index = (bufferinfo.index + 1) % kNumBuffers;
       }
@@ -236,12 +197,10 @@ std::pair<TimePoint, cv::Mat> V4LWebcam::DecodeLatestFrame() {
     buffer = processing_buffer_;
     rv.first = capture_times_[buffer];
   }
-  std::cout << "Decoding frame from buffer " << buffer << std::endl;
+  // std::cout << "Decoding frame from buffer " << buffer << std::endl;
   rv.second = cv::imdecode(
       cv::Mat(kRowsPixels, kColsPixels, CV_8UC3, capture_buffers_[buffer]),
       CV_LOAD_IMAGE_COLOR);
-  std::cout << "Size is " << rv.second.cols << " by " << rv.second.rows
-            << std::endl;
   {
     // Release the processing buffer
     std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
@@ -258,29 +217,62 @@ void V4LWebcam::SetCameraSettings(const v4l2_control& control) {
   }
 }
 
-bool V4LWebcam::SetAndCheckCameraSettings(const v4l2_control& control) {
-  int num_retries_left = 10;
+void V4LWebcam::LoadSettings() {
+  // set manual white balance
   v4l2_control c;
-  c.id = control.id;
-  c.value = control.value;
-  while (num_retries_left > 0) {
-    if (v4l2_ioctl(descriptor_, VIDIOC_G_CTRL, &c) == 0) {
-      if (c.value != control.value) {
-        SetCameraSettings(control);
-      } else {
-        std::cout << "Property " << c.id << " already at the desired value"
-                  << std::endl;
-        return true;
-      }
-    } else {
-      std::cerr << "Could not get property" << std::endl;
-      return false;
-    }
-    num_retries_left--;
-    std::cout << "Checking property " << c.id << " again..." << std::endl;
-  }
-  exit(1);
-  return false;
+  c.id = V4L2_CID_AUTO_WHITE_BALANCE;
+  c.value = 0;
+  SetCameraSettings(c);
+
+  // set color temperature
+  c.id = V4L2_CID_WHITE_BALANCE_TEMPERATURE;
+  c.value = 4000;
+  SetCameraSettings(c);
+
+  // set brightness
+  c.id = V4L2_CID_BRIGHTNESS;
+  c.value = 20;
+  SetCameraSettings(c);
+
+  // set contrast
+  c.id = V4L2_CID_CONTRAST;
+  c.value = 128;
+  SetCameraSettings(c);
+
+  // set saturation
+  c.id = V4L2_CID_SATURATION;
+  c.value = 255;
+  SetCameraSettings(c);
+
+  // set gain
+  c.id = V4L2_CID_GAIN;
+  c.value = 20;
+  SetCameraSettings(c);
+
+  // set sharpness
+  c.id = V4L2_CID_SHARPNESS;
+  c.value = 255;
+  SetCameraSettings(c);
+
+  // set manual focus
+  c.id = V4L2_CID_FOCUS_AUTO;
+  c.value = 0;
+  SetCameraSettings(c);
+
+  // set focus
+  c.id = V4L2_CID_FOCUS_ABSOLUTE;
+  c.value = 0;
+  SetCameraSettings(c);
+
+  // manual exposure control
+  c.id = V4L2_CID_EXPOSURE_AUTO;
+  c.value = (is_calibration_ ? V4L2_EXPOSURE_AUTO : V4L2_EXPOSURE_MANUAL);
+  SetCameraSettings(c);
+
+  // set exposure time
+  c.id = V4L2_CID_EXPOSURE_ABSOLUTE;
+  c.value = 10;
+  SetCameraSettings(c);
 }
 
 }  // namespace team254

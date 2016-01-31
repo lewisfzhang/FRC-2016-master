@@ -104,7 +104,6 @@ void App::run() {
   c.id = V4L2_CID_EXPOSURE_ABSOLUTE;
   c.value = 10;
   SetAndCheckCameraSettings(c, descriptor);
-Parameters:
 
   // set manual focus
   c.id = V4L2_CID_FOCUS_AUTO;
@@ -280,7 +279,7 @@ Parameters:
     */
     // INSERT OPENCVhierarchy CALLS HERE
     std::cout << "Frame is " << frame.cols << " x " << frame.rows << std::endl;
-    cv::imshow("opencv_webcam", frame_morphology2);
+    cv::imshow("opencv_webcam", frame);
   }
 
   if (ioctl(descriptor, VIDIOC_STREAMOFF, &type) < 0) {
