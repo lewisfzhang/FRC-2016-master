@@ -3,6 +3,7 @@
 #include <string>
 #include <thread>
 #include <iomanip>
+#include <mutex>
 #include <stdexcept>
 #include <libv4l2.h>
 #include <linux/videodev2.h>
@@ -15,7 +16,7 @@
 
 const int kRowsPixels = 1080;
 const int kColsPixels = 1920;
-const int kNumBuffers = 16;
+const int kNumBuffers = 4;
 
 namespace team254 {
 
@@ -39,7 +40,7 @@ class V4LWebcam {
   bool is_calibration_;
   bool is_configured_;
   std::atomic<bool> stop_streaming_;
-  std::thread streaming_thread_;
+  std::unique_ptr<std::thread> streaming_thread_;
 
   std::mutex buffer_bookkeeping_mutex_;
   // Which buffer is locked for use by a processing operation
@@ -57,5 +58,4 @@ class V4LWebcam {
   void SetCameraSettings(const v4l2_control& control);
   bool SetAndCheckCameraSettings(const v4l2_control& control);
 };
-
 }

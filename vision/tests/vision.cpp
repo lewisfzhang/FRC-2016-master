@@ -32,7 +32,7 @@ void App::run() {
   cv::Mat frame_morphology;
   cv::Mat frame_morphology2;
 
-  webcam.StartStreaming(std::move(callback));
+  webcam.StartStream();
   while (true) {
     cv::Mat frame = webcam.DecodeLatestFrame().second;
     cv::cvtColor(frame, frame_hsv, cv::COLOR_BGR2HSV);

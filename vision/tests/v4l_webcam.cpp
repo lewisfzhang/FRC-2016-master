@@ -9,7 +9,7 @@ V4LWebcam::V4LWebcam(const std::string& device)
       processing_buffer_(-1),
       latest_capture_buffer_(-1),
       device_(device) {
-  descriptor_ = v4l2_open(device_, O_RDWR);
+  descriptor_ = v4l2_open(device_.c_str(), O_RDWR);
   if (descriptor_ < 0) {
     perror("v4l2_open");
     exit(1);
@@ -31,6 +31,7 @@ V4LWebcam::V4LWebcam(const std::string& device)
 V4LWebcam::~V4LWebcam() {
   if (streaming_thread_) {
     StopStream();
+    streaming_thread_.reset();
   }
   if (is_configured_) {
     for (size_t i = 0; i < kNumBuffers; ++i) {
@@ -40,7 +41,7 @@ V4LWebcam::~V4LWebcam() {
   v4l2_close(descriptor_);
 }
 
-void V4LWebcam::Configure(bool calibration = false) {
+void V4LWebcam::Configure(bool calibration) {
   is_configured_ = true;
   if (streaming_thread_) {
     std::cout << "Capture thread running; cannot configure camera";
@@ -107,7 +108,7 @@ void V4LWebcam::Configure(bool calibration = false) {
   }
 
   // allocate buffers
-  v4l_buffer bufferinfo;
+  v4l2_buffer bufferinfo;
   memset(&bufferinfo, 0, sizeof(bufferinfo));
 
   bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -137,13 +138,13 @@ void V4LWebcam::Configure(bool calibration = false) {
 void V4LWebcam::StartStream() {
   if (!streaming_thread_) {
     // Activate streaming
-    v4l_buffer bufferinfo;
+    v4l2_buffer bufferinfo;
     memset(&bufferinfo, 0, sizeof(bufferinfo));
     bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    bufferinfo.memory = V4L2_MEMORY_MAP;
+    bufferinfo.memory = V4L2_MEMORY_MMAP;
     bufferinfo.index = 0;
     int type = bufferinfo.type;
-    if (ioctl(descriptor, VIDIOC_STREAMON, &type) < 0) {
+    if (ioctl(descriptor_, VIDIOC_STREAMON, &type) < 0) {
       std::cerr << "Could not start streaming" << std::endl;
       return;
     }
@@ -153,21 +154,22 @@ void V4LWebcam::StartStream() {
     // See: https://patchwork.linuxtv.org/patch/22822/
     // As a workaround, force the ioctl update here.
     // exposure control
+    v4l2_control c;
     c.id = V4L2_CID_EXPOSURE_AUTO;
-    c.value = (is_calibration_ ? V4L2_EXPOSURE_AUTO : V4L2_EXPOSURE_MANUAL_);
-    SetCameraSettings(c, descriptor);
+    c.value = (is_calibration_ ? V4L2_EXPOSURE_AUTO : V4L2_EXPOSURE_MANUAL);
+    SetCameraSettings(c);
 
     // set exposure time
     c.id = V4L2_CID_EXPOSURE_ABSOLUTE;
     c.value = 10;
-    SetCameraSettings(c, descriptor);
+    SetCameraSettings(c);
 
-    streaming_thread_ = [this, bufferinfo]() {
+    streaming_thread_.reset(new std::thread([this, bufferinfo]() mutable {
       while (!stop_streaming_) {
         {
           // Figure out which buffer to read into.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
-          if (processing_buffer_ == bufferinfo.index) {
+          if (processing_buffer_ == static_cast<int>(bufferinfo.index)) {
             bufferinfo.index = (bufferinfo.index + 1) % kNumBuffers;
             std::cerr << "Capture buffer wrapped around";
           }
@@ -190,7 +192,7 @@ void V4LWebcam::StartStream() {
           // Update the latest buffer.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
           latest_capture_buffer_ = bufferinfo.index;
-          capture_times_[i] = capture_time;
+          capture_times_[bufferinfo.index] = capture_time;
         }
         bufferinfo.index = (bufferinfo.index + 1) % kNumBuffers;
       }
@@ -201,19 +203,21 @@ void V4LWebcam::StartStream() {
         exit(1);
       }
       stop_streaming_ = false;
-    };
+    }));
   }
 }
 
 void V4LWebcam::StopStream() {
   if (streaming_thread_) {
     stop_streaming_ = true;
-    streaming_thread_.join();
+    streaming_thread_->join();
+    streaming_thread_.reset();
   }
 }
 
 std::pair<TimePoint, cv::Mat> V4LWebcam::DecodeLatestFrame() {
-  std::pair<TimePoint, cv::Mat> rv = std::make_pair(TimePoint::min(), cv::Mat());
+  std::pair<TimePoint, cv::Mat> rv =
+      std::make_pair(TimePoint::min(), cv::Mat());
   int buffer = -1;
   {
     std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
