@@ -14,7 +14,8 @@ public class DriveSignal {
 
     public static DriveSignal NEUTRAL = new DriveSignal(0, 0);
 
+    @Override
     public String toString() {
-        return "L: " + leftMotor +  ", R: " + rightMotor;
+        return "L: " + leftMotor + ", R: " + rightMotor;
     }
 }

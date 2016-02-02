@@ -1,6 +1,5 @@
 package com.team254.frc2016;
 
-
 import com.team254.lib.util.ConstantsBase;
 
 public class Constants extends ConstantsBase {

@@ -5,7 +5,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,9 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class MqttSender implements Runnable, MqttCallback {
 
     public enum QOS {
-        BEST_EFFORT(0),
-        AT_LEAST_ONCE(1),
-        EXACTLY_ONCE(2);
+        BEST_EFFORT(0), AT_LEAST_ONCE(1), EXACTLY_ONCE(2);
 
         private final int mQosValue;
 
@@ -39,10 +36,7 @@ public class MqttSender implements Runnable, MqttCallback {
     public MqttSender(String mqttBrokerServer) throws MqttException {
         mLogQueue = new ConcurrentLinkedQueue<>();
         synchronized (this) {
-            mMqttClient = new MqttClient(
-                    mqttBrokerServer,
-                    "robot_" + UUID.randomUUID(),
-                    new MemoryPersistence());
+            mMqttClient = new MqttClient(mqttBrokerServer, "robot_" + UUID.randomUUID(), new MemoryPersistence());
             mMqttClient.setCallback(this);
         }
 
@@ -65,10 +59,12 @@ public class MqttSender implements Runnable, MqttCallback {
     }
 
     @Override
-    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {}
+    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+    }
 
     @Override
-    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
+    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+    }
 
     @Override
     public void run() {

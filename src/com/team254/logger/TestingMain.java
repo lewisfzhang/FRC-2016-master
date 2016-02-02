@@ -1,7 +1,8 @@
 package com.team254.logger;
 
 /**
- * A java main method implementation for testing code by running it on your laptop
+ * A java main method implementation for testing code by running it on your
+ * laptop
  */
 public class TestingMain {
 
@@ -13,15 +14,13 @@ public class TestingMain {
 
         int modeChangeCount = 0;
         while (true) {
-            cheesyLogger.sendTimePlotPoint(
-                    "my_plot",
-                    "test_value",
-                    System.currentTimeMillis() % 10000);
+            cheesyLogger.sendTimePlotPoint("my_plot", "test_value", System.currentTimeMillis() % 10000);
 
             modeChangeCount++;
             if (modeChangeCount == 10) {
                 cheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
-            } if (modeChangeCount == 20) {
+            }
+            if (modeChangeCount == 20) {
                 cheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
                 modeChangeCount = 0;
             }

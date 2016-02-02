@@ -10,9 +10,7 @@ import java.util.HashMap;
 public class CheesyLogger {
 
     public static enum CompetitionState {
-        DISABLED("disabled"),
-        TELEOP("teleop"),
-        AUTO("auto");
+        DISABLED("disabled"), TELEOP("teleop"), AUTO("auto");
 
         private final String mWireValue;
 
@@ -39,6 +37,7 @@ public class CheesyLogger {
 
     /**
      * Send a text log message.
+     * 
      * @param message
      */
     public void sendLogMessage(String message) {
@@ -48,11 +47,16 @@ public class CheesyLogger {
     }
 
     /**
-     * Send a value point which should be plotted against the current time in a time-series plot.
-     * @param category Which plot this data should go on
-     * @param field Which data in this line this point is assocaited with (aka, which line it
-     *              belongs to)
-     * @param value The poisition of the point on the plot
+     * Send a value point which should be plotted against the current time in a
+     * time-series plot.
+     * 
+     * @param category
+     *            Which plot this data should go on
+     * @param field
+     *            Which data in this line this point is assocaited with (aka,
+     *            which line it belongs to)
+     * @param value
+     *            The poisition of the point on the plot
      */
     public void sendTimePlotPoint(String category, String field, double value) {
         HashMap<String, String> payload = makeEmptyLogPayload("timeplot");
@@ -74,6 +78,5 @@ public class CheesyLogger {
         result.put("type", type);
         return result;
     }
-
 
 }

@@ -36,12 +36,13 @@ public abstract class ConstantsBase {
             this.value = value;
         }
 
+        @Override
         public boolean equals(Object o) {
             String itsName = ((Constant) o).name;
             Class itsType = ((Constant) o).type;
             Object itsValue = ((Constant) o).value;
-            return o instanceof Constant && this.name.equals(itsName)
-                    && this.type.equals(itsType) && this.value.equals(itsValue);
+            return o instanceof Constant && this.name.equals(itsName) && this.type.equals(itsType)
+                    && this.value.equals(itsValue);
         }
     }
 
@@ -67,8 +68,7 @@ public abstract class ConstantsBase {
         boolean success = false;
         Field[] declaredFields = this.getClass().getDeclaredFields();
         for (Field field : declaredFields) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
-                    && field.getName().equals(name)) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) && field.getName().equals(name)) {
                 try {
                     Object current = field.get(this);
                     field.set(this, value);
@@ -87,8 +87,7 @@ public abstract class ConstantsBase {
     public Object getValueForConstant(String name) throws Exception {
         Field[] declaredFields = this.getClass().getDeclaredFields();
         for (Field field : declaredFields) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
-                    && field.getName().equals(name)) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) && field.getName().equals(name)) {
                 try {
                     return field.get(this);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -102,11 +101,9 @@ public abstract class ConstantsBase {
     public Constant getConstant(String name) {
         Field[] declaredFields = this.getClass().getDeclaredFields();
         for (Field field : declaredFields) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
-                    && field.getName().equals(name)) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers()) && field.getName().equals(name)) {
                 try {
-                    return new Constant(field.getName(), field.getType(),
-                            field.get(this));
+                    return new Constant(field.getName(), field.getType(), field.get(this));
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -130,14 +127,12 @@ public abstract class ConstantsBase {
 
     private Collection<Constant> getAllConstants() {
         Field[] declaredFields = this.getClass().getDeclaredFields();
-        List<Constant> constants = new ArrayList<Constant>(
-                declaredFields.length);
+        List<Constant> constants = new ArrayList<Constant>(declaredFields.length);
         for (Field field : declaredFields) {
             if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
                 Constant c;
                 try {
-                    c = new Constant(field.getName(), field.getType(),
-                            field.get(this));
+                    c = new Constant(field.getName(), field.getType(), field.get(this));
                     constants.add(c);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     // TODO Auto-generated catch block
@@ -148,8 +143,7 @@ public abstract class ConstantsBase {
         return constants;
     }
 
-    public JSONObject getJSONObjectFromFile() throws IOException,
-            ParseException {
+    public JSONObject getJSONObjectFromFile() throws IOException, ParseException {
         File file = getFile();
         if (file == null || !file.exists()) {
             return new JSONObject();
@@ -167,8 +161,7 @@ public abstract class ConstantsBase {
             for (Object o : keys) {
                 String key = (String) o;
                 Object value = jsonObject.get(o);
-                if (value instanceof Long
-                        && getConstant(key).type.equals(int.class)) {
+                if (value instanceof Long && getConstant(key).type.equals(int.class)) {
                     value = new BigDecimal((Long) value).intValueExact();
                 }
                 setConstantRaw(key, value);
