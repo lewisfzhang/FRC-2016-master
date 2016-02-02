@@ -9,14 +9,18 @@ import java.util.Map;
  * 
  * @param <K>
  *            The NUMERICAL type of the key (must extend number)
+ * @param <T>
+ *            The type of the value
  * @param <V>
- *            The AVERAGEABLE type of the value (must implement Averageable)
+ *            The INTERPOLABLE type of the value (must implement Interpolable)
  */
-public class InterpolatingTreeMap<K extends Number, V extends Averageable> extends TreeMap<K, V> {
-    Integer max;
+public class InterpolatingTreeMap<K extends Number, V extends Interpolable<V>> extends TreeMap<K, V> {
+    private static final long serialVersionUID = 8347275262778054124L;
+
+    Integer max_;
 
     public InterpolatingTreeMap(int maximumSize) {
-        max = maximumSize;
+        max_ = maximumSize;
     }
 
     public InterpolatingTreeMap() {
@@ -33,7 +37,7 @@ public class InterpolatingTreeMap<K extends Number, V extends Averageable> exten
      */
     @Override
     public V put(K key, V value) {
-        if (max != null && max <= size()) {
+        if (max_ != null && max_ <= size()) {
             // "Prune" the tree if it is oversize
             K first = firstKey();
             remove(first);
@@ -53,7 +57,7 @@ public class InterpolatingTreeMap<K extends Number, V extends Averageable> exten
      *
      * @param key
      *            Lookup for a value (does not have to exist)
-     * @return V or null; V if it is averageable or exists, null if it is at a
+     * @return V or null; V if it is Interpolable or exists, null if it is at a
      *         bound and cannot average
      */
     public V getInterpolated(K key) {
@@ -63,9 +67,15 @@ public class InterpolatingTreeMap<K extends Number, V extends Averageable> exten
             K topBound = ceilingKey(key);
             K bottomBound = floorKey(key);
 
-            // If attempting interploation at ends of tree, return null
-            if (topBound == null || bottomBound == null)
+            // If attempting interpolation at ends of tree, return the nearest
+            // data point
+            if (topBound == null && bottomBound == null) {
                 return null;
+            } else if (topBound == null) {
+                return get(bottomBound);
+            } else if (bottomBound == null) {
+                return get(topBound);
+            }
 
             // Get surrounding values for interpolation
             V topElem = get(topBound);
@@ -73,7 +83,7 @@ public class InterpolatingTreeMap<K extends Number, V extends Averageable> exten
 
             // Number xValue, Number highXValue, Number highYValue, Number
             // searchedForValue
-            return (V) bottomElem.average(bottomBound, topBound, topElem, key);
+            return (V) bottomElem.interpolate(bottomBound, topBound, topElem, key);
         } else {
             return gotval;
         }
