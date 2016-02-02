@@ -7,7 +7,7 @@ import java.lang.Exception;
 /**
  * Interpolating Tree Maps are used to get values at points that are not defined by making a guess from points that are defined
  * @param <K> The NUMERICAL type of the key (must extend number)
- * @param <V> The AVERAGEABLE type of the value (must implement averageable)
+ * @param <V> The AVERAGEABLE type of the value (must implement Averageable)
  */
 public class InterpolatingTreeMap<K extends Number, V extends Averageable> extends TreeMap<K, V> {
     Integer max;
