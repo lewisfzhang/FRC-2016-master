@@ -40,4 +40,11 @@ public class TestVisionUpdate {
         VisionUpdate v = VisionUpdate.generateFromJsonString(s);
         assertFalse(v.isValid());
     }
+
+    @Test
+    public void testBadDataType() {
+        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"theta\":\"notanumber\",\"distance\":15.3}]}";
+        VisionUpdate v = VisionUpdate.generateFromJsonString(s);
+        assertFalse(v.isValid());
+    }
 }

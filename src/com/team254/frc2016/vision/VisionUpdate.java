@@ -38,6 +38,9 @@ public class VisionUpdate {
             update.targets = targetInfos;
             update.valid = true;
         } catch (ParseException e) {
+            System.err.println("Parse error: " + e);
+        } catch (ClassCastException e) {
+            System.err.println("Data type error: " + e);
         }
         return update;
     }
