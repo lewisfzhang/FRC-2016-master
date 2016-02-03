@@ -4,6 +4,8 @@ import com.team254.lib.util.ConstantsBase;
 
 public class Constants extends ConstantsBase {
 
+    public static int kVisionUDPPort = 5254;
+
     // Do not change anything after this line!
     // Talons
     public static int kTurretTalonId = 9;
