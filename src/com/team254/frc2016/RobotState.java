@@ -24,7 +24,7 @@ import com.team254.lib.util.Translation2d;
  * 4. Turret rotating frame: origin is the center of the turret as it rotates
  * 
  * 5. Camera frame: origin is the center of the camera imager as it rotates with
- * the camera
+ * the turret
  * 
  * As a simple kinematic chain with 5 frames, there are 4 transforms of
  * interest:
