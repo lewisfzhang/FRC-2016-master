@@ -7,7 +7,7 @@ public class Constants extends ConstantsBase {
     public static double kTurretXOffset = -10.0;
     public static double kTurretYOffset = 0.0;
     public static double kTurretAngleOffsetDegrees = 0.0;
-    
+
     // Pose of the camera frame w.r.t. the turret frame
     public static double kCameraXOffset = -5.0;
     public static double kCameraYOffset = 0.0;

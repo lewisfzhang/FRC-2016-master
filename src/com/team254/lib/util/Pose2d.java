@@ -74,4 +74,8 @@ public class Pose2d implements Interpolable<Pose2d> {
         return new Pose2d(translation_.interpolate(xValue, otherXValue, otherYValue.translation_, interpolatedXValue),
                 rotation_.interpolate(xValue, otherXValue, otherYValue.rotation_, interpolatedXValue));
     }
+
+    public String toString() {
+        return "T:" + translation_.toString() + ", R:" + rotation_.toString();
+    }
 }

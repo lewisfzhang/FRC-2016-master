@@ -1,5 +1,7 @@
 package com.team254.lib.util;
 
+import java.text.DecimalFormat;
+
 /**
  * A translation in a 2d coordinate frame.
  * 
@@ -61,7 +63,13 @@ public class Translation2d implements Interpolable<Translation2d> {
         if (xValue.doubleValue() == otherXValue.doubleValue()) {
             return new Translation2d(this);
         }
-        double interp = interpolatedXValue.doubleValue() / (otherXValue.doubleValue() - xValue.doubleValue());
+        double interp = (interpolatedXValue.doubleValue() - xValue.doubleValue())
+                / (otherXValue.doubleValue() - xValue.doubleValue());
         return new Translation2d(interp * (otherYValue.x_ - x_) + x_, interp * (otherYValue.y_ - y_) + y_);
+    }
+
+    public String toString() {
+        final DecimalFormat fmt = new DecimalFormat("#0.000");
+        return "(" + fmt.format(x_) + "," + fmt.format(y_) + ")";
     }
 }

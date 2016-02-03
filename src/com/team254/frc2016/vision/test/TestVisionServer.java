@@ -1,6 +1,5 @@
 package com.team254.frc2016.vision.test;
 
-
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
@@ -8,7 +7,7 @@ import com.team254.frc2016.vision.VisionUpdateReciever;
 
 public class TestVisionServer {
 
-    public static class TestReceiver implements VisionUpdateReciever{
+    public static class TestReceiver implements VisionUpdateReciever {
 
         @Override
         public void gotUpdate(VisionUpdate update) {

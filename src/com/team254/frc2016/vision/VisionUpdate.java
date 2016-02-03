@@ -1,6 +1,5 @@
 package com.team254.frc2016.vision;
 
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,7 +14,7 @@ public class VisionUpdate {
     protected List<TargetInfo> targets;
     protected long capturedAtMs = 0;
 
-    private static JSONParser parser  = new JSONParser();
+    private static JSONParser parser = new JSONParser();
 
     // Example json string
     // { "capturedAgoMs" : 100, "targets": [{"theta": 5.4, "distance": 5.5}] }

@@ -57,12 +57,11 @@ public class RobotState {
     protected InterpolatingTreeMap<Long, Pose2d> odometric_to_vehicle_;
     protected InterpolatingTreeMap<Long, Rotation2d> turret_rotation_;
 
-    public RobotState(Pose2d initial_odometric_to_vehicle, Rotation2d initial_turret_fixed_to_turret_rotating) {
-        long now = System.nanoTime();
+    public RobotState(long start_time, Pose2d initial_odometric_to_vehicle, Rotation2d initial_turret_rotation) {
         odometric_to_vehicle_ = new InterpolatingTreeMap<Long, Pose2d>(kObservationBufferSize);
-        odometric_to_vehicle_.put(now, initial_odometric_to_vehicle);
+        odometric_to_vehicle_.put(start_time, initial_odometric_to_vehicle);
         turret_rotation_ = new InterpolatingTreeMap<Long, Rotation2d>(kObservationBufferSize);
-        turret_rotation_.put(now, initial_turret_fixed_to_turret_rotating);
+        turret_rotation_.put(start_time, initial_turret_rotation);
     }
 
     public synchronized Pose2d getOdometricToVehicle(long timestamp) {
@@ -106,12 +105,11 @@ public class RobotState {
     public Pose2d generateOdometryFromSensors(double left_encoder_delta_distance, double right_encoder_delta_distance,
             Rotation2d current_gyro_angle) {
         Pose2d last_measurement = getLatestOdometricToVehicle().getValue();
-        // Use average encoder distance for translation, and average gyro
-        // reading from previous to current measurement for rotation.
         Pose2d differential_pose = new Pose2d(
                 new Translation2d((left_encoder_delta_distance + right_encoder_delta_distance) / 2, 0),
-                Rotation2d.fromRadians(
-                        (last_measurement.getRotation().inverse().rotateBy(current_gyro_angle)).getRadians() / 2));
-        return last_measurement.transformBy(differential_pose);
+                last_measurement.getRotation().inverse().rotateBy(current_gyro_angle));
+        Pose2d new_observation = last_measurement.transformBy(differential_pose);
+        new_observation.getRotation().normalize();
+        return new_observation;
     }
 }

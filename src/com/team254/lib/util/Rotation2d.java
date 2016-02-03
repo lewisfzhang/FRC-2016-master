@@ -1,5 +1,7 @@
 package com.team254.lib.util;
 
+import java.text.DecimalFormat;
+
 /**
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
@@ -88,7 +90,13 @@ public class Rotation2d implements Interpolable<Rotation2d> {
             return new Rotation2d(this);
         }
         double angle_diff = inverse().rotateBy(otherYValue).getRadians();
-        double interp = interpolatedXValue.doubleValue() / (otherXValue.doubleValue() - xValue.doubleValue());
+        double interp = (interpolatedXValue.doubleValue() - xValue.doubleValue())
+                / (otherXValue.doubleValue() - xValue.doubleValue());
         return this.rotateBy(Rotation2d.fromRadians(angle_diff * interp));
+    }
+
+    public String toString() {
+        final DecimalFormat fmt = new DecimalFormat("#0.000");
+        return "(" + fmt.format(getDegrees()) + " deg)";
     }
 }
