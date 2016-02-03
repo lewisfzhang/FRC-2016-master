@@ -13,17 +13,20 @@ public class VisionUpdate {
     protected boolean valid = false;
     protected long capturedAgoMs;
     protected List<TargetInfo> targets;
+    protected long capturedAtMs = 0;
 
     private static JSONParser parser  = new JSONParser();
 
     // Example json string
     // { "capturedAgoMs" : 100, "targets": [{"theta": 5.4, "distance": 5.5}] }
     public static VisionUpdate generateFromJsonString(String updateString) {
+        long startMs = System.currentTimeMillis();
         VisionUpdate update = new VisionUpdate();
         try {
             JSONObject j = (JSONObject) parser.parse(updateString);
             long capturedAgoMs = (long) j.get("capturedAgoMs");
             update.capturedAgoMs = capturedAgoMs;
+            update.capturedAtMs = startMs - capturedAgoMs;
             JSONArray targets = (JSONArray) j.get("targets");
             ArrayList<TargetInfo> targetInfos = new ArrayList<>(targets.size());
             for (Object targetObj : targets) {
@@ -51,5 +54,8 @@ public class VisionUpdate {
         return capturedAgoMs;
     }
 
+    public long getCapturedAtMs() {
+        return capturedAtMs;
+    }
 
 }

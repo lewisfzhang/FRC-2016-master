@@ -14,6 +14,8 @@ public class TestVisionServer {
         public void gotUpdate(VisionUpdate update) {
             System.out.println("Got update!");
             System.out.println("-- Time ago: " + update.getCapturedAgoMs());
+            System.out.println("-- Time captured: " + update.getCapturedAtMs());
+            System.out.println("-- Now: " + System.currentTimeMillis());
             System.out.println("-- Num targets: " + update.getTargets().size());
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
