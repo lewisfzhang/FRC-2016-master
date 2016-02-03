@@ -11,7 +11,7 @@ package com.team254.lib.util;
  * 
  * @author Jared
  */
-public class Rotation2d {
+public class Rotation2d implements Interpolable<Rotation2d> {
     protected static final double kEpsilon = 1E-9;
 
     protected double cos_angle_;
@@ -27,6 +27,11 @@ public class Rotation2d {
         if (normalize) {
             normalize();
         }
+    }
+
+    public Rotation2d(Rotation2d other) {
+        cos_angle_ = other.cos_angle_;
+        sin_angle_ = other.sin_angle_;
     }
 
     public static Rotation2d fromRadians(double angle_radians) {
@@ -75,5 +80,15 @@ public class Rotation2d {
 
     public Rotation2d inverse() {
         return new Rotation2d(cos_angle_, -sin_angle_, false);
+    }
+
+    public Rotation2d interpolate(Number xValue, Number otherXValue, Rotation2d otherYValue,
+            Number interpolatedXValue) {
+        if (xValue.doubleValue() == otherXValue.doubleValue()) {
+            return new Rotation2d(this);
+        }
+        double angle_diff = inverse().rotateBy(otherYValue).getRadians();
+        double interp = interpolatedXValue.doubleValue() / (otherXValue.doubleValue() - xValue.doubleValue());
+        return this.rotateBy(Rotation2d.fromRadians(angle_diff * interp));
     }
 }

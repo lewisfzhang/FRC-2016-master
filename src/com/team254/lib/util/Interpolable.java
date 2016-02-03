@@ -38,5 +38,5 @@ public interface Interpolable<T> {
      * @return Interpolable<T> The estimated average between the surrounding
      *         data
      */
-    public T interpolate(Number xValue, Number otherXValue, Interpolable<T> otherYValue, Number interpolatedXValue);
+    public T interpolate(Number xValue, Number otherXValue, T otherYValue, Number interpolatedXValue);
 }

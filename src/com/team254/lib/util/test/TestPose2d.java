@@ -76,6 +76,32 @@ public class TestPose2d {
         assertEquals(identity.cos(), rot2.cos(), kTestEpsilon);
         assertEquals(identity.sin(), rot2.sin(), kTestEpsilon);
         assertEquals(identity.getDegrees(), rot2.getDegrees(), kTestEpsilon);
+
+        // Test interpolation
+        rot1 = Rotation2d.fromDegrees(45);
+        rot2 = Rotation2d.fromDegrees(135);
+        rot3 = rot1.interpolate(0, 1, rot2, .5);
+        assertEquals(90, rot3.getDegrees(), kTestEpsilon);
+
+        rot1 = Rotation2d.fromDegrees(45);
+        rot2 = Rotation2d.fromDegrees(135);
+        rot3 = rot1.interpolate(0, 1, rot2, .75);
+        assertEquals(112.5, rot3.getDegrees(), kTestEpsilon);
+
+        rot1 = Rotation2d.fromDegrees(45);
+        rot2 = Rotation2d.fromDegrees(-45);
+        rot3 = rot1.interpolate(0, 1, rot2, .5);
+        assertEquals(0, rot3.getDegrees(), kTestEpsilon);
+
+        rot1 = Rotation2d.fromDegrees(45);
+        rot2 = Rotation2d.fromDegrees(45);
+        rot3 = rot1.interpolate(0, 1, rot2, .5);
+        assertEquals(45, rot3.getDegrees(), kTestEpsilon);
+
+        rot1 = Rotation2d.fromDegrees(45);
+        rot2 = Rotation2d.fromDegrees(45);
+        rot3 = rot1.interpolate(1, 1, rot2, .5);
+        assertEquals(45, rot3.getDegrees(), kTestEpsilon);
     }
 
     @Test
@@ -134,6 +160,19 @@ public class TestPose2d {
         assertEquals(identity.getX(), pos2.getX(), kTestEpsilon);
         assertEquals(identity.getY(), pos2.getY(), kTestEpsilon);
         assertEquals(identity.norm(), pos2.norm(), kTestEpsilon);
+
+        // Test interpolation
+        pos1 = new Translation2d(0, 1);
+        pos2 = new Translation2d(10, -1);
+        pos3 = pos1.interpolate(0, 1, pos2, .5);
+        assertEquals(5, pos3.getX(), kTestEpsilon);
+        assertEquals(0, pos3.getY(), kTestEpsilon);
+
+        pos1 = new Translation2d(0, 1);
+        pos2 = new Translation2d(10, -1);
+        pos3 = pos1.interpolate(0, 1, pos2, .75);
+        assertEquals(7.5, pos3.getX(), kTestEpsilon);
+        assertEquals(-.5, pos3.getY(), kTestEpsilon);
     }
 
     @Test
@@ -171,5 +210,20 @@ public class TestPose2d {
         assertEquals(identity.getTranslation().getX(), pose2.getTranslation().getX(), kTestEpsilon);
         assertEquals(identity.getTranslation().getY(), pose2.getTranslation().getY(), kTestEpsilon);
         assertEquals(identity.getRotation().getDegrees(), pose2.getRotation().getDegrees(), kTestEpsilon);
+
+        // Test interpolation
+        pose1 = new Pose2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
+        pose2 = new Pose2d(new Translation2d(13, -6), Rotation2d.fromDegrees(-90));
+        pose3 = pose1.interpolate(0, 1, pose2, .5);
+        assertEquals(8, pose3.getTranslation().getX(), kTestEpsilon);
+        assertEquals(-1, pose3.getTranslation().getY(), kTestEpsilon);
+        assertEquals(0, pose3.getRotation().getDegrees(), kTestEpsilon);
+
+        pose1 = new Pose2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
+        pose2 = new Pose2d(new Translation2d(13, -6), Rotation2d.fromDegrees(-90));
+        pose3 = pose1.interpolate(0, 1, pose2, .75);
+        assertEquals(10.5, pose3.getTranslation().getX(), kTestEpsilon);
+        assertEquals(-3.5, pose3.getTranslation().getY(), kTestEpsilon);
+        assertEquals(-45, pose3.getRotation().getDegrees(), kTestEpsilon);
     }
 }

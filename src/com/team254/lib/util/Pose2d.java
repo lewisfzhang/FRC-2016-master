@@ -12,7 +12,7 @@ package com.team254.lib.util;
  * 
  * @author Jared
  */
-public class Pose2d {
+public class Pose2d implements Interpolable<Pose2d> {
     protected Translation2d translation_;
     protected Rotation2d rotation_;
 
@@ -24,6 +24,11 @@ public class Pose2d {
     public Pose2d(Translation2d translation, Rotation2d rotation) {
         translation_ = translation;
         rotation_ = rotation;
+    }
+
+    public Pose2d(Pose2d other) {
+        translation_ = new Translation2d(other.translation_);
+        rotation_ = new Rotation2d(other.rotation_);
     }
 
     public static Pose2d fromTranslation(Translation2d translation) {
@@ -58,5 +63,15 @@ public class Pose2d {
     public Pose2d inverse() {
         Rotation2d rotation_inverted = rotation_.inverse();
         return new Pose2d(translation_.inverse().rotateBy(rotation_inverted), rotation_inverted);
+    }
+
+    // This currently does Riemannian interpolation. We could do twist
+    // interpolation if necessary.
+    public Pose2d interpolate(Number xValue, Number otherXValue, Pose2d otherYValue, Number interpolatedXValue) {
+        if (xValue.doubleValue() == otherXValue.doubleValue()) {
+            return new Pose2d(this);
+        }
+        return new Pose2d(translation_.interpolate(xValue, otherXValue, otherYValue.translation_, interpolatedXValue),
+                rotation_.interpolate(xValue, otherXValue, otherYValue.rotation_, interpolatedXValue));
     }
 }

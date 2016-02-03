@@ -5,7 +5,7 @@ package com.team254.lib.util;
  * 
  * @author Jared
  */
-public class Translation2d {
+public class Translation2d implements Interpolable<Translation2d> {
     protected double x_;
     protected double y_;
 
@@ -17,6 +17,11 @@ public class Translation2d {
     public Translation2d(double x, double y) {
         x_ = x;
         y_ = y;
+    }
+
+    public Translation2d(Translation2d other) {
+        x_ = other.x_;
+        y_ = other.y_;
     }
 
     public double norm() {
@@ -49,5 +54,14 @@ public class Translation2d {
 
     public Translation2d inverse() {
         return new Translation2d(-x_, -y_);
+    }
+
+    public Translation2d interpolate(Number xValue, Number otherXValue, Translation2d otherYValue,
+            Number interpolatedXValue) {
+        if (xValue.doubleValue() == otherXValue.doubleValue()) {
+            return new Translation2d(this);
+        }
+        double interp = interpolatedXValue.doubleValue() / (otherXValue.doubleValue() - xValue.doubleValue());
+        return new Translation2d(interp * (otherYValue.x_ - x_) + x_, interp * (otherYValue.y_ - y_) + y_);
     }
 }
