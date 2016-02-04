@@ -31,14 +31,14 @@ public class TestPose2d {
         rot1 = Rotation2d.fromRadians(Math.PI / 2);
         assertEquals(0, rot1.cos(), kTestEpsilon);
         assertEquals(1, rot1.sin(), kTestEpsilon);
-        assert (1 / kTestEpsilon < rot1.tan());
+        assertTrue(1 / kTestEpsilon < rot1.tan());
         assertEquals(90, rot1.getDegrees(), kTestEpsilon);
         assertEquals(Math.PI / 2, rot1.getRadians(), kTestEpsilon);
 
         rot1 = Rotation2d.fromDegrees(270);
         assertEquals(0, rot1.cos(), kTestEpsilon);
-        assertEquals(-1, rot1.sin(), kTestEpsilon);
-        assert (-1 / kTestEpsilon > rot1.tan());
+        assertEquals(-1, rot1.sin(), kTestEpsilon); System.out.println(rot1.tan());
+        assertTrue(-1 / kTestEpsilon > rot1.tan());
         assertEquals(-90, rot1.getDegrees(), kTestEpsilon);
         assertEquals(-Math.PI / 2, rot1.getRadians(), kTestEpsilon);
 
@@ -47,7 +47,7 @@ public class TestPose2d {
         Rotation2d rot2 = rot1.inverse();
         assertEquals(0, rot2.cos(), kTestEpsilon);
         assertEquals(1, rot2.sin(), kTestEpsilon);
-        assert (1 / kTestEpsilon < rot2.tan());
+        assertTrue(1 / kTestEpsilon < rot2.tan());
         assertEquals(90, rot2.getDegrees(), kTestEpsilon);
         assertEquals(Math.PI / 2, rot2.getRadians(), kTestEpsilon);
 
@@ -63,7 +63,7 @@ public class TestPose2d {
         Rotation2d rot3 = rot1.rotateBy(rot2);
         assertEquals(0, rot3.cos(), kTestEpsilon);
         assertEquals(1, rot3.sin(), kTestEpsilon);
-        assert (1 / kTestEpsilon < rot3.tan());
+        assertTrue(1 / kTestEpsilon < rot3.tan());
         assertEquals(90, rot3.getDegrees(), kTestEpsilon);
         assertEquals(Math.PI / 2, rot3.getRadians(), kTestEpsilon);
 

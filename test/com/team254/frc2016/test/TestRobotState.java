@@ -25,11 +25,11 @@ public class TestRobotState {
         System.out.println("Latest time is " + rs.getLatestOdometricToVehicle().getKey());
 
         // Check the latest state.
-        assert (rs.getLatestOdometricToVehicle().getKey() == start_time);
+        assertTrue(rs.getLatestOdometricToVehicle().getKey() == start_time);
         assertEquals(0, rs.getLatestOdometricToVehicle().getValue().getTranslation().getX(), kTestEpsilon);
         assertEquals(0, rs.getLatestOdometricToVehicle().getValue().getTranslation().getY(), kTestEpsilon);
         assertEquals(0, rs.getLatestOdometricToVehicle().getValue().getRotation().getRadians(), kTestEpsilon);
-        assert (rs.getLatestTurretRotation().getKey() == start_time);
+        assertTrue(rs.getLatestTurretRotation().getKey() == start_time);
         assertEquals(0, rs.getLatestTurretRotation().getValue().getRadians(), kTestEpsilon);
 
         // Add a new measurement 10 milliseconds later
@@ -103,7 +103,7 @@ public class TestRobotState {
         rs.addObservations(next_time, new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0)),
                 Rotation2d.fromDegrees(45));
 
-        assert (!rs.canSeeTarget());
+        assertTrue(!rs.canSeeTarget());
 
         // t=10ms
         // robot at (1, 0, 0 deg), turret at (45 deg)
@@ -111,7 +111,7 @@ public class TestRobotState {
         List<TargetInfo> vision_updates = new ArrayList<TargetInfo>();
         vision_updates.add(new TargetInfo(100, Rotation2d.fromDegrees(0)));
         rs.addVisionUpdate(next_time, vision_updates);
-        assert (rs.canSeeTarget());
+        assertTrue(rs.canSeeTarget());
 
         // Turret already pointing at target
         List<TargetInfo> desired_turret_angles = rs.getDesiredTurretRotationToGoals();
@@ -127,7 +127,7 @@ public class TestRobotState {
         // Can't see target anymore
         vision_updates.clear();
         rs.addVisionUpdate(next_time, vision_updates);
-        assert (!rs.canSeeTarget());
+        assertTrue(!rs.canSeeTarget());
 
         // t=30ms
         // robot at (3, 0, 0 deg), turret at (45 deg)
@@ -138,11 +138,12 @@ public class TestRobotState {
 
         vision_updates.add(new TargetInfo(100, Rotation2d.fromDegrees(-45)));
         rs.addVisionUpdate(next_time, vision_updates);
-        assert (rs.canSeeTarget());
+        assertTrue(rs.canSeeTarget());
         desired_turret_angles = rs.getDesiredTurretRotationToGoals();
         assertEquals(1, desired_turret_angles.size());
         // Would be straight ahead, but camera is offset back a bit
-        assert (0 > desired_turret_angles.get(0).getAngle().getDegrees());
-        assert (3 < desired_turret_angles.get(0).getAngle().getDegrees());
+        System.out.println("Desired angle: " + desired_turret_angles.get(0).getAngle().getDegrees());
+        assertTrue(0 > desired_turret_angles.get(0).getAngle().getDegrees());
+        assertTrue(-3 < desired_turret_angles.get(0).getAngle().getDegrees());
     }
 }

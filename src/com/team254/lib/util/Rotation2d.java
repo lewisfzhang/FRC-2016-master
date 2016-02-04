@@ -64,6 +64,13 @@ public class Rotation2d implements Interpolable<Rotation2d> {
     }
 
     public double tan() {
+        if (cos_angle_ < kEpsilon) {
+            if (sin_angle_ >= 0.0) {
+                return Double.POSITIVE_INFINITY;
+            } else {
+                return Double.NEGATIVE_INFINITY;
+            }
+        }
         return sin_angle_ / cos_angle_;
     }
 
