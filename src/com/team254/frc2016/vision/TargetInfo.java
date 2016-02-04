@@ -6,7 +6,7 @@ public class TargetInfo {
     protected Rotation2d angle_;
     protected double distance_;
 
-    TargetInfo(double distance, Rotation2d angle) {
+    public TargetInfo(double distance, Rotation2d angle) {
         distance_ = distance;
         angle_ = angle;
     }

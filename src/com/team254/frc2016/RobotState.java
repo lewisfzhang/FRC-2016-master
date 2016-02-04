@@ -1,7 +1,9 @@
 package com.team254.frc2016;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
+import com.team254.frc2016.vision.TargetInfo;
 import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
@@ -26,6 +28,9 @@ import com.team254.lib.util.Translation2d;
  * 5. Camera frame: origin is the center of the camera imager as it rotates with
  * the turret
  * 
+ * 6. Goal frame: origin is the center of the goal (note that orientation in
+ * this frame is arbitrary). Also note that there can be multiple goal frames.
+ * 
  * As a simple kinematic chain with 5 frames, there are 4 transforms of
  * interest:
  * 
@@ -39,6 +44,9 @@ import com.team254.lib.util.Translation2d;
  * time.
  * 
  * 4. Turret-rotating-to-camera: This is a constant.
+ * 
+ * 5. Camera-to-goal: This is a pure translation, and is measured by the vision
+ * system.
  * 
  * @author Jared
  */
@@ -56,12 +64,18 @@ public class RobotState {
     // nanoTime -> Pose2d or Rotation2d
     protected InterpolatingTreeMap<Long, Pose2d> odometric_to_vehicle_;
     protected InterpolatingTreeMap<Long, Rotation2d> turret_rotation_;
+    protected List<Translation2d> camera_to_goals_;
+    protected long latest_camera_to_goals_detected_timestamp_;
+    protected long latest_camera_to_goals_undetected_timestamp_;
 
     public RobotState(long start_time, Pose2d initial_odometric_to_vehicle, Rotation2d initial_turret_rotation) {
         odometric_to_vehicle_ = new InterpolatingTreeMap<Long, Pose2d>(kObservationBufferSize);
         odometric_to_vehicle_.put(start_time, initial_odometric_to_vehicle);
         turret_rotation_ = new InterpolatingTreeMap<Long, Rotation2d>(kObservationBufferSize);
         turret_rotation_.put(start_time, initial_turret_rotation);
+        camera_to_goals_ = new ArrayList<Translation2d>();
+        latest_camera_to_goals_detected_timestamp_ = 0;
+        latest_camera_to_goals_undetected_timestamp_ = start_time;
     }
 
     public synchronized Pose2d getOdometricToVehicle(long timestamp) {
@@ -89,6 +103,34 @@ public class RobotState {
         return getOdometricToTurretRotated(timestamp).transformBy(kTurretRotatingToCamera);
     }
 
+    public synchronized boolean canSeeTarget() {
+        return latest_camera_to_goals_detected_timestamp_ > latest_camera_to_goals_undetected_timestamp_;
+    }
+
+    public synchronized List<TargetInfo> getDesiredTurretRotationToGoals() {
+        List<TargetInfo> rv = new ArrayList<TargetInfo>();
+        Pose2d capture_time_turret_fixed_to_camera = Pose2d
+                .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_))
+                .transformBy(kTurretRotatingToCamera);
+        // Since vehicle-to-turret-fixed is constant, we can compute the change
+        // in odometric-to-vehicle instead.
+        Pose2d latest_turret_fixed_to_capture_time_turret_fixed = getLatestOdometricToVehicle().getValue().inverse()
+                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_));
+        for (Translation2d pos : camera_to_goals_) {
+            Pose2d capture_time_turret_fixed_to_goal = capture_time_turret_fixed_to_camera
+                    .transformBy(Pose2d.fromTranslation(pos));
+            Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_capture_time_turret_fixed
+                    .transformBy(capture_time_turret_fixed_to_goal);
+
+            // We can actually disregard the angular portion of this pose. It is
+            // the angle bearing that we care about!
+            rv.add(new TargetInfo(latest_turret_fixed_to_goal.getTranslation().norm(),
+                    new Rotation2d(latest_turret_fixed_to_goal.getTranslation().getX(),
+                            latest_turret_fixed_to_goal.getTranslation().getY(), true)));
+        }
+        return rv;
+    }
+
     public synchronized void addOdometricToVehicleObservation(long timestamp, Pose2d observation) {
         odometric_to_vehicle_.put(timestamp, observation);
     }
@@ -100,6 +142,19 @@ public class RobotState {
     public synchronized void addObservations(long timestamp, Pose2d odometric_to_vehicle, Rotation2d turret_rotation) {
         addOdometricToVehicleObservation(timestamp, odometric_to_vehicle);
         addTurretRotationObservation(timestamp, turret_rotation);
+    }
+
+    public synchronized void addVisionUpdate(long timestamp, List<TargetInfo> vision_update) {
+        if (vision_update == null || vision_update.isEmpty()) {
+            latest_camera_to_goals_undetected_timestamp_ = timestamp;
+        } else {
+            latest_camera_to_goals_detected_timestamp_ = timestamp;
+            camera_to_goals_.clear();
+            for (TargetInfo target : vision_update) {
+                camera_to_goals_.add(new Translation2d(target.getDistance() * target.getAngle().cos(),
+                        target.getDistance() * target.getAngle().sin()));
+            }
+        }
     }
 
     public Pose2d generateOdometryFromSensors(double left_encoder_delta_distance, double right_encoder_delta_distance,

@@ -21,6 +21,13 @@ public class TestPose2d {
         assertEquals(0, rot1.getDegrees(), kTestEpsilon);
         assertEquals(0, rot1.getRadians(), kTestEpsilon);
 
+        rot1 = new Rotation2d(1, 1, true);
+        assertEquals(Math.sqrt(2) / 2, rot1.cos(), kTestEpsilon);
+        assertEquals(Math.sqrt(2) / 2, rot1.sin(), kTestEpsilon);
+        assertEquals(1, rot1.tan(), kTestEpsilon);
+        assertEquals(45, rot1.getDegrees(), kTestEpsilon);
+        assertEquals(Math.PI / 4, rot1.getRadians(), kTestEpsilon);
+
         rot1 = Rotation2d.fromRadians(Math.PI / 2);
         assertEquals(0, rot1.cos(), kTestEpsilon);
         assertEquals(1, rot1.sin(), kTestEpsilon);
