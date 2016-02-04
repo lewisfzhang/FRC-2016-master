@@ -10,41 +10,33 @@ import com.team254.lib.util.Util;
 public class CheesyDriveHelper {
 
     double quickStopAccumulator;
-    private static final double throttleDeadband = 0.02;
-    private static final double wheelDeadband = 0.02;
+    private static final double kThrottleDeadband = 0.02;
+    private static final double kWheelDeadband = 0.02;
+    private static final double kTurnSensitivity = 1.0;
     private DriveSignal signal = new DriveSignal(0, 0);
 
-    public DriveSignal cheesyDrive(double throttle, double wheel, boolean isQuickTurn, boolean isHighGear) {
+    public DriveSignal cheesyDrive(double throttle, double wheel, boolean isQuickTurn) {
 
         // Apply deadbands to joystick inputs
-        wheel = handleDeadband(wheel, wheelDeadband);
-        throttle = handleDeadband(throttle, throttleDeadband);
-
-        // Apply a sin function that's scaled to make it feel better.
-        if (isHighGear) {
-            wheel = applyNonLinearity(wheel, 0.6, 2);
-        } else {
-            wheel = applyNonLinearity(wheel, 0.5, 3);
-        }
+        wheel = handleDeadband(wheel, kWheelDeadband);
+        throttle = handleDeadband(throttle, kThrottleDeadband);
 
         double overPower;
 
         double angularPower;
-        double linearPower = throttle; // alias for throttle
 
         // Quickturn!
         if (isQuickTurn) {
-            if (Math.abs(linearPower) < 0.2) {
+            if (Math.abs(throttle) < 0.2) {
                 double alpha = 0.1;
-                // quickStopAccumulator approaches wheel*5
-                quickStopAccumulator = (1 - alpha) * quickStopAccumulator + alpha * Util.limit(wheel, 1.0) * 5;
+                // quickStopAccumulator approaches wheel*2
+                quickStopAccumulator = (1 - alpha) * quickStopAccumulator + alpha * Util.limit(wheel, 1.0) * 2;
             }
             overPower = 1.0;
             angularPower = wheel;
         } else {
             overPower = 0.0;
-            double turnSensitivity = isHighGear ? 1.0 : 0.85;
-            angularPower = Math.abs(throttle) * wheel * turnSensitivity - quickStopAccumulator;
+            angularPower = Math.abs(throttle) * wheel * kTurnSensitivity - quickStopAccumulator;
             // quickStopAccumulator -> 0 (gradually, by 1 per step)
             if (quickStopAccumulator > 1) {
                 quickStopAccumulator -= 1;
@@ -56,8 +48,8 @@ public class CheesyDriveHelper {
         }
 
         // Calculate final L/R output values
-        double rightPwm = linearPower - angularPower;
-        double leftPwm = linearPower + angularPower;
+        double rightPwm = throttle - angularPower;
+        double leftPwm = throttle + angularPower;
         if (leftPwm > 1.0) {
             rightPwm -= overPower * (leftPwm - 1.0);
             leftPwm = 1.0;
@@ -74,14 +66,6 @@ public class CheesyDriveHelper {
         signal.rightMotor = rightPwm;
         signal.leftMotor = leftPwm;
         return signal;
-    }
-
-    // Sinusoidal Non-linearity
-    private double applyNonLinearity(Double wheel, Double constant, int times) {
-        for (int i = 0; i < times; i++) {
-            wheel = Math.sin(Math.PI / 2.0 * constant * wheel) / Math.sin(Math.PI / 2.0 * constant);
-        }
-        return wheel;
     }
 
     public double handleDeadband(double val, double deadband) {

@@ -18,10 +18,11 @@ public class Constants extends ConstantsBase {
     // Do not change anything after this line!
     // Talons
     public static int kTurretTalonId = 9;
-    public static int kLeftDriveAId = 11;
-    public static int kLeftDriveBId = 12;
-    public static int kRightDriveAId = 3;
-    public static int kRightDriveBId = 4;
+    public static int kLeftDriveMasterId = 11;
+    public static int kLeftDriveSlaveId = 12;
+    public static int kRightDriveMasterId = 4;
+    public static int kRightDriveSlaveId = 3;
+    
 
     @Override
     public String getFileLocation() {

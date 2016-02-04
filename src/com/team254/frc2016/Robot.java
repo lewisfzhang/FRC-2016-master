@@ -5,6 +5,7 @@ import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Turret;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -54,7 +55,7 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         double throttle = controls.getThrottle();
         double turn = controls.getTurn();
-        drive.set(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn(), false));
+        drive.set(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
         mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle);
         mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn);
     }
