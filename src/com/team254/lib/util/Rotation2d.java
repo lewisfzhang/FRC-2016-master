@@ -77,7 +77,7 @@ public class Rotation2d implements Interpolable<Rotation2d> {
 
     public Rotation2d rotateBy(Rotation2d other) {
         return new Rotation2d(cos_angle_ * other.cos_angle_ - sin_angle_ * other.sin_angle_,
-                cos_angle_ * other.sin_angle_ + sin_angle_ * other.cos_angle_, false);
+                cos_angle_ * other.sin_angle_ + sin_angle_ * other.cos_angle_, true);
     }
 
     public Rotation2d inverse() {

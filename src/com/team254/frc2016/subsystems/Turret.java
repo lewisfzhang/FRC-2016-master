@@ -17,7 +17,7 @@ public class Turret {
         talon.changeControlMode(CANTalon.TalonControlMode.Position);
     }
 
-    public void setAngle(double angle) {
+    public void setAngleDegrees(double angle) {
 
     }
 }

@@ -5,7 +5,6 @@ import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Turret;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
