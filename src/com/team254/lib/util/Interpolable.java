@@ -11,32 +11,17 @@ package com.team254.lib.util;
  */
 public interface Interpolable<T> {
     /**
-     * Interpolates between the surrounding two data points by taking the data
-     * underneath (Low bound) the requested key and also the data above (High
-     * Bound). Since keys are numbers in an interpolating tree, they can be used
-     * to create an informed estimate. This method is always called on the
-     * <strong>LOWER BOUND</strong>
-     * 
-     * Given the points (xValue, yValue) and (otherXValue, otherYValue), find
-     * the point (interpolatedXValue, interpolatedYValue). - xValue,
-     * otherXValue, otherYValue, and interpolatedXValue are given as parameters
-     * - yValue should be known to this Interpolable - interpolatedYValue is the
-     * return value of this function
+     * Interpolates between this value and an other value according to a given
+     * parameter. If x is 0, the method should return this value. If x is 1, the
+     * method should return the other value. If 0 < x < 1, the return value
+     * should be interpolated proportionally between the two.
      *
-     * PRECONDITION: xValue <= interpolatedXValue <= otherXValue
-     *
-     * @param xValue
-     *            The numerical key for the value that this Interpolable
-     *            represents (Lower Bound)
-     * @param otherXValue
-     *            The numerical key for the value that the other Interpolable
-     *            represents (Upper Bound)
-     * @param otherYValue
+     * @param other
      *            The value of the upper bound
-     * @param interpolatedXValue
-     *            The requested value.
+     * @param x
+     *            The requested value. Should be between 0 and 1.
      * @return Interpolable<T> The estimated average between the surrounding
      *         data
      */
-    public T interpolate(Number xValue, Number otherXValue, T otherYValue, Number interpolatedXValue);
+    public T interpolate(T other, double x);
 }

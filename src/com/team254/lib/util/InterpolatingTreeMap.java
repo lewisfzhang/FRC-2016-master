@@ -24,6 +24,7 @@ public class InterpolatingTreeMap<K extends Number, V extends Interpolable<V>> e
     }
 
     public InterpolatingTreeMap() {
+        this(0);
     }
 
     /**
@@ -81,9 +82,19 @@ public class InterpolatingTreeMap<K extends Number, V extends Interpolable<V>> e
             V topElem = get(topBound);
             V bottomElem = get(bottomBound);
 
-            // Number xValue, Number highXValue, Number highYValue, Number
-            // searchedForValue
-            return (V) bottomElem.interpolate(bottomBound, topBound, topElem, key);
+            // Scale the key to the interval [0, 1]
+            double scaledKey = 0;
+
+            // The Number class (and Java) leaves a lot to be desired...
+            if (key instanceof Double || key instanceof Float) {
+                scaledKey = (key.doubleValue() - bottomBound.doubleValue())
+                        / (topBound.doubleValue() - bottomBound.doubleValue());
+            } else {
+                // Assume an integer type
+                scaledKey = (key.longValue() - bottomBound.longValue())
+                        / ((double) (topBound.longValue() - bottomBound.longValue()));
+            }
+            return (V) bottomElem.interpolate(topElem, scaledKey);
         } else {
             return gotval;
         }

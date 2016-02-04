@@ -58,14 +58,13 @@ public class Translation2d implements Interpolable<Translation2d> {
         return new Translation2d(-x_, -y_);
     }
 
-    public Translation2d interpolate(Number xValue, Number otherXValue, Translation2d otherYValue,
-            Number interpolatedXValue) {
-        if (xValue.doubleValue() == otherXValue.doubleValue()) {
+    public Translation2d interpolate(Translation2d other, double x) {
+        if (x <= 0) {
             return new Translation2d(this);
+        } else if (x >= 1) {
+            return new Translation2d(other);
         }
-        double interp = (interpolatedXValue.doubleValue() - xValue.doubleValue())
-                / (otherXValue.doubleValue() - xValue.doubleValue());
-        return new Translation2d(interp * (otherYValue.x_ - x_) + x_, interp * (otherYValue.y_ - y_) + y_);
+        return new Translation2d(x * (other.x_ - x_) + x_, x * (other.y_ - y_) + y_);
     }
 
     public String toString() {

@@ -67,12 +67,13 @@ public class Pose2d implements Interpolable<Pose2d> {
 
     // This currently does Riemannian interpolation. We could do twist
     // interpolation if necessary.
-    public Pose2d interpolate(Number xValue, Number otherXValue, Pose2d otherYValue, Number interpolatedXValue) {
-        if (xValue.doubleValue() == otherXValue.doubleValue()) {
+    public Pose2d interpolate(Pose2d other, double x) {
+        if (x <= 0) {
             return new Pose2d(this);
+        } else if (x >= 1) {
+            return new Pose2d(other);
         }
-        return new Pose2d(translation_.interpolate(xValue, otherXValue, otherYValue.translation_, interpolatedXValue),
-                rotation_.interpolate(xValue, otherXValue, otherYValue.rotation_, interpolatedXValue));
+        return new Pose2d(translation_.interpolate(other.translation_, x), rotation_.interpolate(other.rotation_, x));
     }
 
     public String toString() {

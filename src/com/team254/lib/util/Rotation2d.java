@@ -91,15 +91,14 @@ public class Rotation2d implements Interpolable<Rotation2d> {
         return new Rotation2d(cos_angle_, -sin_angle_, false);
     }
 
-    public Rotation2d interpolate(Number xValue, Number otherXValue, Rotation2d otherYValue,
-            Number interpolatedXValue) {
-        if (xValue.doubleValue() == otherXValue.doubleValue()) {
+    public Rotation2d interpolate(Rotation2d other, double x) {
+        if (x <= 0) {
             return new Rotation2d(this);
+        } else if (x >= 1) {
+            return new Rotation2d(other);
         }
-        double angle_diff = inverse().rotateBy(otherYValue).getRadians();
-        double interp = (interpolatedXValue.doubleValue() - xValue.doubleValue())
-                / (otherXValue.doubleValue() - xValue.doubleValue());
-        return this.rotateBy(Rotation2d.fromRadians(angle_diff * interp));
+        double angle_diff = inverse().rotateBy(other).getRadians();
+        return this.rotateBy(Rotation2d.fromRadians(angle_diff * x));
     }
 
     public String toString() {

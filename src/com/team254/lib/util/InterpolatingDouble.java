@@ -8,13 +8,9 @@ public class InterpolatingDouble implements Interpolable<InterpolatingDouble> {
     }
 
     @Override
-    public InterpolatingDouble interpolate(Number xValue, Number otherXValue, InterpolatingDouble otherYValue,
-            Number interpolatedXValue) {
-        Double dy = otherYValue.value - value;
-        Double dx = otherXValue.doubleValue() - xValue.doubleValue();
-
-        Double searchY = dy / dx * (interpolatedXValue.doubleValue() - xValue.doubleValue()) + value;
-
+    public InterpolatingDouble interpolate(InterpolatingDouble other, double x) {
+        Double dydx = other.value - value;
+        Double searchY = dydx * x + value;
         return new InterpolatingDouble(searchY);
     }
 
