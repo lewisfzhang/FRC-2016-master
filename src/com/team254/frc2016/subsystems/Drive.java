@@ -24,7 +24,7 @@ public class Drive {
         leftB.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         rightA.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         rightB.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-        
+
         leftA.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         rightA.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
 
@@ -44,19 +44,19 @@ public class Drive {
     public void set(DriveSignal signal) {
         setLeftRightPower(signal.leftMotor, signal.rightMotor);
     }
-    
+
     public int getLeftDistance() {
         return leftA.getEncPosition();
     }
-    
+
     public int getRightDistance() {
         return rightA.getEncPosition();
     }
-    
+
     public int getLeftVelocity() {
         return leftA.getEncVelocity();
     }
-    
+
     public int getRightVelocity() {
         return rightA.getEncVelocity();
     }

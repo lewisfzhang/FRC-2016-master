@@ -1,14 +1,21 @@
-package com.team254.lib.util;
+package edu.wpi.first.wpilibj;
+
+import com.team254.lib.util.InterpolatingDouble;
+import com.team254.lib.util.InterpolatingTreeMap;
 
 import edu.wpi.first.wpilibj.PWM;
 
+// In the wpilibj package to use package-private methods from the base class.
+// This is a driver for this servo:
+// https://www.parallax.com/sites/default/files/downloads/900-00025-High-Speed-CR-Servo-Guide-v1.1.pdf
+// Note that this requires modifying the servo so a 1.5ms pulse width is center (neutral)
 public class ContinuousRotationServo extends PWM {
     InterpolatingTreeMap<Double, InterpolatingDouble> tree = new InterpolatingTreeMap<Double, InterpolatingDouble>();
 
     public ContinuousRotationServo(int channel) {
         super(channel);
 
-        setBounds(1.3, 1.5, 1.5, 1.5, 1.7);
+        setBounds(1.3, 1.49, 1.5, 1.51, 1.7);
 
         // Static Values pulled from graph for 7.4V operation, then converted to
         // 6V
@@ -33,11 +40,8 @@ public class ContinuousRotationServo extends PWM {
     }
 
     private double scaleOut(double pulsewidth) {
-        // Takes in 1.3 thru 1.7 and outputs 0 to 1
-        final double max = 1.7;
-        final double min = 1.3;
-
-        return (pulsewidth - min) / (max - min);
+        // Takes in 1.3 thru 1.7 and outputs -1 to 1
+        return (pulsewidth - 1.5) / (.4);
     }
 
     private double scaleIn(double input) {
@@ -46,9 +50,6 @@ public class ContinuousRotationServo extends PWM {
     }
 
     public void set(double value) {
-        // Between -1 and 1
-        // Ideally we would use setSpeed, but that isn't visible in the PWM
-        // class...
-        setPosition(scaleOut(tree.getInterpolated(scaleIn(value)).value));
+        setSpeed(scaleOut(tree.getInterpolated(scaleIn(value)).value));
     }
 }
