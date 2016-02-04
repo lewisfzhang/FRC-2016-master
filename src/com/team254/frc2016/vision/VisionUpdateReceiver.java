@@ -1,5 +1,5 @@
 package com.team254.frc2016.vision;
 
-public interface VisionUpdateReciever {
+public interface VisionUpdateReceiver {
     void gotUpdate(VisionUpdate update);
 }

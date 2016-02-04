@@ -22,7 +22,7 @@ public class VisionServer implements Runnable {
 
     private DatagramSocket socket;
     private boolean m_running = true;
-    private ArrayList<VisionUpdateReciever> receivers = new ArrayList<>();
+    private ArrayList<VisionUpdateReceiver> receivers = new ArrayList<>();
 
     private VisionServer(int port) {
         try {
@@ -33,13 +33,13 @@ public class VisionServer implements Runnable {
         new Thread(this).start();
     }
 
-    public void addVisionUpdateReceiver(VisionUpdateReciever receiver) {
+    public void addVisionUpdateReceiver(VisionUpdateReceiver receiver) {
         if (!receivers.contains(receiver)) {
             receivers.add(receiver);
         }
     }
 
-    public void removeVisionUpdateReceiver(VisionUpdateReciever receiver) {
+    public void removeVisionUpdateReceiver(VisionUpdateReceiver receiver) {
         if (receivers.contains(receiver)) {
             receivers.remove(receiver);
         }
@@ -56,7 +56,7 @@ public class VisionServer implements Runnable {
                 VisionUpdate update = VisionUpdate.generateFromJsonString(message);
                 receivers.removeAll(Collections.singleton(null));
                 if (update.isValid()) {
-                    for (VisionUpdateReciever receiver : receivers) {
+                    for (VisionUpdateReceiver receiver : receivers) {
                         receiver.gotUpdate(update);
                     }
                 }
