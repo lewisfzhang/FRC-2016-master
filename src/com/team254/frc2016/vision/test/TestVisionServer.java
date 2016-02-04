@@ -19,7 +19,7 @@ public class TestVisionServer {
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
                 System.out.println("-- Target #" + i);
-                System.out.println("---- Theta: " + target.getTheta());
+                System.out.println("---- Theta: " + target.getAngle().getDegrees());
                 System.out.println("---- Distance: " + target.getDistance());
             }
             System.out.println("");

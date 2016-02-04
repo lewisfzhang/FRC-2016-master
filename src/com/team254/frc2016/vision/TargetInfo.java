@@ -1,19 +1,21 @@
 package com.team254.frc2016.vision;
 
-public class TargetInfo {
-    protected double theta;
-    protected double distance;
+import com.team254.lib.util.Rotation2d;
 
-    TargetInfo(double theta, double distance) {
-        this.theta = theta;
-        this.distance = distance;
+public class TargetInfo {
+    protected Rotation2d angle_;
+    protected double distance_;
+
+    TargetInfo(double distance, Rotation2d angle) {
+        distance_ = distance;
+        angle_ = angle;
     }
 
-    public double getTheta() {
-        return theta;
+    public Rotation2d getAngle() {
+        return angle_;
     }
 
     public double getDistance() {
-        return distance;
+        return distance_;
     }
 }

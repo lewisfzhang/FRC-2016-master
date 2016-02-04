@@ -52,8 +52,9 @@ public class VisionServer implements Runnable {
         while (m_running) {
             try {
                 socket.receive(packet);
+                long timestamp = System.nanoTime();
                 String message = new String(packet.getData(), 0, packet.getLength());
-                VisionUpdate update = VisionUpdate.generateFromJsonString(message);
+                VisionUpdate update = VisionUpdate.generateFromJsonString(timestamp, message);
                 receivers.removeAll(Collections.singleton(null));
                 if (update.isValid()) {
                     for (VisionUpdateReceiver receiver : receivers) {

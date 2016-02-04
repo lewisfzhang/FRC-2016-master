@@ -5,6 +5,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.team254.lib.util.Rotation2d;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +20,8 @@ public class VisionUpdate {
 
     // Example json string
     // { "capturedAgoMs" : 100, "targets": [{"theta": 5.4, "distance": 5.5}] }
-    public static VisionUpdate generateFromJsonString(String updateString) {
-        long startMs = System.currentTimeMillis();
+    public static VisionUpdate generateFromJsonString(long timestamp, String updateString) {
+        long startMs = timestamp * 1000000L;
         VisionUpdate update = new VisionUpdate();
         try {
             JSONObject j = (JSONObject) parser.parse(updateString);
@@ -31,8 +33,8 @@ public class VisionUpdate {
             for (Object targetObj : targets) {
                 JSONObject target = (JSONObject) targetObj;
                 double distance = (double) target.get("distance");
-                double theta = (double) target.get("theta");
-                targetInfos.add(new TargetInfo(theta, distance));
+                Rotation2d angle = Rotation2d.fromDegrees((double) target.get("theta"));
+                targetInfos.add(new TargetInfo(distance, angle));
             }
             update.targets = targetInfos;
             update.valid = true;
