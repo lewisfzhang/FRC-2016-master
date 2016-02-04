@@ -1,9 +1,9 @@
 package com.team254.lib.util;
 
 /**
- * Interpolable is an interface used by an Interpolating Tree to estimate linear
- * data based off of the two surrounding datapoints, by using the Interpolate
- * method.
+ * Interpolable is an interface used by an Interpolating Tree as the Value type.
+ * Given two end points and an interpolation parameter on [0, 1], it calculates
+ * a new Interpolable representing the interpolated value.
  * 
  * @param <T>
  *            The Type of Interpolable

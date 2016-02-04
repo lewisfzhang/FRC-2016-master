@@ -8,13 +8,12 @@ import java.util.Map;
  * by making a guess from points that are defined
  * 
  * @param <K>
- *            The NUMERICAL type of the key (must extend number)
- * @param <T>
- *            The type of the value
+ *            The type of the key (must implement InverseInterpolable)
  * @param <V>
- *            The INTERPOLABLE type of the value (must implement Interpolable)
+ *            The type of the value (must implement Interpolable)
  */
-public class InterpolatingTreeMap<K extends Number, V extends Interpolable<V>> extends TreeMap<K, V> {
+public class InterpolatingTreeMap<K extends InverseInterpolable<K> & Comparable<K>, V extends Interpolable<V>>
+        extends TreeMap<K, V> {
     private static final long serialVersionUID = 8347275262778054124L;
 
     Integer max_;
@@ -81,20 +80,7 @@ public class InterpolatingTreeMap<K extends Number, V extends Interpolable<V>> e
             // Get surrounding values for interpolation
             V topElem = get(topBound);
             V bottomElem = get(bottomBound);
-
-            // Scale the key to the interval [0, 1]
-            double scaledKey = 0;
-
-            // The Number class (and Java) leaves a lot to be desired...
-            if (key instanceof Double || key instanceof Float) {
-                scaledKey = (key.doubleValue() - bottomBound.doubleValue())
-                        / (topBound.doubleValue() - bottomBound.doubleValue());
-            } else {
-                // Assume an integer type
-                scaledKey = (key.longValue() - bottomBound.longValue())
-                        / ((double) (topBound.longValue() - bottomBound.longValue()));
-            }
-            return (V) bottomElem.interpolate(topElem, scaledKey);
+            return (V) bottomElem.interpolate(topElem, bottomBound.inverseInterpolate(topBound, key));
         } else {
             return gotval;
         }

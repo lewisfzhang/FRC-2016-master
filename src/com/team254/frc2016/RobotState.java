@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.team254.frc2016.vision.TargetInfo;
+import com.team254.lib.util.InterpolatingLong;
 import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
@@ -62,41 +63,42 @@ public class RobotState {
             Rotation2d.fromDegrees(Constants.kCameraAngleOffsetDegrees));
 
     // nanoTime -> Pose2d or Rotation2d
-    protected InterpolatingTreeMap<Long, Pose2d> odometric_to_vehicle_;
-    protected InterpolatingTreeMap<Long, Rotation2d> turret_rotation_;
+    protected InterpolatingTreeMap<InterpolatingLong, Pose2d> odometric_to_vehicle_;
+    protected InterpolatingTreeMap<InterpolatingLong, Rotation2d> turret_rotation_;
     protected List<Translation2d> camera_to_goals_;
     protected long latest_camera_to_goals_detected_timestamp_;
     protected long latest_camera_to_goals_undetected_timestamp_;
 
     public RobotState(long start_time, Pose2d initial_odometric_to_vehicle, Rotation2d initial_turret_rotation) {
-        odometric_to_vehicle_ = new InterpolatingTreeMap<Long, Pose2d>(kObservationBufferSize);
-        odometric_to_vehicle_.put(start_time, initial_odometric_to_vehicle);
-        turret_rotation_ = new InterpolatingTreeMap<Long, Rotation2d>(kObservationBufferSize);
-        turret_rotation_.put(start_time, initial_turret_rotation);
+        odometric_to_vehicle_ = new InterpolatingTreeMap<InterpolatingLong, Pose2d>(kObservationBufferSize);
+        odometric_to_vehicle_.put(new InterpolatingLong(start_time), initial_odometric_to_vehicle);
+        turret_rotation_ = new InterpolatingTreeMap<InterpolatingLong, Rotation2d>(kObservationBufferSize);
+        turret_rotation_.put(new InterpolatingLong(start_time), initial_turret_rotation);
         camera_to_goals_ = new ArrayList<Translation2d>();
         latest_camera_to_goals_detected_timestamp_ = 0;
         latest_camera_to_goals_undetected_timestamp_ = start_time;
     }
 
     public synchronized Pose2d getOdometricToVehicle(long timestamp) {
-        return odometric_to_vehicle_.getInterpolated(timestamp);
+        return odometric_to_vehicle_.getInterpolated(new InterpolatingLong(timestamp));
     }
 
-    public synchronized Map.Entry<Long, Pose2d> getLatestOdometricToVehicle() {
+    public synchronized Map.Entry<InterpolatingLong, Pose2d> getLatestOdometricToVehicle() {
         return odometric_to_vehicle_.lastEntry();
     }
 
     public synchronized Rotation2d getTurretRotation(long timestamp) {
-        return turret_rotation_.getInterpolated(timestamp);
+        return turret_rotation_.getInterpolated(new InterpolatingLong(timestamp));
     }
 
-    public synchronized Map.Entry<Long, Rotation2d> getLatestTurretRotation() {
+    public synchronized Map.Entry<InterpolatingLong, Rotation2d> getLatestTurretRotation() {
         return turret_rotation_.lastEntry();
     }
 
     public synchronized Pose2d getOdometricToTurretRotated(long timestamp) {
-        return odometric_to_vehicle_.getInterpolated(timestamp).transformBy(kVehicleToTurretFixed)
-                .transformBy(Pose2d.fromRotation(turret_rotation_.getInterpolated(timestamp)));
+        InterpolatingLong key = new InterpolatingLong(timestamp);
+        return odometric_to_vehicle_.getInterpolated(key).transformBy(kVehicleToTurretFixed)
+                .transformBy(Pose2d.fromRotation(turret_rotation_.getInterpolated(key)));
     }
 
     public synchronized Pose2d getOdometricToCamera(long timestamp) {
@@ -132,11 +134,11 @@ public class RobotState {
     }
 
     public synchronized void addOdometricToVehicleObservation(long timestamp, Pose2d observation) {
-        odometric_to_vehicle_.put(timestamp, observation);
+        odometric_to_vehicle_.put(new InterpolatingLong(timestamp), observation);
     }
 
     public synchronized void addTurretRotationObservation(long timestamp, Rotation2d observation) {
-        turret_rotation_.put(timestamp, observation);
+        turret_rotation_.put(new InterpolatingLong(timestamp), observation);
     }
 
     public synchronized void addObservations(long timestamp, Pose2d odometric_to_vehicle, Rotation2d turret_rotation) {

@@ -22,31 +22,31 @@ public class TestRobotState {
         // Start at the identity.
         long start_time = System.nanoTime();
         RobotState rs = new RobotState(start_time, new Pose2d(), new Rotation2d());
-        System.out.println("Latest time is " + rs.getLatestOdometricToVehicle().getKey());
+        System.out.println("Latest time is " + rs.getLatestOdometricToVehicle().getKey().value);
 
         // Check the latest state.
-        assertTrue(rs.getLatestOdometricToVehicle().getKey() == start_time);
+        assertTrue(rs.getLatestOdometricToVehicle().getKey().value == start_time);
         assertEquals(0, rs.getLatestOdometricToVehicle().getValue().getTranslation().getX(), kTestEpsilon);
         assertEquals(0, rs.getLatestOdometricToVehicle().getValue().getTranslation().getY(), kTestEpsilon);
         assertEquals(0, rs.getLatestOdometricToVehicle().getValue().getRotation().getRadians(), kTestEpsilon);
-        assertTrue(rs.getLatestTurretRotation().getKey() == start_time);
+        assertTrue(rs.getLatestTurretRotation().getKey().value == start_time);
         assertEquals(0, rs.getLatestTurretRotation().getValue().getRadians(), kTestEpsilon);
 
         // Add a new measurement 10 milliseconds later
-        long next_time = rs.getLatestOdometricToVehicle().getKey() + 10000000;
+        long next_time = rs.getLatestOdometricToVehicle().getKey().value + 10000000;
         System.out.println("Next time is " + next_time);
         rs.addObservations(next_time, new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(10)),
                 Rotation2d.fromDegrees(-15));
 
         // Check the latest state.
-        assertEquals(next_time, rs.getLatestOdometricToVehicle().getKey().longValue());
+        assertEquals(next_time, rs.getLatestOdometricToVehicle().getKey().value.longValue());
         assertEquals(1, rs.getLatestOdometricToVehicle().getValue().getTranslation().getX(), kTestEpsilon);
         assertEquals(0, rs.getLatestOdometricToVehicle().getValue().getTranslation().getY(), kTestEpsilon);
         assertEquals(10, rs.getLatestOdometricToVehicle().getValue().getRotation().getDegrees(), kTestEpsilon);
         assertEquals(1, rs.getOdometricToVehicle(next_time).getTranslation().getX(), kTestEpsilon);
         assertEquals(0, rs.getOdometricToVehicle(next_time).getTranslation().getY(), kTestEpsilon);
         assertEquals(10, rs.getOdometricToVehicle(next_time).getRotation().getDegrees(), kTestEpsilon);
-        assertEquals(next_time, rs.getLatestTurretRotation().getKey().longValue());
+        assertEquals(next_time, rs.getLatestTurretRotation().getKey().value.longValue());
         assertEquals(-15, rs.getLatestTurretRotation().getValue().getDegrees(), kTestEpsilon);
         assertEquals(-15, rs.getTurretRotation(next_time).getDegrees(), kTestEpsilon);
 
@@ -99,7 +99,7 @@ public class TestRobotState {
 
         // t=10ms
         // robot at (1, 0, 0 deg), turret at (45 deg)
-        long next_time = rs.getLatestOdometricToVehicle().getKey() + 10000000;
+        long next_time = rs.getLatestOdometricToVehicle().getKey().value + 10000000;
         rs.addObservations(next_time, new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0)),
                 Rotation2d.fromDegrees(45));
 

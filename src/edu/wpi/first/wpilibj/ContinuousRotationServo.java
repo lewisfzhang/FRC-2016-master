@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.PWM;
 // https://www.parallax.com/sites/default/files/downloads/900-00025-High-Speed-CR-Servo-Guide-v1.1.pdf
 // Note that this requires modifying the servo so a 1.5ms pulse width is center (neutral)
 public class ContinuousRotationServo extends PWM {
-    InterpolatingTreeMap<Double, InterpolatingDouble> tree = new InterpolatingTreeMap<Double, InterpolatingDouble>();
+    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> tree = new InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>();
 
     public ContinuousRotationServo(int channel) {
         super(channel);
@@ -20,23 +20,23 @@ public class ContinuousRotationServo extends PWM {
         // Static Values pulled from graph for 7.4V operation, then converted to
         // 6V
         // Key: RPM, Value: Pulse Width in ms
-        tree.put(6 / 7.4 * 200.0, new InterpolatingDouble(1.3));
-        tree.put(6 / 7.4 * 199.9, new InterpolatingDouble(1.325));
-        tree.put(6 / 7.4 * 195.0, new InterpolatingDouble(1.35));
-        tree.put(6 / 7.4 * 190.0, new InterpolatingDouble(1.375));
-        tree.put(6 / 7.4 * 180.0, new InterpolatingDouble(1.4));
-        tree.put(6 / 7.4 * 160.0, new InterpolatingDouble(1.425));
-        tree.put(6 / 7.4 * 110.0, new InterpolatingDouble(1.45));
-        tree.put(6 / 7.4 * 50.0, new InterpolatingDouble(1.475));
-        tree.put(0.0, new InterpolatingDouble(1.5));
-        tree.put(6 / 7.4 * -55.0, new InterpolatingDouble(1.525));
-        tree.put(6 / 7.4 * -90.0, new InterpolatingDouble(1.55));
-        tree.put(6 / 7.4 * -130.0, new InterpolatingDouble(1.575));
-        tree.put(6 / 7.4 * -160.0, new InterpolatingDouble(1.6));
-        tree.put(6 / 7.4 * -180.0, new InterpolatingDouble(1.625));
-        tree.put(6 / 7.4 * -185.0, new InterpolatingDouble(1.65));
-        tree.put(6 / 7.4 * -195.0, new InterpolatingDouble(1.675));
-        tree.put(6 / 7.4 * -200.0, new InterpolatingDouble(1.7));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 200.0), new InterpolatingDouble(1.3));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 199.9), new InterpolatingDouble(1.325));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 195.0), new InterpolatingDouble(1.35));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 190.0), new InterpolatingDouble(1.375));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 180.0), new InterpolatingDouble(1.4));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 160.0), new InterpolatingDouble(1.425));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 110.0), new InterpolatingDouble(1.45));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 50.0), new InterpolatingDouble(1.475));
+        tree.put(new InterpolatingDouble(0.0), new InterpolatingDouble(1.5));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -55.0), new InterpolatingDouble(1.525));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -90.0), new InterpolatingDouble(1.55));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -130.0), new InterpolatingDouble(1.575));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -160.0), new InterpolatingDouble(1.6));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -180.0), new InterpolatingDouble(1.625));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -185.0), new InterpolatingDouble(1.65));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -195.0), new InterpolatingDouble(1.675));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -200.0), new InterpolatingDouble(1.7));
     }
 
     private double scaleOut(double pulsewidth) {
@@ -50,6 +50,6 @@ public class ContinuousRotationServo extends PWM {
     }
 
     public void set(double value) {
-        setSpeed(scaleOut(tree.getInterpolated(scaleIn(value)).value));
+        setSpeed(scaleOut(tree.getInterpolated(new InterpolatingDouble(scaleIn(value))).value));
     }
 }
