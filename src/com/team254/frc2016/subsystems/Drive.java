@@ -145,6 +145,7 @@ public class Drive {
         if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             leftMaster_.setProfile(kVelocityControlSlot);
+            leftMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
             leftMaster_.enableBrakeMode(true);
             leftSlave_.enableBrakeMode(true);
             setHighGear(true);
@@ -152,6 +153,7 @@ public class Drive {
         if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             rightMaster_.setProfile(kVelocityControlSlot);
+            rightMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
             rightMaster_.enableBrakeMode(true);
             rightSlave_.enableBrakeMode(true);
             setHighGear(true);
@@ -164,6 +166,7 @@ public class Drive {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             leftMaster_.setProfile(kBaseLockControlSlot);
             leftMaster_.set(leftMaster_.getEncPosition());
+            leftMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
             leftMaster_.enableBrakeMode(true);
             leftSlave_.enableBrakeMode(true);
             setHighGear(false);
@@ -172,6 +175,7 @@ public class Drive {
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             rightMaster_.setProfile(kBaseLockControlSlot);
             rightMaster_.set(rightMaster_.getEncPosition());
+            rightMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
             rightMaster_.enableBrakeMode(true);
             rightSlave_.enableBrakeMode(true);
             setHighGear(false);

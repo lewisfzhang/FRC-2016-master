@@ -27,6 +27,7 @@ public class Constants extends ConstantsBase {
                                                                     // open loop
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0;
+    public static int kDriveVelocityAllowableError = 0;
 
     // PID gains for drive base lock loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
@@ -37,6 +38,7 @@ public class Constants extends ConstantsBase {
     public static double kDriveBaseLockKf = 0;
     public static int kDriveBaseLockIZone = 0;
     public static double kDriveBaseLockRampRate = 0;
+    public static int kDriveBaseLockAllowableError = 10;
 
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
