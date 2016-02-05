@@ -4,10 +4,10 @@ import com.team254.frc2016.Constants;
 import edu.wpi.first.wpilibj.CANTalon;
 
 public class Turret {
-    private static Turret ourInstance = new Turret();
+    private static Turret instance_ = new Turret();
 
     public static Turret getInstance() {
-        return ourInstance;
+        return instance_;
     }
 
     private CANTalon talon;

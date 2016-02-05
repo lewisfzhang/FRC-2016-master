@@ -2,66 +2,192 @@ package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
 import com.team254.lib.util.DriveSignal;
+
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Solenoid;
 
 public class Drive {
+    protected static final int kVelocityControlSlot = 0;
+    protected static final int kBaseLockControlSlot = 1;
 
-    private static Drive ourInstance = new Drive();
+    private static Drive instance_ = new Drive();
 
     public static Drive getInstance() {
-        return ourInstance;
+        return instance_;
     }
 
-    private final CANTalon leftA, leftB, rightA, rightB;
+    private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
+    private final Solenoid shifter_;
+    private final ADXRS450_Gyro gyro_;
 
     private Drive() {
-        leftA = new CANTalon(Constants.kLeftDriveMasterId);
-        leftB = new CANTalon(Constants.kLeftDriveSlaveId);
-        rightA = new CANTalon(Constants.kRightDriveMasterId);
-        rightB = new CANTalon(Constants.kRightDriveSlaveId);
+        leftMaster_ = new CANTalon(Constants.kLeftDriveMasterId);
+        leftSlave_ = new CANTalon(Constants.kLeftDriveSlaveId);
+        rightMaster_ = new CANTalon(Constants.kRightDriveMasterId);
+        rightSlave_ = new CANTalon(Constants.kRightDriveSlaveId);
+        shifter_ = new Solenoid(Constants.kShifterSolenoidId);
+        shifter_.set(false); // low gear
+        gyro_ = new ADXRS450_Gyro();
 
-        leftA.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-        leftB.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-        rightA.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-        rightB.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+        // Get status at 100Hz
+        leftMaster_.setStatusFrameRateMs(CANTalon.StatusFrameRate.Feedback, 10);
+        rightMaster_.setStatusFrameRateMs(CANTalon.StatusFrameRate.Feedback, 10);
 
-        leftA.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
-        rightA.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+        // Start in open loop mode
+        leftMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+        leftMaster_.set(0);
+        leftSlave_.changeControlMode(CANTalon.TalonControlMode.Follower);
+        leftMaster_.set(Constants.kLeftDriveMasterId);
+        rightMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+        rightMaster_.set(0);
+        rightSlave_.changeControlMode(CANTalon.TalonControlMode.Follower);
+        rightSlave_.set(Constants.kRightDriveMasterId);
+        leftMaster_.enableBrakeMode(false);
+        leftSlave_.enableBrakeMode(false);
+        rightMaster_.enableBrakeMode(false);
+        rightSlave_.enableBrakeMode(false);
 
-        leftA.enableBrakeMode(false);
-        leftB.enableBrakeMode(false);
-        rightA.enableBrakeMode(false);
-        rightB.enableBrakeMode(false);
+        leftMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+        if (leftMaster_.isSensorPresent(
+                CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
+            // TODO: Complain loudly!
+        }
+        rightMaster_.reverseSensor(false);
+        rightMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+        if (rightMaster_.isSensorPresent(
+                CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
+            // TODO: Complain loudly!
+        }
+        rightMaster_.reverseSensor(true);
+
+        // Load velocity control gains
+        leftMaster_.setPID(Constants.kDriveVelocityKp, Constants.kDriveVelocityKi, Constants.kDriveVelocityKd,
+                Constants.kDriveVelocityKf, Constants.kDriveVelocityIZone, Constants.kDriveVelocityRampRate,
+                kVelocityControlSlot);
+        rightMaster_.setPID(Constants.kDriveVelocityKp, Constants.kDriveVelocityKi, Constants.kDriveVelocityKd,
+                Constants.kDriveVelocityKf, Constants.kDriveVelocityIZone, Constants.kDriveVelocityRampRate,
+                kVelocityControlSlot);
+        leftMaster_.setPID(Constants.kDriveBaseLockKp, Constants.kDriveBaseLockKi, Constants.kDriveBaseLockKd,
+                Constants.kDriveBaseLockKf, Constants.kDriveBaseLockIZone, Constants.kDriveBaseLockRampRate,
+                kBaseLockControlSlot);
+        rightMaster_.setPID(Constants.kDriveBaseLockKp, Constants.kDriveBaseLockKi, Constants.kDriveBaseLockKd,
+                Constants.kDriveBaseLockKf, Constants.kDriveBaseLockIZone, Constants.kDriveBaseLockRampRate,
+                kBaseLockControlSlot);
     }
 
-    public void setLeftRightPower(double left, double right) {
-        leftA.set(left);
-        leftB.set(left);
-        rightA.set(-right);
-        rightB.set(-right);
+    protected synchronized void setLeftRightPower(double left, double right) {
+        leftMaster_.set(left);
+        rightMaster_.set(-right);
     }
 
-    public void set(DriveSignal signal) {
+    public synchronized void setOpenLoop(DriveSignal signal) {
+        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.PercentVbus) {
+            leftMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+            leftMaster_.enableBrakeMode(false);
+            leftSlave_.enableBrakeMode(false);
+        }
+        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.PercentVbus) {
+            rightMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+            rightMaster_.enableBrakeMode(false);
+            rightSlave_.enableBrakeMode(false);
+        }
         setLeftRightPower(signal.leftMotor, signal.rightMotor);
     }
 
-    public int getLeftDistance() {
-        return leftA.getEncPosition();
+    private double encoderCountsToInches(double counts) {
+        return counts * (Constants.kDriveWheelDiameterInches * Math.PI) / 4096;
     }
 
-    public int getRightDistance() {
-        return rightA.getEncPosition();
+    private double inchesToEncoderCounts(double inches) {
+        return inches * 4096 / (Constants.kDriveWheelDiameterInches * Math.PI);
     }
 
-    public int getLeftVelocity() {
-        return leftA.getEncVelocity();
+    private double encoderVelocityToInchesPerSec(double counts) {
+        return encoderCountsToInches(counts) * 10.0;
     }
 
-    public int getRightVelocity() {
-        return rightA.getEncVelocity();
+    private double inchesPerSecToEncoderVelocity(double inches_per_sec) {
+        return (int) (inchesToEncoderCounts(inches_per_sec) / 10.0);
     }
 
-    public void stop() {
-        setLeftRightPower(0, 0);
+    public double getLeftDistanceInches() {
+        return encoderCountsToInches(leftMaster_.getPosition());
+    }
+
+    public double getRightDistanceInches() {
+        return encoderCountsToInches(rightMaster_.getPosition());
+    }
+
+    public double getLeftVelocityInchesPerSec() {
+        return encoderVelocityToInchesPerSec(leftMaster_.getSpeed());
+    }
+
+    public double getRightVelocityInchesPerSec() {
+        return encoderVelocityToInchesPerSec(rightMaster_.getSpeed());
+    }
+
+    public void recalibrateGyro() {
+        // TODO: LOL we should fix this
+        gyro_.calibrate();
+    }
+
+    public void resetGyro() {
+        gyro_.reset();
+    }
+
+    public double getGyroHeading() {
+        return gyro_.getAngle();
+    }
+
+    public synchronized void stop() {
+        setOpenLoop(DriveSignal.NEUTRAL);
+    }
+
+    protected synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+        leftMaster_.set(inchesPerSecToEncoderVelocity(left_inches_per_sec));
+        rightMaster_.set(inchesPerSecToEncoderVelocity(right_inches_per_sec));
+    }
+
+    public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
+            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
+            leftMaster_.setProfile(kVelocityControlSlot);
+            leftMaster_.enableBrakeMode(true);
+            leftSlave_.enableBrakeMode(true);
+            setHighGear(true);
+        }
+        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
+            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
+            rightMaster_.setProfile(kVelocityControlSlot);
+            rightMaster_.enableBrakeMode(true);
+            rightSlave_.enableBrakeMode(true);
+            setHighGear(true);
+        }
+        updateVelocitySetpoint(left_inches_per_sec, right_inches_per_sec);
+    }
+
+    public synchronized void baseLock() {
+        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
+            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
+            leftMaster_.setProfile(kBaseLockControlSlot);
+            leftMaster_.set(leftMaster_.getEncPosition());
+            leftMaster_.enableBrakeMode(true);
+            leftSlave_.enableBrakeMode(true);
+            setHighGear(false);
+        }
+        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
+            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
+            rightMaster_.setProfile(kBaseLockControlSlot);
+            rightMaster_.set(rightMaster_.getEncPosition());
+            rightMaster_.enableBrakeMode(true);
+            rightSlave_.enableBrakeMode(true);
+            setHighGear(false);
+        }
+    }
+
+    public void setHighGear(boolean high_gear) {
+        shifter_.set(high_gear);
     }
 }

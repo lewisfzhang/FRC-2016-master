@@ -54,7 +54,7 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         double throttle = controls.getThrottle();
         double turn = controls.getTurn();
-        drive.set(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
+        drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
         mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle);
         mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn);
     }
