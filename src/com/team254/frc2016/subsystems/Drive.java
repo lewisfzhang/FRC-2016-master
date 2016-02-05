@@ -1,11 +1,11 @@
 package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
+import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.lib.util.DriveSignal;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
 
 public class Drive {
@@ -20,7 +20,7 @@ public class Drive {
 
     private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
     private final Solenoid shifter_;
-    private final ADXRS450_Gyro gyro_;
+    private final ADXRS453_Gyro gyro_;
 
     private Drive() {
         leftMaster_ = new CANTalon(Constants.kLeftDriveMasterId);
@@ -29,7 +29,7 @@ public class Drive {
         rightSlave_ = new CANTalon(Constants.kRightDriveSlaveId);
         shifter_ = new Solenoid(Constants.kShifterSolenoidId);
         shifter_.set(false); // low gear
-        gyro_ = new ADXRS450_Gyro();
+        gyro_ = new ADXRS453_Gyro();
 
         // Get status at 100Hz
         leftMaster_.setStatusFrameRateMs(CANTalon.StatusFrameRate.Feedback, 10);
@@ -52,13 +52,13 @@ public class Drive {
         leftMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         if (leftMaster_.isSensorPresent(
                 CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
-            // TODO: Complain loudly!
+            DriverStation.reportError("Could not detect left drive encoder!", false);
         }
         rightMaster_.reverseSensor(false);
         rightMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         if (rightMaster_.isSensorPresent(
                 CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
-            // TODO: Complain loudly!
+            DriverStation.reportError("Could not detect right drive encoder!", false);
         }
         rightMaster_.reverseSensor(true);
 
@@ -128,17 +128,8 @@ public class Drive {
         return encoderVelocityToInchesPerSec(rightMaster_.getSpeed());
     }
 
-    public void recalibrateGyro() {
-        // TODO: LOL we should fix this
-        gyro_.calibrate();
-    }
-
-    public void resetGyro() {
-        gyro_.reset();
-    }
-
-    public double getGyroHeading() {
-        return gyro_.getAngle();
+    public ADXRS453_Gyro getGyro() {
+        return gyro_;
     }
 
     public synchronized void stop() {

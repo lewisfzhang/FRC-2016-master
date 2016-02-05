@@ -3,8 +3,10 @@ package com.team254.frc2016;
 
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Turret;
+import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -20,6 +22,8 @@ public class Robot extends IterativeRobot {
     Drive drive = Drive.getInstance();
     CheesyDriveHelper cdh = new CheesyDriveHelper();
     ControlBoard controls = ControlBoard.getInstance();
+
+    double gyroCalibrationStartTime = 0;
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger();
@@ -38,16 +42,26 @@ public class Robot extends IterativeRobot {
     public void disabledInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
         drive.stop();
+        double now = Timer.getFPGATimestamp();
+        // Keep re-calibrating the gyro every 5 seconds
+        if (now - gyroCalibrationStartTime > ADXRS453_Gyro.kCalibrationSampleTime) {
+            drive.getGyro().endCalibrate();
+            gyroCalibrationStartTime = now;
+            drive.getGyro().startCalibrate();
+        }
     }
 
     @Override
     public void autonomousInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
+        drive.getGyro().cancelCalibrate();
+        drive.getGyro().reset();
     }
 
     @Override
     public void teleopInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
+        drive.getGyro().cancelCalibrate();
     }
 
     @Override

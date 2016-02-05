@@ -18,6 +18,7 @@ public class Constants extends ConstantsBase {
     public static int kVisionUDPPort = 5254;
 
     // PID gains for drive velocity loop
+    // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     // TODO: tune these!
     public static double kDriveVelocityKp = 0;
     public static double kDriveVelocityKi = 0;
@@ -28,8 +29,9 @@ public class Constants extends ConstantsBase {
     public static double kDriveVelocityRampRate = 0;
 
     // PID gains for drive base lock loop
+    // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     // TODO: tune these!
-    public static double kDriveBaseLockKp = 0;
+    public static double kDriveBaseLockKp = 0.01;
     public static double kDriveBaseLockKi = 0;
     public static double kDriveBaseLockKd = 0;
     public static double kDriveBaseLockKf = 0;
