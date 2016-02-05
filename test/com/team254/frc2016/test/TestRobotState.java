@@ -21,7 +21,8 @@ public class TestRobotState {
     public void smokeTest() {
         // Start at the identity.
         long start_time = System.nanoTime();
-        RobotState rs = new RobotState(start_time, new Pose2d(), new Rotation2d());
+        RobotState rs = RobotState.getInstance();
+        rs.reset(start_time, new Pose2d(), new Rotation2d());
         System.out.println("Latest time is " + rs.getLatestOdometricToVehicle().getKey().value);
 
         // Check the latest state.
@@ -62,7 +63,8 @@ public class TestRobotState {
     @Test
     public void simulatedTest() {
         long start_time = System.nanoTime();
-        RobotState rs = new RobotState(start_time, new Pose2d(), new Rotation2d());
+        RobotState rs = RobotState.getInstance();
+        rs.reset(start_time, new Pose2d(), new Rotation2d());
 
         final long kTimestep = 10000000; // 10ms
 
@@ -95,7 +97,8 @@ public class TestRobotState {
     @Test
     public void targetingTest() {
         long start_time = System.nanoTime();
-        RobotState rs = new RobotState(start_time, new Pose2d(), new Rotation2d());
+        RobotState rs = RobotState.getInstance();
+        rs.reset(start_time, new Pose2d(), new Rotation2d());
 
         // t=10ms
         // robot at (1, 0, 0 deg), turret at (45 deg)

@@ -3,6 +3,8 @@ package com.team254.frc2016;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.lib.util.InterpolatingLong;
 import com.team254.lib.util.InterpolatingTreeMap;
@@ -52,6 +54,12 @@ import com.team254.lib.util.Translation2d;
  * @author Jared
  */
 public class RobotState {
+    private static RobotState instance_ = new RobotState();
+
+    public static RobotState getInstance() {
+        return instance_;
+    }
+
     public static final int kObservationBufferSize = 100;
 
     public static final Pose2d kVehicleToTurretFixed = new Pose2d(
@@ -69,7 +77,12 @@ public class RobotState {
     protected long latest_camera_to_goals_detected_timestamp_;
     protected long latest_camera_to_goals_undetected_timestamp_;
 
-    public RobotState(long start_time, Pose2d initial_odometric_to_vehicle, Rotation2d initial_turret_rotation) {
+    protected RobotState() {
+        reset(0, new Pose2d(), new Rotation2d());
+    }
+
+    public synchronized void reset(long start_time, Pose2d initial_odometric_to_vehicle,
+            Rotation2d initial_turret_rotation) {
         odometric_to_vehicle_ = new InterpolatingTreeMap<InterpolatingLong, Pose2d>(kObservationBufferSize);
         odometric_to_vehicle_.put(new InterpolatingLong(start_time), initial_odometric_to_vehicle);
         turret_rotation_ = new InterpolatingTreeMap<InterpolatingLong, Rotation2d>(kObservationBufferSize);

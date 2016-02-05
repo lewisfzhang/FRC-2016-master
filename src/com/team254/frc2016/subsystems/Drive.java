@@ -49,6 +49,7 @@ public class Drive {
         rightMaster_.enableBrakeMode(false);
         rightSlave_.enableBrakeMode(false);
 
+        // Set up the encoders
         leftMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         if (leftMaster_.isSensorPresent(
                 CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
@@ -69,6 +70,7 @@ public class Drive {
         rightMaster_.setPID(Constants.kDriveVelocityKp, Constants.kDriveVelocityKi, Constants.kDriveVelocityKd,
                 Constants.kDriveVelocityKf, Constants.kDriveVelocityIZone, Constants.kDriveVelocityRampRate,
                 kVelocityControlSlot);
+        // Load base lock control gains
         leftMaster_.setPID(Constants.kDriveBaseLockKp, Constants.kDriveBaseLockKi, Constants.kDriveBaseLockKd,
                 Constants.kDriveBaseLockKf, Constants.kDriveBaseLockIZone, Constants.kDriveBaseLockRampRate,
                 kBaseLockControlSlot);
