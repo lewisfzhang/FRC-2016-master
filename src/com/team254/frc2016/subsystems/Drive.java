@@ -98,36 +98,36 @@ public class Drive {
         setLeftRightPower(signal.leftMotor, signal.rightMotor);
     }
 
-    private double encoderCountsToInches(double counts) {
-        return counts * (Constants.kDriveWheelDiameterInches * Math.PI) / 4096;
+    private double rotationsToInches(double rotations) {
+        return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
     }
 
-    private double inchesToEncoderCounts(double inches) {
-        return inches * 4096 / (Constants.kDriveWheelDiameterInches * Math.PI);
+    private double rpmToInchesPerSecond(double rpm) {
+        return rotationsToInches(rpm) / 60;
     }
 
-    private double encoderVelocityToInchesPerSec(double counts) {
-        return encoderCountsToInches(counts) * 10.0;
+    private double inchesToRotations(double inches) {
+        return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
     }
-
-    private double inchesPerSecToEncoderVelocity(double inches_per_sec) {
-        return (int) (inchesToEncoderCounts(inches_per_sec) / 10.0);
+    
+    private double inchesPerSecondToRpm(double inches_per_second) {
+        return inchesToRotations(inches_per_second) * 60;
     }
 
     public double getLeftDistanceInches() {
-        return encoderCountsToInches(leftMaster_.getPosition());
+        return rotationsToInches(leftMaster_.getPosition());
     }
 
     public double getRightDistanceInches() {
-        return encoderCountsToInches(rightMaster_.getPosition());
+        return rotationsToInches(rightMaster_.getPosition());
     }
 
     public double getLeftVelocityInchesPerSec() {
-        return encoderVelocityToInchesPerSec(leftMaster_.getSpeed());
+        return rpmToInchesPerSecond(leftMaster_.getSpeed());
     }
 
     public double getRightVelocityInchesPerSec() {
-        return encoderVelocityToInchesPerSec(rightMaster_.getSpeed());
+        return rpmToInchesPerSecond(rightMaster_.getSpeed());
     }
 
     public ADXRS453_Gyro getGyro() {
@@ -139,8 +139,8 @@ public class Drive {
     }
 
     protected synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-        leftMaster_.set(inchesPerSecToEncoderVelocity(left_inches_per_sec));
-        rightMaster_.set(inchesPerSecToEncoderVelocity(right_inches_per_sec));
+        leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
+        rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
     }
 
     public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
