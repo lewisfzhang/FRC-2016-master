@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
     public static final double kCalibrationSampleTime = 5.0;
 
-    // TODO: Austin is using 200Hz
     private static final double kSamplePeriod = 0.001;
     private static final double kDegreePerSecondPerLSB = -0.0125;
 
@@ -84,16 +83,16 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
             DriverStation.reportError("Could not find ADXRS453 gyro on SPI port " + port.getValue(), false);
             return;
         }
-        
-        // TODO: error checking
-        // http://www.analog.com/media/en/technical-documentation/data-sheets/ADXRS453.pdf
 
-        // TODO: check 0xEFE00000 for mask, 0x4E000000 for expected and read RATE register instead of issuing data request
-        m_spi.initAccumulator(kSamplePeriod, 0x20000000, 4, 0x0c000000, 0x04000000, 10, 16, true, true);
+        // http://www.analog.com/media/en/technical-documentation/data-sheets/ADXRS453.pdf
+        m_spi.initAccumulator(kSamplePeriod, 0x20000000, 4, 0x0c00000E, 0x04000000, 10, 16, true, true);
+        // m_spi.initAccumulator(kSamplePeriod, 0x80000000, 4, 0xEFE00000,
+        // 0x4E000000, 5, 16, true, true);
 
         calibrate();
 
-        UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue());  // close enough...
+        UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue()); // close
+                                                                                      // enough...
         LiveWindow.addSensor("ADXRS453_Gyro", port.getValue(), this);
     }
 
@@ -105,7 +104,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
      */
     @Override
     public synchronized void calibrate() {
-        Timer.delay(0.1);  // Wait for things to settle down
+        Timer.delay(0.1); // Wait for things to settle down
         startCalibrate();
         Timer.delay(kCalibrationSampleTime);
         endCalibrate();
@@ -127,7 +126,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
             m_is_calibrating = false;
             m_last_center = m_spi.getAccumulatorAverage();
             SmartDashboard.putNumber("gyro center", m_last_center);
-            m_spi.setAccumulatorCenter((int) m_last_center);
+            m_spi.setAccumulatorCenter((int) Math.round(m_last_center));
             m_spi.resetAccumulator();
         }
     }
