@@ -58,7 +58,7 @@ public class Robot extends IterativeRobot {
         drive.getGyro().cancelCalibrate();
         drive.resetEncoders();
     }
-    
+
     @Override
     public void disabledPeriodic() {
         double now = Timer.getFPGATimestamp();

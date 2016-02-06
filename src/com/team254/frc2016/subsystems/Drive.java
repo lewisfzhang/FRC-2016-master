@@ -113,7 +113,7 @@ public class Drive {
     private double inchesToRotations(double inches) {
         return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
     }
-    
+
     private double inchesPerSecondToRpm(double inches_per_second) {
         return inchesToRotations(inches_per_second) * 60;
     }
@@ -191,7 +191,7 @@ public class Drive {
     public void setHighGear(boolean high_gear) {
         shifter_.set(high_gear);
     }
-    
+
     public synchronized void resetEncoders() {
         leftMaster_.setPosition(0);
         rightMaster_.setPosition(0);

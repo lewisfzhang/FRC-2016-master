@@ -13,7 +13,7 @@ public class Constants extends ConstantsBase {
     public static double kCameraYOffset = 0.0;
     public static double kCameraAngleOffsetDegrees = 0.0;
 
-    public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5
+    public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
 
     public static int kVisionUDPPort = 5254;
 
@@ -23,7 +23,7 @@ public class Constants extends ConstantsBase {
     public static double kDriveVelocityKp = 0.1;
     public static double kDriveVelocityKi = 0;
     public static double kDriveVelocityKd = 0;
-    public static double kDriveVelocityKf = 1023 / (7 * 12 / 100); // 15 fps
+    public static double kDriveVelocityKf = 1023 / (15 * 12 / 100); // 15 fps
                                                                     // open loop
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0;
@@ -31,7 +31,6 @@ public class Constants extends ConstantsBase {
 
     // PID gains for drive base lock loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    // TODO: tune these!
     public static double kDriveBaseLockKp = 1.0;
     public static double kDriveBaseLockKi = 0;
     public static double kDriveBaseLockKd = 0;

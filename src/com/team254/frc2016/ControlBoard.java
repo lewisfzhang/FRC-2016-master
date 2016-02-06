@@ -28,7 +28,7 @@ public class ControlBoard {
     public boolean getQuickTurn() {
         return turnStick.getRawButton(1);
     }
-    
+
     public boolean getBaseLock() {
         return throttleStick.getRawButton(1);
     }
