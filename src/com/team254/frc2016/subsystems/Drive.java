@@ -39,7 +39,7 @@ public class Drive {
         leftMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         leftMaster_.set(0);
         leftSlave_.changeControlMode(CANTalon.TalonControlMode.Follower);
-        leftMaster_.set(Constants.kLeftDriveMasterId);
+        leftSlave_.set(Constants.kLeftDriveMasterId);
         rightMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         rightMaster_.set(0);
         rightSlave_.changeControlMode(CANTalon.TalonControlMode.Follower);
@@ -55,13 +55,17 @@ public class Drive {
                 CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
             DriverStation.reportError("Could not detect left drive encoder!", false);
         }
-        rightMaster_.reverseSensor(false);
+        leftMaster_.reverseSensor(true);
+        leftMaster_.reverseOutput(false);
+        leftSlave_.reverseOutput(false);
         rightMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         if (rightMaster_.isSensorPresent(
                 CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
             DriverStation.reportError("Could not detect right drive encoder!", false);
         }
-        rightMaster_.reverseSensor(true);
+        rightMaster_.reverseSensor(false);
+        rightMaster_.reverseOutput(true);
+        rightSlave_.reverseOutput(false);
 
         // Load velocity control gains
         leftMaster_.setPID(Constants.kDriveVelocityKp, Constants.kDriveVelocityKi, Constants.kDriveVelocityKd,
@@ -165,26 +169,31 @@ public class Drive {
 
     public synchronized void baseLock() {
         if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
-            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             leftMaster_.setProfile(kBaseLockControlSlot);
-            leftMaster_.set(leftMaster_.getEncPosition());
+            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             leftMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
             leftMaster_.enableBrakeMode(true);
             leftSlave_.enableBrakeMode(true);
+            leftMaster_.set(leftMaster_.getPosition());
             setHighGear(false);
         }
         if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
-            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             rightMaster_.setProfile(kBaseLockControlSlot);
-            rightMaster_.set(rightMaster_.getEncPosition());
+            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             rightMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
             rightMaster_.enableBrakeMode(true);
             rightSlave_.enableBrakeMode(true);
+            rightMaster_.set(rightMaster_.getPosition());
             setHighGear(false);
         }
     }
 
     public void setHighGear(boolean high_gear) {
         shifter_.set(high_gear);
+    }
+    
+    public synchronized void resetEncoders() {
+        leftMaster_.setPosition(0);
+        rightMaster_.setPosition(0);
     }
 }

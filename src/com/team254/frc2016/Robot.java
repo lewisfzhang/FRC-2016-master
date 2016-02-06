@@ -7,6 +7,7 @@ import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -42,13 +43,6 @@ public class Robot extends IterativeRobot {
     public void disabledInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
         drive.stop();
-        double now = Timer.getFPGATimestamp();
-        // Keep re-calibrating the gyro every 5 seconds
-        if (now - gyroCalibrationStartTime > ADXRS453_Gyro.kCalibrationSampleTime) {
-            drive.getGyro().endCalibrate();
-            gyroCalibrationStartTime = now;
-            drive.getGyro().startCalibrate();
-        }
     }
 
     @Override
@@ -62,14 +56,36 @@ public class Robot extends IterativeRobot {
     public void teleopInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
         drive.getGyro().cancelCalibrate();
+        drive.resetEncoders();
+    }
+    
+    @Override
+    public void disabledPeriodic() {
+        double now = Timer.getFPGATimestamp();
+        // Keep re-calibrating the gyro every 5 seconds
+        if (now - gyroCalibrationStartTime > ADXRS453_Gyro.kCalibrationSampleTime) {
+            drive.getGyro().endCalibrate();
+            gyroCalibrationStartTime = now;
+            drive.getGyro().startCalibrate();
+        }
     }
 
     @Override
     public void teleopPeriodic() {
         double throttle = controls.getThrottle();
         double turn = controls.getTurn();
-        drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
+        if (controls.getBaseLock()) {
+            drive.baseLock();
+        } else {
+            drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
+        }
         mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle);
         mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn);
+
+        SmartDashboard.putNumber("left_distance", drive.getLeftDistanceInches());
+        SmartDashboard.putNumber("right_distance", drive.getRightDistanceInches());
+        SmartDashboard.putNumber("left_velocity", drive.getLeftVelocityInchesPerSec());
+        SmartDashboard.putNumber("right_velocity", drive.getRightVelocityInchesPerSec());
+        SmartDashboard.putNumber("gyro_angle", drive.getGyro().getAngle());
     }
 }
