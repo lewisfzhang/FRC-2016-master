@@ -31,18 +31,34 @@ void App::run() {
   cv::Mat frame_threshold;
   cv::Mat frame_morphology;
   cv::Mat frame_morphology2;
+  cv::Mat frame_vis;
+  std::vector<std::vector<cv::Point>> contours;
+  std::vector<cv::Point> convex_contour;
+  std::vector<cv::Point> poly;
+  std::vector<cv::Vec4i> hierarchy;
 
   webcam.StartStream();
   std::chrono::steady_clock::time_point last_frame_time =
       std::chrono::steady_clock::time_point::min();
+  const bool kPrintTiming = true;
+  const bool kShowVis = false;
   while (true) {
+    contours.clear();
+    hierarchy.clear();
+
     auto processing_started = std::chrono::steady_clock::now();
     auto decoded = webcam.DecodeLatestFrame();
+    auto decoding_finished = std::chrono::steady_clock::now();
     cv::Mat& frame = decoded.second;
     if (frame.rows == 0 || frame.cols == 0) {
-      cv::waitKey(1);
+      if (kShowVis) {
+        cv::waitKey(1);
+      } else {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
       continue;
     }
+
     cv::cvtColor(frame, frame_hsv, cv::COLOR_BGR2HSV);
     cv::inRange(frame_hsv, cv::Scalar(57, 231, 44), cv::Scalar(81, 255, 205),
                 frame_threshold);
@@ -52,15 +68,46 @@ void App::run() {
     cv::morphologyEx(frame_morphology, frame_morphology2, cv::MORPH_CLOSE,
                      cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)),
                      cv::Point(-1, -1), 1);
+    if (kShowVis) {
+      frame_vis = frame_morphology2.clone();
+    }
+    // Filter the image based on shape
+    cv::findContours(frame_morphology2, contours, hierarchy, cv::RETR_EXTERNAL,
+                     cv::CHAIN_APPROX_TC89_KCOS);
+    int num_targets = 0;
+    for (auto& contour : contours) {
+      convex_contour.clear();
+      cv::convexHull(contour, convex_contour, false);
+      poly.clear();
+      cv::approxPolyDP(convex_contour, poly, 20, true);
+      if (poly.size() == 4 && cv::isContourConvex(poly)) {
+        auto moments = cv::moments(poly);
+        std::cout << "Found target " << num_targets << ", center at "
+                  << moments.m10 / moments.m00 << ","
+                  << moments.m01 / moments.m00 << std::endl;
+        ++num_targets;
+      }
+    }
 
     last_frame_time = decoded.first;
-    auto processing_done = std::chrono::steady_clock::now();
-    std::cout << "Took "
-              << std::chrono::duration<double, std::milli>(
-                     processing_done -
-                     std::max(processing_started, last_frame_time)).count()
-              << " ms" << std::endl;
-    cv::imshow("opencv_webcam", frame_morphology2);
-    cv::waitKey(1);
+    if (kPrintTiming) {
+      auto processing_done = std::chrono::steady_clock::now();
+      std::cout << "Processing start to end: "
+                << std::chrono::duration<double, std::milli>(
+                       processing_done - processing_started).count() << " ms"
+                << std::endl;
+      std::cout << "Image stamp to end: "
+                << std::chrono::duration<double, std::milli>(
+                       processing_done - decoded.first).count() << " ms"
+                << std::endl;
+      std::cout << "Decoding finished to end: "
+                << std::chrono::duration<double, std::milli>(
+                       processing_done - decoding_finished).count() << " ms"
+                << std::endl;
+    }
+    if (kShowVis) {
+      cv::imshow("opencv_webcam", frame_vis);
+      cv::waitKey(1);
+    }
   };
 }

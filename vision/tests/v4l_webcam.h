@@ -14,7 +14,7 @@
 #include "opencv2/gpu/gpu.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-const int kRowsPixels = 960;
+const int kRowsPixels = 720;
 const int kColsPixels = 1280;
 const int kNumBuffers = 6;
 

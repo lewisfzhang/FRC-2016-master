@@ -125,15 +125,16 @@ void V4LWebcam::StartStream(bool calibration) {
       bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       bufferinfo.memory = V4L2_MEMORY_MMAP;
       bufferinfo.index = 0;
+      int index = 0;
       while (!stop_streaming_) {
         {
           // Figure out which buffer to read into.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
-          if (processing_buffer_ == static_cast<int>(bufferinfo.index)) {
+          if (processing_buffer_ == index) {
             std::cerr << "Capture buffer wrapped around" << std::endl;
-            bufferinfo.index = (bufferinfo.index + 1) % kNumBuffers;
+            index = (index + 1) % kNumBuffers;
           }
-          if (latest_capture_buffer_ == static_cast<int>(bufferinfo.index)) {
+          if (latest_capture_buffer_ == index) {
             // If we have wrapped around to the latest capture buffer, first
             // invalidate it.
             latest_capture_buffer_ = -1;
@@ -141,6 +142,7 @@ void V4LWebcam::StartStream(bool calibration) {
         }
 
         // Enqueue the buffer
+        bufferinfo.index = index;
         // std::cout << "Enqueue buffer " << bufferinfo.index << std::endl;
         // const auto capture_start_time = std::chrono::steady_clock::now();
         if (ioctl(descriptor_, VIDIOC_QBUF, &bufferinfo) < 0) {
@@ -158,10 +160,10 @@ void V4LWebcam::StartStream(bool calibration) {
         {
           // Update the latest buffer.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
-          latest_capture_buffer_ = bufferinfo.index;
-          capture_times_[bufferinfo.index] = capture_end_time;
+          latest_capture_buffer_ = index;
+          capture_times_[index] = capture_end_time;
         }
-        bufferinfo.index = (bufferinfo.index + 1) % kNumBuffers;
+        index = (index + 1) % kNumBuffers;
       }
 
       // Stop streaming
