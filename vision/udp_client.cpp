@@ -8,7 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "UDPClient.hpp"
+#include "udp_client.hpp"
 
 UDPClient::UDPClient(std::string hostname, int port) {
   connected_ = false;
