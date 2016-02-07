@@ -45,8 +45,9 @@ function onMessageArrived(message) {
   var logMessageArray = JSON.parse(message.payloadString);
   var data = logMessageArray[0];
   console.log(data);
-  if(data.type=="timeplot")
-    addPoint(data.category, data.field, parseInt(data.walltime), parseInt(data.value));
+  if (data.type=="timeplot") {
+    addPoint(data.category, data.field, Number(data.walltime), Number(data.value));
+  }
 }
 
 function onReplayButtonClick() {
