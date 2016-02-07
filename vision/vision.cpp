@@ -30,7 +30,7 @@ void App::run() {
   const bool kPrintTiming = true;
   const bool kShowVis = false;
 
-  UDPClient client("roborio-252-frc.local", 5254);
+  UDPClient client("roborio-254-frc.local", 5254);
   client.connect();
 
   V4LWebcam webcam("/dev/video0");
