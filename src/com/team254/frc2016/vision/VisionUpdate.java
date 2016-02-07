@@ -51,8 +51,10 @@ public class VisionUpdate {
             update.valid = true;
         } catch (ParseException e) {
             System.err.println("Parse error: " + e);
+            e.printStackTrace();
         } catch (ClassCastException e) {
             System.err.println("Data type error: " + e);
+            e.printStackTrace();
         }
         return update;
     }

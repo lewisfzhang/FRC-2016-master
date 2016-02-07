@@ -121,7 +121,6 @@ public class MqttSender implements Runnable, MqttCallback {
 
         try {
             String payload = jsonMessages.toJSONString();
-            System.out.println(payload);
             synchronized (this) {
                 mMqttClient.publish("/robot_logging", payload.getBytes(), curQos.mQosValue, false);
             }

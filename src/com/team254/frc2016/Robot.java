@@ -35,22 +35,20 @@ public class Robot extends IterativeRobot {
         mCheesyLogger = CheesyLogger.makeCheesyLogger();
     }
 
-    public static class TestReceiver implements VisionUpdateReceiver {
+    public class TestReceiver implements VisionUpdateReceiver {
 
         @Override
         public void gotUpdate(VisionUpdate update) {
-            System.out.println("Got update!");
-            System.out.println("-- Time ago: " + update.getCapturedAgoMs());
-            System.out.println("-- Time captured: " + update.getCapturedAtMs());
-            System.out.println("-- Now: " + System.currentTimeMillis());
-            System.out.println("-- Num targets: " + update.getTargets().size());
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
-                System.out.println("-- Target #" + i);
-                System.out.println("---- Theta: " + target.getAngle().getDegrees());
-                System.out.println("---- Distance: " + target.getDistance());
+               // System.out.println(i + " : " +  target.getAngle().getDegrees() + " : " + target.getDistance());
+                mCheesyLogger.sendTimePlotPoint("vision_angle", "angle", target.getAngle().getDegrees() );
+                mCheesyLogger.sendTimePlotPoint("vision_distance", "distance", target.getDistance() );
+                SmartDashboard.putNumber("Angle",target.getAngle().getDegrees() );
+                SmartDashboard.putNumber("Distance", target.getDistance());
             }
-            System.out.println("");
+
+
         }
     }
     /**
