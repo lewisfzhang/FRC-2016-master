@@ -17,11 +17,13 @@ sudo make install
 sudo cp /home/ubuntu/FRC-2016/logger/mqtt_service.conf .
 sudo start mqtt_service
 
+6. With sudo access, replace the contents of `/etc/network/interfaces` with:
+auto eth0
+iface eth0 inet static
+address 10.2.54.195
+netmask 255.255.255.0
+gateway 10.2.54.1
 
-In the gui:
-1. click the network icon in the system tray
-2. click "edit connections"
-3. Delete any kind of "auto ethernet" connections in the list
-4. Add a new connection. Ensure "General->Automatically connect to this network" is enabled
-5. Set this new connection's IPv4 config to manual, ip "10.2.54.195"
-6. (Optional) Add a second connection with "General->Automatically connect..." disabled using DHCP (for internet connectivity).
+7. To get DHCP back on the robot, replace all of `/etc/network/interfaces` with:
+auto eth0
+iface eth0 inet dhcp
