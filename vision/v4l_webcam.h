@@ -14,11 +14,11 @@
 #include "opencv2/gpu/gpu.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+namespace team254 {
+
 const int kRowsPixels = 720;
 const int kColsPixels = 1280;
 const int kNumBuffers = 6;
-
-namespace team254 {
 
 using TimePoint = std::chrono::steady_clock::time_point;
 

@@ -2,6 +2,8 @@
 
 namespace team254 {
 
+const double kC920CaptureDelay = 0.168;  // seconds
+
 V4LWebcam::V4LWebcam(const std::string& device)
     : is_calibration_(false),
       is_configured_(false),
@@ -161,7 +163,9 @@ void V4LWebcam::StartStream(bool calibration) {
           // Update the latest buffer.
           std::lock_guard<std::mutex> lock(buffer_bookkeeping_mutex_);
           latest_capture_buffer_ = index;
-          capture_times_[index] = capture_end_time;
+          capture_times_[index] =
+              capture_end_time - std::chrono::milliseconds(static_cast<long>(
+                                     1000 * kC920CaptureDelay));
         }
         index = (index + 1) % kNumBuffers;
       }

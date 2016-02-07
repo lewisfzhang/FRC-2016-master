@@ -1,7 +1,9 @@
 #include <sstream>
-#include "v4l_webcam.h"
+#include "targeting.h"
 #include "udp_client.hpp"
+#include "v4l_webcam.h"
 
+using team254::TargetInfo;
 using team254::V4LWebcam;
 
 class App {
@@ -25,13 +27,17 @@ int main(int argc, char** argv) {
 App::App() { cv::gpu::printShortCudaDeviceInfo(cv::gpu::getDevice()); }
 
 void App::run() {
+  const bool kPrintTiming = true;
+  const bool kShowVis = false;
+
   UDPClient client("roborio-252-frc.local", 5254);
   client.connect();
 
   V4LWebcam webcam("/dev/video0");
   webcam.Configure();
-
-  cv::namedWindow("opencv_webcam", cv::WINDOW_NORMAL);
+  if (kShowVis) {
+    cv::namedWindow("opencv_webcam", cv::WINDOW_NORMAL);
+  }
   cv::Mat frame_hsv;
   cv::Mat frame_threshold;
   cv::Mat frame_morphology;
@@ -41,15 +47,17 @@ void App::run() {
   std::vector<cv::Point> convex_contour;
   std::vector<cv::Point> poly;
   std::vector<cv::Vec4i> hierarchy;
+  std::vector<std::pair<double, double>> target_centers;
+  std::vector<TargetInfo> targets;
 
   webcam.StartStream();
   std::chrono::steady_clock::time_point last_frame_time =
       std::chrono::steady_clock::time_point::min();
-  const bool kPrintTiming = true;
-  const bool kShowVis = false;
   while (true) {
     contours.clear();
     hierarchy.clear();
+    targets.clear();
+    target_centers.clear();
 
     auto processing_started = std::chrono::steady_clock::now();
     auto decoded = webcam.DecodeLatestFrame();
@@ -80,10 +88,6 @@ void App::run() {
     cv::findContours(frame_morphology2, contours, hierarchy, cv::RETR_EXTERNAL,
                      cv::CHAIN_APPROX_TC89_KCOS);
 
-    std::ostringstream json;
-    json << "{\"targets\":[";
-
-    int num_targets = 0;
     for (auto& contour : contours) {
       convex_contour.clear();
       cv::convexHull(contour, convex_contour, false);
@@ -91,38 +95,45 @@ void App::run() {
       cv::approxPolyDP(convex_contour, poly, 20, true);
       if (poly.size() == 4 && cv::isContourConvex(poly)) {
         auto moments = cv::moments(poly);
-        std::cout << "Found target " << num_targets << ", center at "
-                  << moments.m10 / moments.m00 << ","
-                  << moments.m01 / moments.m00 << std::endl;
-        std::ostringstream targetStr;
-        targetStr << "{\"theta\":" << (moments.m10 / moments.m00) << ",\"distance\":" << (moments.m01 / moments.m00) << "}";
-	if (num_targets > 0) {
-	  json << ",";
-	}
-	json << targetStr.str();
-        ++num_targets;
+        target_centers.emplace_back(moments.m10 / moments.m00,
+                                    moments.m01 / moments.m00);
       }
     }
+
+    std::ostringstream json;
+    json << "{\"targets\":[";
+    targets = team254::getTargetInfo(target_centers);
+    for (auto& target : targets) {
+      std::cout << "Found target theta=" << target.theta
+                << ", distance=" << target.distance << std::endl;
+      json << team254::toJSON(target) << ",";
+    }
     json << "]";
-    json << ", \"capturedAgoMs\": 100}";
+    last_frame_time = decoded.first;
+    auto processing_done = std::chrono::steady_clock::now();
+    json << ", \"capturedAgoMs\": "
+         << std::chrono::duration<double, std::milli>(processing_done -
+                                                      last_frame_time)
+                .count()
+         << "}";
     client.send(json.str());
 
-
-    last_frame_time = decoded.first;
     if (kPrintTiming) {
-      auto processing_done = std::chrono::steady_clock::now();
       std::cout << "Processing start to end: "
-                << std::chrono::duration<double, std::milli>(
-                       processing_done - processing_started).count() << " ms"
-                << std::endl;
+                << std::chrono::duration<double, std::milli>(processing_done -
+                                                             processing_started)
+                       .count()
+                << " ms" << std::endl;
       std::cout << "Image stamp to end: "
-                << std::chrono::duration<double, std::milli>(
-                       processing_done - decoded.first).count() << " ms"
-                << std::endl;
+                << std::chrono::duration<double, std::milli>(processing_done -
+                                                             decoded.first)
+                       .count()
+                << " ms" << std::endl;
       std::cout << "Decoding finished to end: "
-                << std::chrono::duration<double, std::milli>(
-                       processing_done - decoding_finished).count() << " ms"
-                << std::endl;
+                << std::chrono::duration<double, std::milli>(processing_done -
+                                                             decoding_finished)
+                       .count()
+                << " ms" << std::endl;
     }
     if (kShowVis) {
       cv::imshow("opencv_webcam", frame_vis);
