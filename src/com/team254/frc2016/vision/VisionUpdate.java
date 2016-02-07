@@ -16,6 +16,13 @@ public class VisionUpdate {
     protected List<TargetInfo> targets;
     protected long capturedAtMs = 0;
 
+    private static long getOptLong(Object n, long defaultValue) {
+        if (n == null) {
+            return defaultValue;
+        }
+        return (long) n;
+    }
+
     private static JSONParser parser = new JSONParser();
 
     // Example json string
@@ -24,8 +31,13 @@ public class VisionUpdate {
         long startMs = timestamp * 1000000L;
         VisionUpdate update = new VisionUpdate();
         try {
+            System.out.println(updateString);
             JSONObject j = (JSONObject) parser.parse(updateString);
-            long capturedAgoMs = (long) j.get("capturedAgoMs");
+            long capturedAgoMs = getOptLong(j.get("capturedAgoMs"), 0);
+            if (capturedAgoMs == 0) {
+                update.valid = false;
+                return update;
+            }
             update.capturedAgoMs = capturedAgoMs;
             update.capturedAtMs = startMs - capturedAgoMs;
             JSONArray targets = (JSONArray) j.get("targets");

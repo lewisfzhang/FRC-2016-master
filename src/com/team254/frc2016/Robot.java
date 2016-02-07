@@ -3,6 +3,10 @@ package com.team254.frc2016;
 
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Turret;
+import com.team254.frc2016.vision.TargetInfo;
+import com.team254.frc2016.vision.VisionServer;
+import com.team254.frc2016.vision.VisionUpdate;
+import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -23,6 +27,7 @@ public class Robot extends IterativeRobot {
     Drive drive = Drive.getInstance();
     CheesyDriveHelper cdh = new CheesyDriveHelper();
     ControlBoard controls = ControlBoard.getInstance();
+    VisionServer visionServer = VisionServer.getInstance();
 
     double gyroCalibrationStartTime = 0;
 
@@ -30,6 +35,24 @@ public class Robot extends IterativeRobot {
         mCheesyLogger = CheesyLogger.makeCheesyLogger();
     }
 
+    public static class TestReceiver implements VisionUpdateReceiver {
+
+        @Override
+        public void gotUpdate(VisionUpdate update) {
+            System.out.println("Got update!");
+            System.out.println("-- Time ago: " + update.getCapturedAgoMs());
+            System.out.println("-- Time captured: " + update.getCapturedAtMs());
+            System.out.println("-- Now: " + System.currentTimeMillis());
+            System.out.println("-- Num targets: " + update.getTargets().size());
+            for (int i = 0; i < update.getTargets().size(); i++) {
+                TargetInfo target = update.getTargets().get(i);
+                System.out.println("-- Target #" + i);
+                System.out.println("---- Theta: " + target.getAngle().getDegrees());
+                System.out.println("---- Distance: " + target.getDistance());
+            }
+            System.out.println("");
+        }
+    }
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -37,6 +60,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void robotInit() {
         mCheesyLogger.sendLogMessage("Robot Init-ed");
+        visionServer.addVisionUpdateReceiver(new TestReceiver());
     }
 
     @Override

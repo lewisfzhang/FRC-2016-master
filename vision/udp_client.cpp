@@ -18,7 +18,6 @@ UDPClient::UDPClient(std::string hostname, int port) {
 
 bool UDPClient::connect() {
   struct hostent *he;
-  struct in_addr **addr_list;
 
   // Resolve hostname
   if ((he = gethostbyname(hostname_.c_str())) == NULL) {
@@ -28,9 +27,10 @@ bool UDPClient::connect() {
 
 #ifdef DEBUG_VISION
   // print information about this host:
+  struct in_addr **addr_list;
+  addr_list = (struct in_addr **)he->h_addr_list;
   printf("Hostname is: %s\n", he->h_name);
   printf("    IP addresses: ");
-  addr_list = (struct in_addr **)he->h_addr_list;
   for (int i = 0; addr_list[i] != NULL; i++) {
     printf("%s ", inet_ntoa(*addr_list[i]));
   }

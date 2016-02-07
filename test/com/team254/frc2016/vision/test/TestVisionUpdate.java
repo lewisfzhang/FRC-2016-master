@@ -47,4 +47,11 @@ public class TestVisionUpdate {
         VisionUpdate v = VisionUpdate.generateFromJsonString(System.nanoTime(), s);
         assertFalse(v.isValid());
     }
+
+    @Test
+    public void testEmptyObject() {
+        String s = "{}";
+        VisionUpdate v = VisionUpdate.generateFromJsonString(System.nanoTime(), s);
+        assertFalse(v.isValid());
+    }
 }

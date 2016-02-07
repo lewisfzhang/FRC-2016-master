@@ -1,4 +1,6 @@
+#include <sstream>
 #include "v4l_webcam.h"
+#include "udp_client.hpp"
 
 using team254::V4LWebcam;
 
@@ -23,6 +25,9 @@ int main(int argc, char** argv) {
 App::App() { cv::gpu::printShortCudaDeviceInfo(cv::gpu::getDevice()); }
 
 void App::run() {
+  UDPClient client("roborio-252-frc.local", 5254);
+  client.connect();
+
   V4LWebcam webcam("/dev/video0");
   webcam.Configure();
 
@@ -74,6 +79,10 @@ void App::run() {
     // Filter the image based on shape
     cv::findContours(frame_morphology2, contours, hierarchy, cv::RETR_EXTERNAL,
                      cv::CHAIN_APPROX_TC89_KCOS);
+
+    std::ostringstream json;
+    json << "{\"targets\":[";
+
     int num_targets = 0;
     for (auto& contour : contours) {
       convex_contour.clear();
@@ -85,9 +94,19 @@ void App::run() {
         std::cout << "Found target " << num_targets << ", center at "
                   << moments.m10 / moments.m00 << ","
                   << moments.m01 / moments.m00 << std::endl;
+        std::ostringstream targetStr;
+        targetStr << "{\"theta\":" << (moments.m10 / moments.m00) << ",\"distance\":" << (moments.m01 / moments.m00) << "}";
+	if (num_targets > 0) {
+	  json << ",";
+	}
+	json << targetStr.str();
         ++num_targets;
       }
     }
+    json << "]";
+    json << ", \"capturedAgoMs\": 100}";
+    client.send(json.str());
+
 
     last_frame_time = decoded.first;
     if (kPrintTiming) {
