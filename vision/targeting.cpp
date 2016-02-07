@@ -41,7 +41,7 @@ std::vector<TargetInfo> getTargetInfo(
     if (zr > 0) {
       double scaling = kDifferentialHeight / zr;
       TargetInfo target;
-      target.distance = xr * scaling;
+      target.distance = std::hypot(xr, yr) * scaling;
       target.theta = std::atan2(yr, xr) * 180.0 / M_PI;
       rv.push_back(std::move(target));
     }
