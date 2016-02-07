@@ -31,7 +31,6 @@ public class VisionUpdate {
         long startMs = timestamp * 1000000L;
         VisionUpdate update = new VisionUpdate();
         try {
-            System.out.println(updateString);
             JSONObject j = (JSONObject) parser.parse(updateString);
             long capturedAgoMs = getOptLong(j.get("capturedAgoMs"), 0);
             if (capturedAgoMs == 0) {
