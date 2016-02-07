@@ -13,6 +13,11 @@ sudo ldconfig
 4. From `<repo-location>/mosquitto-1.4.7/` Run:
 sudo make install
 
+5. From `/etc/init` Run:
+sudo cp /home/ubuntu/FRC-2016/logger/mqtt_service.conf .
+sudo start mqtt_service
+
+
 In the gui:
 1. click the network icon in the system tray
 2. click "edit connections"
