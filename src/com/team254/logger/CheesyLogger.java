@@ -24,7 +24,7 @@ public class CheesyLogger {
     public static CheesyLogger makeCheesyLogger() {
         try {
             // TODO: unbreak mDNS and put a hostname here
-            return new CheesyLogger(new MqttSender("tcp://localhost:1883"));
+            return new CheesyLogger(new MqttSender("tcp://10.2.54.195:1883"));
         } catch (MqttException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

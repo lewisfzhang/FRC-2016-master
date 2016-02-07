@@ -3,7 +3,7 @@ var logDiv;
 
 $(document).ready(function() {
   logDiv = $("#log_div");
-  client = new Paho.MQTT.Client('localhost', 11883, "clienId");
+  client = new Paho.MQTT.Client('10.2.54.195', 11883, "clientId");
 
   // set callback handlers
   client.onConnectionLost = onConnectionLost;
