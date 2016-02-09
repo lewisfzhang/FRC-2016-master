@@ -3,7 +3,7 @@ var logDiv;
 
 $(document).ready(function() {
   logDiv = $("#log_div");
-  client = new Paho.MQTT.Client('10.2.54.195', 11883, "clientId");
+  client = new Paho.MQTT.Client('localhost', 11883, "clientId");
 
   // set callback handlers
   client.onConnectionLost = onConnectionLost;
@@ -42,10 +42,13 @@ function onConnectionLost(responseObject) {
 // called when a message arrives
 function onMessageArrived(message) {
   var logMessageArray = JSON.parse(message.payloadString);
-  var data = logMessageArray[0];
-  console.log(data);
-  if (data.type=="timeplot") {
-    addPoint(data.category, data.field, Number(data.walltime), Number(data.value));
+
+  for (var i = 0; i < logMessageArray.length; ++i) {
+    var data = logMessageArray[i];
+    console.log(data);
+    if (data.type=="timeplot") {
+      addPoint(data.category, data.field, Number(data.walltime), Number(data.value));
+    }
   }
 }
 

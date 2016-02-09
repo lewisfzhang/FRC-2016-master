@@ -38,7 +38,7 @@ public class Robot extends IterativeRobot {
     double gyroCalibrationStartTime = 0;
 
     public Robot() {
-        mCheesyLogger = CheesyLogger.makeCheesyLogger();
+        mCheesyLogger = CheesyLogger.makeCheesyLogger("10.2.54.195");
     }
 
     public class TestReceiver implements VisionUpdateReceiver {
@@ -48,8 +48,8 @@ public class Robot extends IterativeRobot {
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
                // System.out.println(i + " : " +  target.getAngle().getDegrees() + " : " + target.getDistance());
-                mCheesyLogger.sendTimePlotPoint("vision_angle", "angle", target.getAngle().getDegrees() );
-                mCheesyLogger.sendTimePlotPoint("vision_distance", "distance", target.getDistance() );
+                mCheesyLogger.sendTimePlotPoint("vision_angle", "angle", target.getAngle().getDegrees(), 20);
+                mCheesyLogger.sendTimePlotPoint("vision_distance", "distance", target.getDistance(), 20);
                 SmartDashboard.putNumber("Angle",target.getAngle().getDegrees() );
                 SmartDashboard.putNumber("Distance", target.getDistance());
             }
@@ -113,9 +113,10 @@ public class Robot extends IterativeRobot {
         } else {
             //drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
         }
-        mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle);
-        mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn);
-        
+
+        mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle, 100);
+        mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn, 100);
+
         test_servo.set(throttle);
 
         SmartDashboard.putNumber("left_distance", drive.getLeftDistanceInches());

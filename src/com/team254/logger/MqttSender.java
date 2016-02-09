@@ -114,12 +114,16 @@ public class MqttSender implements Runnable, MqttCallback {
             if (nextObject == null || nextObject.mQOS != curQos) {
                 break;
             }
-            mLogQueue.remove();
+            LogElement removedElement = mLogQueue.remove();
+            if (removedElement != nextObject) {
+                System.out.println("Wrong removed element");
+            }
             jsonMessages.add(new JSONObject(nextObject.mPayload));
             numLogs++;
         }
 
         try {
+            System.out.println("Batch size: " + jsonMessages.size());
             String payload = jsonMessages.toJSONString();
             synchronized (this) {
                 mMqttClient.publish("/robot_logging", payload.getBytes(), curQos.mQosValue, false);
