@@ -42,6 +42,7 @@ public class VisionServer implements Runnable {
                     long timestamp = System.nanoTime();
                     String message = new String(buffer, 0, read);
                     if ("PING".equals(message)) {
+                        m_socket.getOutputStream().write("PONG".getBytes());
                         continue;
                     }
                     VisionUpdate update = VisionUpdate.generateFromJsonString(timestamp, message);
