@@ -27,8 +27,8 @@ public class VisionUpdate {
 
     // Example json string
     // { "capturedAgoMs" : 100, "targets": [{"theta": 5.4, "distance": 5.5}] }
-    public static VisionUpdate generateFromJsonString(long timestamp, String updateString) {
-        long startMs = timestamp * 1000000L;
+    public static VisionUpdate generateFromJsonString(long timestampNanos, String updateString) {
+        long startMs = timestampNanos / 1000000L;
         VisionUpdate update = new VisionUpdate();
         try {
             JSONObject j = (JSONObject) parser.parse(updateString);

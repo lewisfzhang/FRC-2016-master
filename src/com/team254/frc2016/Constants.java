@@ -15,7 +15,7 @@ public class Constants extends ConstantsBase {
 
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
 
-    public static int kVisionUDPPort = 5254;
+    public static int kAndroidAppTcpPort = 8254;
 
     // PID gains for drive velocity loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
