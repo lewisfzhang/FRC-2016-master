@@ -16,7 +16,7 @@ public class InterpolatingTreeMap<K extends InverseInterpolable<K> & Comparable<
         extends TreeMap<K, V> {
     private static final long serialVersionUID = 8347275262778054124L;
 
-    Integer max_;
+    int max_;
 
     public InterpolatingTreeMap(int maximumSize) {
         max_ = maximumSize;
@@ -37,7 +37,7 @@ public class InterpolatingTreeMap<K extends InverseInterpolable<K> & Comparable<
      */
     @Override
     public V put(K key, V value) {
-        if (max_ != null && max_ <= size()) {
+        if (max_ > 0 && max_ <= size()) {
             // "Prune" the tree if it is oversize
             K first = firstKey();
             remove(first);
