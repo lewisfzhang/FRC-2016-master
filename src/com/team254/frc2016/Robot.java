@@ -8,7 +8,10 @@ import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.ADXRS453_Gyro;
+import com.team254.lib.util.MA3Encoder;
 import com.team254.logger.CheesyLogger;
+
+import edu.wpi.first.wpilibj.ContinuousRotationServo;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +31,9 @@ public class Robot extends IterativeRobot {
     CheesyDriveHelper cdh = new CheesyDriveHelper();
     ControlBoard controls = ControlBoard.getInstance();
     VisionServer visionServer = VisionServer.getInstance();
+    
+    MA3Encoder test_encoder = new MA3Encoder(0);
+    ContinuousRotationServo test_servo = new ContinuousRotationServo(0);
 
     double gyroCalibrationStartTime = 0;
 
@@ -81,6 +87,7 @@ public class Robot extends IterativeRobot {
         drive.resetEncoders();
     }
 
+    int count = 0;
     @Override
     public void disabledPeriodic() {
         double now = Timer.getFPGATimestamp();
@@ -90,6 +97,11 @@ public class Robot extends IterativeRobot {
             gyroCalibrationStartTime = now;
             drive.getGyro().startCalibrate();
         }
+        if (controls.getQuickTurn()) {
+            test_encoder.zero();
+        }
+        System.out.printf("MA3 angle %d %.2f\n", count++, test_encoder.getContinuousAngleDegrees() / 360);
+        // System.out.println("MA3 angle " + test_encoder.getContinuousAngleDegrees());
     }
 
     @Override
@@ -97,12 +109,14 @@ public class Robot extends IterativeRobot {
         double throttle = controls.getThrottle();
         double turn = controls.getTurn();
         if (controls.getBaseLock()) {
-            drive.baseLock();
+            //drive.baseLock();
         } else {
-            drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
+            //drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
         }
         mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle);
         mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn);
+        
+        test_servo.set(throttle);
 
         SmartDashboard.putNumber("left_distance", drive.getLeftDistanceInches());
         SmartDashboard.putNumber("right_distance", drive.getRightDistanceInches());
