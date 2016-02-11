@@ -9,6 +9,7 @@ import com.team254.lib.util.Rotation2d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class VisionUpdate {
     protected boolean valid = false;
@@ -24,6 +25,15 @@ public class VisionUpdate {
     }
 
     private static JSONParser parser = new JSONParser();
+
+    private static Optional<Double> parseDouble(JSONObject j, String key) throws ClassCastException {
+        Object d = j.get(key);
+        if (d == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of((double) d);
+        }
+    }
 
     // Example json string
     // { "capturedAgoMs" : 100, "targets": [{"angle": 5.4, "distance": 5.5}] }
@@ -43,18 +53,23 @@ public class VisionUpdate {
             ArrayList<TargetInfo> targetInfos = new ArrayList<>(targets.size());
             for (Object targetObj : targets) {
                 JSONObject target = (JSONObject) targetObj;
-                double distance = (double) target.get("distance");
+                Optional<Double> distance = parseDouble(target, "distance");
+                Optional<Double> angleRaw = parseDouble(target, "angle");
+                if (!(distance.isPresent() && angleRaw.isPresent())) {
+                    update.valid = false;
+                    return update;
+                }
                 Rotation2d angle = Rotation2d.fromDegrees((double) target.get("angle"));
-                targetInfos.add(new TargetInfo(distance, angle));
+                targetInfos.add(new TargetInfo(distance.get(), angle));
             }
             update.targets = targetInfos;
             update.valid = true;
         } catch (ParseException e) {
             System.err.println("Parse error: " + e);
-            e.printStackTrace();
+            System.err.println(updateString);
         } catch (ClassCastException e) {
             System.err.println("Data type error: " + e);
-            e.printStackTrace();
+            System.err.println(updateString);
         }
         return update;
     }
