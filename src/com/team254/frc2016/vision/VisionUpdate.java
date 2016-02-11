@@ -26,7 +26,7 @@ public class VisionUpdate {
     private static JSONParser parser = new JSONParser();
 
     // Example json string
-    // { "capturedAgoMs" : 100, "targets": [{"theta": 5.4, "distance": 5.5}] }
+    // { "capturedAgoMs" : 100, "targets": [{"angle": 5.4, "distance": 5.5}] }
     public static VisionUpdate generateFromJsonString(long timestampNanos, String updateString) {
         long startMs = timestampNanos / 1000000L;
         VisionUpdate update = new VisionUpdate();
@@ -44,7 +44,7 @@ public class VisionUpdate {
             for (Object targetObj : targets) {
                 JSONObject target = (JSONObject) targetObj;
                 double distance = (double) target.get("distance");
-                Rotation2d angle = Rotation2d.fromDegrees((double) target.get("theta"));
+                Rotation2d angle = Rotation2d.fromDegrees((double) target.get("angle"));
                 targetInfos.add(new TargetInfo(distance, angle));
             }
             update.targets = targetInfos;

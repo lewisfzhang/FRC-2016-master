@@ -10,7 +10,7 @@ public class TestVisionUpdate {
 
     @Test
     public void testSingleGood() {
-        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"theta\":5.3,\"distance\":15.3}]}";
+        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"angle\":5.3,\"distance\":15.3}]}";
         VisionUpdate v = VisionUpdate.generateFromJsonString(System.nanoTime(), s);
         assertTrue(v.isValid());
         assertEquals(100, v.getCapturedAgoMs());
@@ -22,7 +22,7 @@ public class TestVisionUpdate {
 
     @Test
     public void testMultiGood() {
-        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"theta\":5.3,\"distance\":15.3},{\"theta\":1.2,\"distance\":11.2}]}";
+        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"angle\":5.3,\"distance\":15.3},{\"angle\":1.2,\"distance\":11.2}]}";
         VisionUpdate v = VisionUpdate.generateFromJsonString(System.nanoTime(), s);
         assertTrue(v.isValid());
         assertEquals(100, v.getCapturedAgoMs());
@@ -36,14 +36,14 @@ public class TestVisionUpdate {
 
     @Test
     public void testBadString() {
-        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"theta\":5.3,\"distance\":15.3},{\"the";
+        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"angle\":5.3,\"distance\":15.3},{\"the";
         VisionUpdate v = VisionUpdate.generateFromJsonString(System.nanoTime(), s);
         assertFalse(v.isValid());
     }
 
     @Test
     public void testBadDataType() {
-        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"theta\":\"notanumber\",\"distance\":15.3}]}";
+        String s = "{\"capturedAgoMs\":100,\"targets\":[{\"angle\":\"notanumber\",\"distance\":15.3}]}";
         VisionUpdate v = VisionUpdate.generateFromJsonString(System.nanoTime(), s);
         assertFalse(v.isValid());
     }
