@@ -120,3 +120,9 @@ li {
 #sortable {
 	padding: 0
 }
+
+.form-group {
+    float: right;
+    margin-top: -9px;
+    margin-right: 20px;
+}

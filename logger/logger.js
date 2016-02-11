@@ -12,8 +12,7 @@ $(document).ready(function() {
   connect();
 
   $("#replay_button").click(onReplayButtonClick);
-  
-  logDiv.text("I'm ready!");
+
 });
 
 function connect() {
@@ -64,6 +63,7 @@ var dataPoints = {};
 var dataBase = {};
 var paused = {};
 var displaying = {};
+var chartStorage = {};
 
 /**
 * Adds a point to a graph/plot.  Will automatically create new graph and/or plot if they do not exist
@@ -84,9 +84,10 @@ function addPoint(chart, plot, x, y) {
   if (!paused[chart]) {
     if(!dataPoints[chart])
       dataPoints[chart] = {};
-    dataPoints[chart][plot] = dataBase[chart][plot].slice(dataBase[chart][plot].length-9000);
+    dataPoints[chart][plot] = dataBase[chart][plot].slice(-chartStorage[chart]);
     updateChart();  
   }
+  dataBase[chart][plot] = dataBase[chart][plot].slice(-chartStorage[chart]);
 }
 
 $(function() {
@@ -100,12 +101,10 @@ $(function() {
 
 function initChart(chartName) {
   $("#sortable").append('<li id="'+chartName+'grid"></li>');
-  $('#' + chartName + "grid").append('<div class="tivoContainer" id="'+chartName+'container"><h1><a class="dragger">&#9776;</a>'+chartName+' <a onclick="hideChart(\''+chartName+'\')" class="btn btn-danger btn-lg minButton" id="'+chartName+'minButton">&#10005;</a><a onclick="togglePause(\''+chartName+'\')" class="btn btn-primary btn-lg pauseButton" id="'+chartName+'pauseButton">&#9612;&#9612;</a></h1><div id="'+chartName+'" style="height: 300px; width: 100%;"></div><div id="'+chartName+'tivoBox" class="tivoBox"><div id="'+chartName+'tivoSlider" class="tivoSlider"></div></div></div>');
+  
+  $('#' + chartName + "grid").append('<div class="tivoContainer" id="'+chartName+'container"><h1><a class="dragger">&#9776;</a>'+chartName+' <a onclick="hideChart(\''+chartName+'\')" class="btn btn-danger btn-lg minButton" id="'+chartName+'minButton">&#10005;</a><a onclick="togglePause(\''+chartName+'\')" class="btn btn-primary btn-lg pauseButton" id="'+chartName+'pauseButton">&#9612;&#9612;</a><form class="form-group" style="display:inline-block;width:200px;" action="javascript:updateStorage(\''+chartName+'\')"><div class="input-group"><input id="'+chartName+'amount" min="0" value="9000" type="number" class="form-control"><span class="input-group-btn"><button class="btn btn-primary" type="submit">Submit</button></span></div></form></h1><div id="'+chartName+'" style="height: 300px; width: 100%;"></div><div id="'+chartName+'tivoBox" class="tivoBox"><div id="'+chartName+'tivoSlider" class="tivoSlider"></div></div></div>');
   chart[chartName] = new CanvasJS.Chart(chartName,{
     zoomEnabled: false,
-    // title: {
-    //  text: "Test Graph"    
-    // },
     toolTip: {
       shared: true
     },
@@ -145,6 +144,9 @@ function initChart(chartName) {
   else if(paused[chartName]) {
     $("#"+chartName+"pauseButton").html("<span style='font-size:20px;'>&#9658;</span>");
   }
+
+  if(!chartStorage[chart])
+      chartStorage[chart] = 9000;
 
   displaying[chartName] = true;
 
@@ -225,7 +227,7 @@ function togglePause(chartName) {
     $("#"+chartName+"pauseButton").html("&#9612;&#9612;");
     var keys = Object.keys(dataBase[chartName]);
     for(i=0; i<keys.length; i++)
-      dataPoints[chartName][keys[i]] = dataBase[chartName][keys[i]].slice(-9000);
+      dataPoints[chartName][keys[i]] = dataBase[chartName][keys[i]].slice(-chartStorage[chartName]);
   }
 }
 
@@ -233,17 +235,12 @@ function lerp(a, b, x) {
   return a*(1-x) + b*x;
 }
 
-function initProducer() {
-  addPoint("chart1", "graph1", 0, Math.random()*0.2-0.1);
-  addPoint("chart1", "graph2", 0, Math.random()*0.2-0.1);
-  for (var n = 0; n <= 9000; n++) {
-    produce("chart1", "graph1");
-    produce("chart1", "graph2");
-  }
-}
-
 function produce(chart, plot) {
   time = dataBase[chart][plot][dataBase[chart][plot].length-1].x+1000/30;
   addPoint(chart, plot, time, dataBase[chart][plot][dataBase[chart][plot].length-1].y+Math.random()*0.2-0.1);
 }
 
+function updateStorage(chartName) {
+  chartStorage[chartName] = $("#"+chartName+"amount").val();
+
+}
