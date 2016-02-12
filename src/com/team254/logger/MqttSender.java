@@ -45,11 +45,12 @@ public class MqttSender implements Runnable, MqttCallback {
     }
 
     public void sendPayload(Map<String, String> payload, QOS qos) {
-        if (mLogQueue.size() < MAX_MESSAGES_QUEUE_LENGTH) {
-            mLogQueue.add(new LogElement(payload, qos));
-        } else {
-            System.out.println("CheesyLogger Message Queue full");
+        if (mLogQueue.size() >= MAX_MESSAGES_QUEUE_LENGTH) {
+            // Too spammy when mqtt is disconnected
+            // System.out.println("CheesyLogger Message Queue full");
+            return;
         }
+        mLogQueue.add(new LogElement(payload, qos));
     }
 
     @Override
@@ -123,13 +124,13 @@ public class MqttSender implements Runnable, MqttCallback {
         }
 
         try {
-            System.out.println("Batch size: " + jsonMessages.size());
             String payload = jsonMessages.toJSONString();
             synchronized (this) {
                 mMqttClient.publish("/robot_logging", payload.getBytes(), curQos.mQosValue, false);
             }
         } catch (MqttException e) {
-            e.printStackTrace();
+            // Dropping the message
+            forceMqttConnect();
         }
     }
 

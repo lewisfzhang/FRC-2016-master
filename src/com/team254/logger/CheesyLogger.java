@@ -71,7 +71,6 @@ public class CheesyLogger {
         sampleKey.add(category);
         sampleKey.add(field);
         long lastSampleTime = mLastSampleMap.getOrDefault(sampleKey, 0L);
-        System.out.println("last sample time: " + lastSampleTime + " hash: " + sampleKey.hashCode());
         if (walltime - lastSampleTime < minSampleMillis) {
             return;
         }
