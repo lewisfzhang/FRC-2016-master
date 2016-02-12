@@ -115,10 +115,7 @@ public class MqttSender implements Runnable, MqttCallback {
             if (nextObject == null || nextObject.mQOS != curQos) {
                 break;
             }
-            LogElement removedElement = mLogQueue.remove();
-            if (removedElement != nextObject) {
-                System.out.println("Wrong removed element");
-            }
+            mLogQueue.remove();
             jsonMessages.add(new JSONObject(nextObject.mPayload));
             numLogs++;
         }
