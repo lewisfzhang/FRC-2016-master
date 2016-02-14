@@ -16,6 +16,7 @@ public class VisionServer implements Runnable {
     private int m_port;
     private ArrayList<VisionUpdateReceiver> receivers = new ArrayList<>();
     AdbBridge adb = new AdbBridge();
+    long lastMessageReceivedNanoTime = 0;
 
     public static VisionServer getInstance() {
         if (s_instance == null) {
@@ -42,6 +43,7 @@ public class VisionServer implements Runnable {
                 int read;
                 while (m_socket.isConnected() && (read = is.read(buffer)) != -1) {
                     long timestamp = System.nanoTime();
+                    lastMessageReceivedNanoTime = timestamp;
                     String message = new String(buffer, 0, read);
                     if ("PING".equals(message)) {
                         m_socket.getOutputStream().write("PONG".getBytes());
@@ -55,6 +57,7 @@ public class VisionServer implements Runnable {
                         }
                     }
                 }
+                System.out.print("Socket disconnected");
             } catch(IOException e) {
                 System.err.println("Could not talk to socket");
             }
@@ -79,6 +82,7 @@ public class VisionServer implements Runnable {
             e.printStackTrace();
         }
         new Thread(this).start();
+        new Thread(new ForcePortForwardingThread()).start();
     }
 
     public void restartAdb() {
@@ -106,6 +110,22 @@ public class VisionServer implements Runnable {
                 new Thread(new ServerThread(p)).start();
             } catch (IOException e) {
                 System.err.println("Issue accepting socket connection!");
+            }
+        }
+    }
+
+    private class ForcePortForwardingThread implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                if (System.nanoTime() - lastMessageReceivedNanoTime > 100E6) {
+                    adb.reversePortForward(m_port, m_port);
+                }
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
