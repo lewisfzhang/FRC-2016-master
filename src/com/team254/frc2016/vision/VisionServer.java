@@ -13,7 +13,9 @@ public class VisionServer implements Runnable {
     private static VisionServer s_instance = null;
     private ServerSocket m_server_socket;
     private boolean m_running = true;
+    private int m_port;
     private ArrayList<VisionUpdateReceiver> receivers = new ArrayList<>();
+    AdbBridge adb = new AdbBridge();
 
     public static VisionServer getInstance() {
         if (s_instance == null) {
@@ -68,11 +70,20 @@ public class VisionServer implements Runnable {
 
     private VisionServer(int port) {
         try {
+            adb = new AdbBridge();
+            m_port = port;
             m_server_socket = new ServerSocket(port);
+            adb.start();
+            adb.reversePortForward(port, port);
         } catch (IOException e) {
             e.printStackTrace();
         }
         new Thread(this).start();
+    }
+
+    public void restartAdb() {
+        adb.restart();
+        adb.reversePortForward(m_port, m_port);
     }
 
     public void addVisionUpdateReceiver(VisionUpdateReceiver receiver) {
