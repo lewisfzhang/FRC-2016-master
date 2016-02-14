@@ -25,9 +25,9 @@ public class VisionServer implements Runnable {
         return s_instance;
     }
 
-    protected class ServerThread implements Runnable
-    {
+    protected class ServerThread implements Runnable {
         private Socket m_socket;
+
         public ServerThread(Socket socket) {
             m_socket = socket;
         }

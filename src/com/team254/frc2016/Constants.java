@@ -39,6 +39,27 @@ public class Constants extends ConstantsBase {
     public static double kDriveBaseLockRampRate = 0;
     public static int kDriveBaseLockAllowableError = 10;
 
+    // PID gains for turret position loop
+    // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
+    public static double kTurretKp = 0.06;
+    public static double kTurretKi = 0.00006;
+    public static double kTurretKd = 6.0;
+    public static double kTurretKf = 0;
+    public static int kTurretIZone = 10000;
+    public static double kTurretRampRate = 0;
+    public static int kTurretAllowableError = 200;
+
+    // PID gains for turret position loop
+    // Units: error is (4096 counts/rev)/100ms. Max output is +/- 1023 units.
+    // TODO: tune me
+    public static double kFlywheelKp = 0.0;
+    public static double kFlywheelKi = 0.0;
+    public static double kFlywheelKd = 0.0;
+    public static double kFlywheelKf = 0.014;
+    public static int kFlywheelIZone = 0;
+    public static double kFlywheelRampRate = 0;
+    public static int kFlywheelAllowableError = 0;
+
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
     // https://docs.google.com/spreadsheets/d/1O2Szvp3cC3gO2euKjqhdmpsyd54t6eB2t9jzo41G2H4
@@ -50,6 +71,8 @@ public class Constants extends ConstantsBase {
     public static final int kLeftDriveSlaveId = 12;
     public static final int kRightDriveMasterId = 4;
     public static final int kRightDriveSlaveId = 3;
+    public static final int kShooterMasterId = 5;
+    public static final int kShooterSlaveId = 6;
 
     public static final int kShifterSolenoidId = 1; // TODO: determine this
 

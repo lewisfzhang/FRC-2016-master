@@ -14,12 +14,12 @@ import edu.wpi.first.wpilibj.Notifier;
 public class MA3Encoder {
     static final double kNominalPeriodS = 4098 * 1E-6;
     static final double kPeriodToleranceS = 100 * 1E-6;
-    
+
     protected DigitalInput digital_input_;
     protected Counter high_counter_; // access only from inner class after
                                      // construction
     protected Counter period_counter_; // access only from inner class after
-                                    // construction
+                                       // construction
     protected Notifier notifier_;
     protected Rotation2d rotation_ = new Rotation2d();
     protected Rotation2d home_ = new Rotation2d();
@@ -40,7 +40,8 @@ public class MA3Encoder {
             double t_high = high_counter_.getPeriod();
             double t_total = period_counter_.getPeriod();
             if (t_total > kNominalPeriodS + kPeriodToleranceS || t_total < kNominalPeriodS - kPeriodToleranceS) {
-                // We got a nonsensical rising-to-rising edge period, so ignore this sample.
+                // We got a nonsensical rising-to-rising edge period, so ignore
+                // this sample.
                 return;
             }
             double x = (t_high * 4098) / (t_total) - 1;
@@ -55,10 +56,12 @@ public class MA3Encoder {
                         + rotation_.inverse().rotateBy(new_rotation).getRadians();
                 if (relative_angle > Math.PI) {
                     ++num_rotations_;
-                    // System.out.println("Num rotations " + num_rotations_ + " angle " + new_rotation.getDegrees());
+                    // System.out.println("Num rotations " + num_rotations_ + "
+                    // angle " + new_rotation.getDegrees());
                 } else if (relative_angle < -Math.PI) {
                     --num_rotations_;
-                    // System.out.println("Num rotations " + num_rotations_ + " angle " + new_rotation.getDegrees());
+                    // System.out.println("Num rotations " + num_rotations_ + "
+                    // angle " + new_rotation.getDegrees());
                 }
                 rotation_ = new_rotation;
             }

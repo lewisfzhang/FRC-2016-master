@@ -6,4 +6,5 @@ public class Shooter {
     public static Shooter getInstance() {
         return instance_;
     }
+
 }

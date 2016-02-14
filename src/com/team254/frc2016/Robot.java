@@ -2,6 +2,7 @@
 package com.team254.frc2016;
 
 import com.team254.frc2016.subsystems.Drive;
+import com.team254.frc2016.subsystems.Flywheel;
 import com.team254.frc2016.subsystems.Turret;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
@@ -9,11 +10,13 @@ import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.lib.util.MA3Encoder;
+import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
 
 import edu.wpi.first.wpilibj.ContinuousRotationServo;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -28,12 +31,14 @@ public class Robot extends IterativeRobot {
     private final CheesyLogger mCheesyLogger;
     Turret turret = Turret.getInstance();
     Drive drive = Drive.getInstance();
+    Flywheel flywheel = Flywheel.getInstance();
     CheesyDriveHelper cdh = new CheesyDriveHelper();
     ControlBoard controls = ControlBoard.getInstance();
     VisionServer visionServer = VisionServer.getInstance();
-    
-    MA3Encoder test_encoder = new MA3Encoder(0);
+
+    // MA3Encoder test_encoder = new MA3Encoder(0);
     ContinuousRotationServo test_servo = new ContinuousRotationServo(0);
+    ContinuousRotationServo test_servo2 = new ContinuousRotationServo(1);
 
     double gyroCalibrationStartTime = 0;
 
@@ -47,16 +52,17 @@ public class Robot extends IterativeRobot {
         public void gotUpdate(VisionUpdate update) {
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
-               // System.out.println(i + " : " +  target.getAngle().getDegrees() + " : " + target.getDistance());
+                // System.out.println(i + " : " + target.getAngle().getDegrees()
+                // + " : " + target.getDistance());
                 mCheesyLogger.sendTimePlotPoint("vision_angle", "angle", target.getAngle().getDegrees(), 20);
                 mCheesyLogger.sendTimePlotPoint("vision_distance", "distance", target.getDistance(), 20);
-                SmartDashboard.putNumber("Angle",target.getAngle().getDegrees() );
+                SmartDashboard.putNumber("Angle", target.getAngle().getDegrees());
                 SmartDashboard.putNumber("Distance", target.getDistance());
             }
 
-
         }
     }
+
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -88,6 +94,7 @@ public class Robot extends IterativeRobot {
     }
 
     int count = 0;
+
     @Override
     public void disabledPeriodic() {
         double now = Timer.getFPGATimestamp();
@@ -98,10 +105,10 @@ public class Robot extends IterativeRobot {
             drive.getGyro().startCalibrate();
         }
         if (controls.getQuickTurn()) {
-            test_encoder.zero();
+            turret.reset(new Rotation2d());
         }
-        System.out.printf("MA3 angle %d %.2f\n", count++, test_encoder.getContinuousAngleDegrees() / 360);
-        // System.out.println("MA3 angle " + test_encoder.getContinuousAngleDegrees());
+        // System.out.println("MA3 angle " +
+        // test_encoder.getContinuousAngleDegrees());
     }
 
     @Override
@@ -109,16 +116,25 @@ public class Robot extends IterativeRobot {
         double throttle = controls.getThrottle();
         double turn = controls.getTurn();
         if (controls.getBaseLock()) {
-            //drive.baseLock();
+            // drive.baseLock();
         } else {
-            //drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
+            // drive.setOpenLoop(cdh.cheesyDrive(throttle, turn,
+            // controls.getQuickTurn()));
         }
 
         mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle, 100);
         mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn, 100);
 
-        test_servo.set(throttle);
+        turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));
+        flywheel.setOpenLoop(throttle);
 
+        // test_servo.set(throttle);
+        // test_servo2.set(-throttle);
+
+        SmartDashboard.putNumber("flywheel_rpm", flywheel.getRpm());
+        SmartDashboard.putNumber("turret_angle", turret.getAngle().getDegrees());
+        SmartDashboard.putBoolean("turret_fwd_limit", turret.getForwardLimitSwitch());
+        SmartDashboard.putBoolean("turret_rev_limit", turret.getReverseLimitSwitch());
         SmartDashboard.putNumber("left_distance", drive.getLeftDistanceInches());
         SmartDashboard.putNumber("right_distance", drive.getRightDistanceInches());
         SmartDashboard.putNumber("left_velocity", drive.getLeftVelocityInchesPerSec());

@@ -14,16 +14,8 @@ public class TestingMain {
 
         int modeChangeCount = 0;
         while (true) {
-            cheesyLogger.sendTimePlotPoint(
-                    "my_plot",
-                    "test_value",
-                    System.currentTimeMillis() % 10000,
-                    100);
-            cheesyLogger.sendTimePlotPoint(
-                    "my_other_plot",
-                    "test_value2",
-                    System.currentTimeMillis() % 1000,
-                    100);
+            cheesyLogger.sendTimePlotPoint("my_plot", "test_value", System.currentTimeMillis() % 10000, 100);
+            cheesyLogger.sendTimePlotPoint("my_other_plot", "test_value2", System.currentTimeMillis() % 1000, 100);
 
             modeChangeCount++;
             if (modeChangeCount == 1000) {

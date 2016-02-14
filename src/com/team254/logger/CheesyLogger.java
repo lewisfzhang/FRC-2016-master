@@ -52,17 +52,18 @@ public class CheesyLogger {
      * Send a value point which should be plotted against the current time in a
      * time-series plot.
      * 
-     * @param category Which plot this data should go on
-     * @param field Which data in this line this point is assocaited with (aka, which line it
-     *              belongs to)
-     * @param value The poisition of the point on the plot
-     * @param minSampleMillis The min milliseconds between 2 points to send for this category
+     * @param category
+     *            Which plot this data should go on
+     * @param field
+     *            Which data in this line this point is assocaited with (aka,
+     *            which line it belongs to)
+     * @param value
+     *            The poisition of the point on the plot
+     * @param minSampleMillis
+     *            The min milliseconds between 2 points to send for this
+     *            category
      */
-    public void sendTimePlotPoint(
-            String category,
-            String field,
-            double value,
-            long minSampleMillis) {
+    public void sendTimePlotPoint(String category, String field, double value, long minSampleMillis) {
         // Apply Sampling logic first
         long walltime = System.currentTimeMillis();
         ArrayList<String> sampleKey = new ArrayList<>(3);
