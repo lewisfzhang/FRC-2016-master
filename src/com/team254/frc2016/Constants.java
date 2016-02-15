@@ -55,7 +55,7 @@ public class Constants extends ConstantsBase {
     public static double kFlywheelKp = 0.0;
     public static double kFlywheelKi = 0.0;
     public static double kFlywheelKd = 0.0;
-    public static double kFlywheelKf = 0.014;
+    public static double kFlywheelKf = 0.015;
     public static int kFlywheelIZone = 0;
     public static double kFlywheelRampRate = 0;
     public static int kFlywheelAllowableError = 0;
@@ -73,6 +73,7 @@ public class Constants extends ConstantsBase {
     public static final int kRightDriveSlaveId = 3;
     public static final int kShooterMasterId = 5;
     public static final int kShooterSlaveId = 6;
+    public static final int kIntakeTalonId = 8;
 
     public static final int kShifterSolenoidId = 1; // TODO: determine this
 

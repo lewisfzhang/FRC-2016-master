@@ -3,20 +3,19 @@ package com.team254.frc2016;
 
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Flywheel;
+import com.team254.frc2016.subsystems.Intake;
 import com.team254.frc2016.subsystems.Turret;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.ADXRS453_Gyro;
-import com.team254.lib.util.MA3Encoder;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
 
 import edu.wpi.first.wpilibj.ContinuousRotationServo;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -32,6 +31,7 @@ public class Robot extends IterativeRobot {
     Turret turret = Turret.getInstance();
     Drive drive = Drive.getInstance();
     Flywheel flywheel = Flywheel.getInstance();
+    Intake intake = Intake.getInstance();
     CheesyDriveHelper cdh = new CheesyDriveHelper();
     ControlBoard controls = ControlBoard.getInstance();
     VisionServer visionServer = VisionServer.getInstance();
@@ -125,11 +125,11 @@ public class Robot extends IterativeRobot {
         mCheesyLogger.sendTimePlotPoint("joystick", "throttle", throttle, 100);
         mCheesyLogger.sendTimePlotPoint("joystick", "turn", turn, 100);
 
-        turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));
-        flywheel.setOpenLoop(throttle);
-
-        // test_servo.set(throttle);
-        // test_servo2.set(-throttle);
+        //turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));
+        //flywheel.setOpenLoop(throttle);
+        test_servo.set(throttle);
+        test_servo2.set(-throttle);
+        //intake.set(throttle);
 
         SmartDashboard.putNumber("flywheel_rpm", flywheel.getRpm());
         SmartDashboard.putNumber("turret_angle", turret.getAngle().getDegrees());

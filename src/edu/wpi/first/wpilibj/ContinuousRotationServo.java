@@ -15,12 +15,12 @@ public class ContinuousRotationServo extends PWM {
     public ContinuousRotationServo(int channel) {
         super(channel);
 
-        setBounds(1.3, 1.49, 1.5, 1.51, 1.7);
+        setBounds(1.0, 1.49, 1.5, 1.51, 2.0);
 
         // Static Values pulled from graph for 7.4V operation, then converted to
         // 6V
         // Key: RPM, Value: Pulse Width in ms
-        tree.put(new InterpolatingDouble(6 / 7.4 * 200.0), new InterpolatingDouble(1.3));
+        tree.put(new InterpolatingDouble(6 / 7.4 * 200.0), new InterpolatingDouble(1.0));
         tree.put(new InterpolatingDouble(6 / 7.4 * 199.9), new InterpolatingDouble(1.325));
         tree.put(new InterpolatingDouble(6 / 7.4 * 195.0), new InterpolatingDouble(1.35));
         tree.put(new InterpolatingDouble(6 / 7.4 * 190.0), new InterpolatingDouble(1.375));
@@ -36,12 +36,15 @@ public class ContinuousRotationServo extends PWM {
         tree.put(new InterpolatingDouble(6 / 7.4 * -180.0), new InterpolatingDouble(1.625));
         tree.put(new InterpolatingDouble(6 / 7.4 * -185.0), new InterpolatingDouble(1.65));
         tree.put(new InterpolatingDouble(6 / 7.4 * -195.0), new InterpolatingDouble(1.675));
-        tree.put(new InterpolatingDouble(6 / 7.4 * -200.0), new InterpolatingDouble(1.7));
+        tree.put(new InterpolatingDouble(6 / 7.4 * -200.0), new InterpolatingDouble(2.0));
     }
 
     private double scaleOut(double pulsewidth) {
         // Takes in 1.3 thru 1.7 and outputs -1 to 1
-        return (pulsewidth - 1.5) / (.4);
+        double rv = (pulsewidth - 1.5) / (.4);
+        if (rv <= 1.3) rv = 1.0;
+        else if (rv >= 1.7) rv = 2.0;
+        return rv;
     }
 
     private double scaleIn(double input) {
@@ -50,6 +53,7 @@ public class ContinuousRotationServo extends PWM {
     }
 
     public void set(double value) {
+        setSpeed(value);
         setSpeed(scaleOut(tree.getInterpolated(new InterpolatingDouble(scaleIn(value))).value));
     }
 }
