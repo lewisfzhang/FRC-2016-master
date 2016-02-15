@@ -15,7 +15,7 @@ public class VisionServerTest {
     public static void main(String[] args) {
         VisionServer visionServer = VisionServer.getInstance();
         visionServer.addVisionUpdateReceiver(new TestReceiver());
-        while (true){
+        while (true) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

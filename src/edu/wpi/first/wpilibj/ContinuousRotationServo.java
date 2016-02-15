@@ -42,8 +42,10 @@ public class ContinuousRotationServo extends PWM {
     private double scaleOut(double pulsewidth) {
         // Takes in 1.3 thru 1.7 and outputs -1 to 1
         double rv = (pulsewidth - 1.5) / (.4);
-        if (rv <= 1.3) rv = 1.0;
-        else if (rv >= 1.7) rv = 2.0;
+        if (rv <= 1.3)
+            rv = 1.0;
+        else if (rv >= 1.7)
+            rv = 2.0;
         return rv;
     }
 

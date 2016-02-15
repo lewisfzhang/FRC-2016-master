@@ -91,6 +91,7 @@ public class Rotation2d implements Interpolable<Rotation2d> {
         return new Rotation2d(cos_angle_, -sin_angle_, false);
     }
 
+    @Override
     public Rotation2d interpolate(Rotation2d other, double x) {
         if (x <= 0) {
             return new Rotation2d(this);
@@ -101,6 +102,7 @@ public class Rotation2d implements Interpolable<Rotation2d> {
         return this.rotateBy(Rotation2d.fromRadians(angle_diff * x));
     }
 
+    @Override
     public String toString() {
         final DecimalFormat fmt = new DecimalFormat("#0.000");
         return "(" + fmt.format(getDegrees()) + " deg)";

@@ -67,6 +67,7 @@ public class Pose2d implements Interpolable<Pose2d> {
 
     // This currently does Riemannian interpolation. We could do twist
     // interpolation if necessary.
+    @Override
     public Pose2d interpolate(Pose2d other, double x) {
         if (x <= 0) {
             return new Pose2d(this);
@@ -76,6 +77,7 @@ public class Pose2d implements Interpolable<Pose2d> {
         return new Pose2d(translation_.interpolate(other.translation_, x), rotation_.interpolate(other.rotation_, x));
     }
 
+    @Override
     public String toString() {
         return "T:" + translation_.toString() + ", R:" + rotation_.toString();
     }

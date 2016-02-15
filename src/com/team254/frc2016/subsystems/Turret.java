@@ -5,8 +5,9 @@ import com.team254.lib.util.Rotation2d;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Turret {
+public class Turret extends Subsystem {
     private static Turret instance_ = new Turret();
 
     public static Turret getInstance() {
@@ -51,10 +52,6 @@ public class Turret {
         talon_.set(speed);
     }
 
-    public synchronized void stop() {
-        setOpenLoop(0);
-    }
-
     public synchronized void reset(Rotation2d actual_rotation) {
         talon_.setPosition(actual_rotation.getRadians() / (2 * Math.PI * getReduction()));
     }
@@ -69,5 +66,24 @@ public class Turret {
 
     public synchronized boolean getReverseLimitSwitch() {
         return talon_.isRevLimitSwitchClosed();
+    }
+
+    @Override
+    public synchronized void stop() {
+        setOpenLoop(0);
+    }
+
+    @Override
+    public void outputToSmartDashboard() {
+        SmartDashboard.putNumber("turret_angle", getAngle().getDegrees());
+        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() / (360.0 * getReduction()));
+        SmartDashboard.putBoolean("turret_fwd_limit", getForwardLimitSwitch());
+        SmartDashboard.putBoolean("turret_rev_limit", getReverseLimitSwitch());
+
+    }
+
+    @Override
+    public void zeroSensors() {
+        reset(new Rotation2d());
     }
 }

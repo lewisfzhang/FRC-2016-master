@@ -58,6 +58,7 @@ public class Translation2d implements Interpolable<Translation2d> {
         return new Translation2d(-x_, -y_);
     }
 
+    @Override
     public Translation2d interpolate(Translation2d other, double x) {
         if (x <= 0) {
             return new Translation2d(this);
@@ -67,6 +68,7 @@ public class Translation2d implements Interpolable<Translation2d> {
         return new Translation2d(x * (other.x_ - x_) + x_, x * (other.y_ - y_) + y_);
     }
 
+    @Override
     public String toString() {
         final DecimalFormat fmt = new DecimalFormat("#0.000");
         return "(" + fmt.format(x_) + "," + fmt.format(y_) + ")";

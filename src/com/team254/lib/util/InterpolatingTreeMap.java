@@ -80,7 +80,7 @@ public class InterpolatingTreeMap<K extends InverseInterpolable<K> & Comparable<
             // Get surrounding values for interpolation
             V topElem = get(topBound);
             V bottomElem = get(bottomBound);
-            return (V) bottomElem.interpolate(topElem, bottomBound.inverseInterpolate(topBound, key));
+            return bottomElem.interpolate(topElem, bottomBound.inverseInterpolate(topBound, key));
         } else {
             return gotval;
         }

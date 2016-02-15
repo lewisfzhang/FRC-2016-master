@@ -7,8 +7,9 @@ import com.team254.lib.util.DriveSignal;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Drive {
+public class Drive extends Subsystem {
     protected static final int kVelocityControlSlot = 0;
     protected static final int kBaseLockControlSlot = 1;
 
@@ -138,10 +139,6 @@ public class Drive {
         return gyro_;
     }
 
-    public synchronized void stop() {
-        setOpenLoop(DriveSignal.NEUTRAL);
-    }
-
     protected synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
         leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
         rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
@@ -195,5 +192,25 @@ public class Drive {
     public synchronized void resetEncoders() {
         leftMaster_.setPosition(0);
         rightMaster_.setPosition(0);
+    }
+
+    @Override
+    public synchronized void stop() {
+        setOpenLoop(DriveSignal.NEUTRAL);
+    }
+
+    @Override
+    public void outputToSmartDashboard() {
+        SmartDashboard.putNumber("left_distance", getLeftDistanceInches());
+        SmartDashboard.putNumber("right_distance", getRightDistanceInches());
+        SmartDashboard.putNumber("left_velocity", getLeftVelocityInchesPerSec());
+        SmartDashboard.putNumber("right_velocity", getRightVelocityInchesPerSec());
+        SmartDashboard.putNumber("gyro_angle", getGyro().getAngle());
+    }
+
+    @Override
+    public synchronized void zeroSensors() {
+        resetEncoders();
+        gyro_.reset();
     }
 }

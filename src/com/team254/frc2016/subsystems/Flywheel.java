@@ -4,8 +4,9 @@ import com.team254.frc2016.Constants;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Flywheel {
+public class Flywheel extends Subsystem {
     static Flywheel instance_ = new Flywheel();
 
     public static Flywheel getInstance() {
@@ -56,7 +57,19 @@ public class Flywheel {
         master_talon_.set(speed);
     }
 
+    @Override
     public synchronized void stop() {
         setOpenLoop(0);
+    }
+
+    @Override
+    public void outputToSmartDashboard() {
+        SmartDashboard.putNumber("flywheel_rpm", getRpm());
+        SmartDashboard.putNumber("flywheel_setpoint", master_talon_.getSetpoint());
+    }
+
+    @Override
+    public void zeroSensors() {
+        // no-op
     }
 }

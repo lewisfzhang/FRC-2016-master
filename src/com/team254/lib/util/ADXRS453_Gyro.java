@@ -171,6 +171,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void reset() {
         if (m_is_calibrating) {
             cancelCalibrate();
@@ -192,6 +193,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized double getAngle() {
         if (m_spi == null)
             return 0.0;
@@ -204,6 +206,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized double getRate() {
         if (m_spi == null)
             return 0.0;

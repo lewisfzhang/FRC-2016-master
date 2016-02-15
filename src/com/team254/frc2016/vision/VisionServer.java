@@ -58,7 +58,7 @@ public class VisionServer implements Runnable {
                     }
                 }
                 System.out.print("Socket disconnected");
-            } catch(IOException e) {
+            } catch (IOException e) {
                 System.err.println("Could not talk to socket");
             }
             if (m_socket != null) {
