@@ -11,6 +11,8 @@ import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * RobotState keeps track of the poses of various inertial frames throughout the
  * match.
@@ -121,8 +123,18 @@ public class RobotState {
         return latest_camera_to_goals_detected_timestamp_ > latest_camera_to_goals_undetected_timestamp_;
     }
 
+    public synchronized List<Pose2d> getCaptureTimeOdometricToGoals() {
+        List<Pose2d> rv = new ArrayList<>();
+
+        Pose2d odometric_to_camera = getOdometricToCamera(latest_camera_to_goals_detected_timestamp_);
+        for (Translation2d pos : camera_to_goals_) {
+            rv.add(odometric_to_camera.transformBy(Pose2d.fromTranslation(pos)));
+        }
+        return rv;
+    }
+
     public synchronized List<TargetInfo> getDesiredTurretRotationToGoals() {
-        List<TargetInfo> rv = new ArrayList<TargetInfo>();
+        List<TargetInfo> rv = new ArrayList<>();
         Pose2d capture_time_turret_fixed_to_camera = Pose2d
                 .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_))
                 .transformBy(kTurretRotatingToCamera);
@@ -137,7 +149,7 @@ public class RobotState {
                     .transformBy(capture_time_turret_fixed_to_goal);
 
             // We can actually disregard the angular portion of this pose. It is
-            // the angle bearing that we care about!
+            // the bearing that we care about!
             rv.add(new TargetInfo(latest_turret_fixed_to_goal.getTranslation().norm(),
                     new Rotation2d(latest_turret_fixed_to_goal.getTranslation().getX(),
                             latest_turret_fixed_to_goal.getTranslation().getY(), true)));
@@ -184,6 +196,14 @@ public class RobotState {
     }
 
     public void outputToSmartDashboard() {
-
+        Pose2d odometry = getLatestOdometricToVehicle().getValue();
+        SmartDashboard.putNumber("robot_pose_x", odometry.getTranslation().getX());
+        SmartDashboard.putNumber("robot_pose_y", odometry.getTranslation().getY());
+        SmartDashboard.putNumber("robot_pose_theta", odometry.getRotation().getDegrees());
+        if (camera_to_goals_.size() > 0) {
+            List<Pose2d> poses = getCaptureTimeOdometricToGoals();
+            SmartDashboard.putNumber("goal_pose_x", poses.get(0).getTranslation().getX());
+            SmartDashboard.putNumber("goal_pose_y", poses.get(0).getTranslation().getY());
+        }
     }
 }

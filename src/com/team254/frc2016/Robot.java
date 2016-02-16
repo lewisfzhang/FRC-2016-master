@@ -78,6 +78,8 @@ public class Robot extends IterativeRobot {
         mHood.outputToSmartDashboard();
         mTurret.outputToSmartDashboard();
         mFlywheel.outputToSmartDashboard();
+
+        mRobotState.outputToSmartDashboard();
     }
 
     public void zeroAllSensors() {
@@ -86,6 +88,7 @@ public class Robot extends IterativeRobot {
         mHood.zeroSensors();
         mTurret.zeroSensors();
         mFlywheel.zeroSensors();
+        mRobotState.reset(Timer.getFPGATimestamp(), new Pose2d(), new Rotation2d());
     }
 
     /**
@@ -99,7 +102,6 @@ public class Robot extends IterativeRobot {
 
         // Reset all state
         zeroAllSensors();
-        mRobotState.reset(Timer.getFPGATimestamp(), new Pose2d(), new Rotation2d());
 
         // Configure loopers
         mEnabledLooper.register(new TurretResetter());
@@ -125,7 +127,6 @@ public class Robot extends IterativeRobot {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
 
         // Reset all state
-        mRobotState.reset(Timer.getFPGATimestamp(), new Pose2d(), new Rotation2d());
         zeroAllSensors();
 
         // Configure loopers
