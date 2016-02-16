@@ -11,6 +11,8 @@ import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * RobotState keeps track of the poses of various inertial frames throughout the
  * match.

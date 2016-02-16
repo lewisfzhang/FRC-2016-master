@@ -13,9 +13,21 @@ public class Constants extends ConstantsBase {
     public static double kCameraYOffset = 0.0;
     public static double kCameraAngleOffsetDegrees = 0.0;
 
+    // Wheel diameter
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
 
+    // Hood constants
+    public static double kMinHoodAngle = 26.0;
+    public static double kMaxHoodAngle = 59.0;
+
     public static int kAndroidAppTcpPort = 8254;
+
+    // PID gains for hood position loop
+    // Units: error is degrees of hood rotation. Max output is +/- 1.0.
+    // Loop runs at 100Hz
+    public static double kHoodKp = 1.0;
+    public static double kHoodKi = 0.1;
+    public static double kHoodKd = 0.0;
 
     // PID gains for drive velocity loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
@@ -73,9 +85,15 @@ public class Constants extends ConstantsBase {
     public static final int kRightDriveSlaveId = 3;
     public static final int kShooterMasterId = 5;
     public static final int kShooterSlaveId = 6;
-    public static final int kIntakeTalonId = 8;
+    public static final int kIntakeTalonId = 7;
+    public static final int kFixedRollerTalonId = 8;
 
     public static final int kShifterSolenoidId = 1; // TODO: determine this
+
+    public static final int kHoodEncoderDIO = 0;
+
+    public static final int kSensorSideServoPWM = 0;
+    public static final int kOppositeSideServoPWM = 1;
 
     @Override
     public String getFileLocation() {

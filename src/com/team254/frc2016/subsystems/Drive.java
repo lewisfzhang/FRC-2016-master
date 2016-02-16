@@ -3,6 +3,7 @@ package com.team254.frc2016.subsystems;
 import com.team254.frc2016.Constants;
 import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.lib.util.DriveSignal;
+import com.team254.lib.util.Rotation2d;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -137,6 +138,10 @@ public class Drive extends Subsystem {
 
     public ADXRS453_Gyro getGyro() {
         return gyro_;
+    }
+
+    public synchronized Rotation2d getGyroAngle() {
+        return Rotation2d.fromDegrees(gyro_.getAngle());
     }
 
     protected synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {

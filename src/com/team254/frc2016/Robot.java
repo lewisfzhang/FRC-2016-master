@@ -1,6 +1,8 @@
 
 package com.team254.frc2016;
 
+import com.team254.frc2016.loops.Looper;
+import com.team254.frc2016.loops.RobotStateEstimator;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Flywheel;
 import com.team254.frc2016.subsystems.Hood;
@@ -11,6 +13,7 @@ import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.ADXRS453_Gyro;
+import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
 
@@ -36,6 +39,9 @@ public class Robot extends IterativeRobot {
     CheesyDriveHelper cdh = new CheesyDriveHelper();
     ControlBoard controls = ControlBoard.getInstance();
     VisionServer visionServer = VisionServer.getInstance();
+    RobotState robot_state = RobotState.getInstance();
+
+    Looper looper = Looper.getInstance();
 
     double gyroCalibrationStartTime = 0;
 
@@ -94,30 +100,34 @@ public class Robot extends IterativeRobot {
         visionServer.addVisionUpdateReceiver(new TestReceiver());
 
         zeroAllSensors();
+        looper.register(RobotStateEstimator.getInstance());
+        robot_state.reset(System.nanoTime(), new Pose2d(), new Rotation2d());
     }
 
     @Override
     public void disabledInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
-
+        looper.stop();
         stopAll();
     }
 
     @Override
     public void autonomousInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
+        robot_state.reset(System.nanoTime(), new Pose2d(), new Rotation2d());
         drive.getGyro().cancelCalibrate();
-        drive.getGyro().reset();
+        drive.zeroSensors();
+        looper.start();
     }
 
     @Override
     public void teleopInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
+        robot_state.reset(System.nanoTime(), new Pose2d(), new Rotation2d());
         drive.getGyro().cancelCalibrate();
         drive.resetEncoders();
+        looper.start();
     }
-
-    int count = 0;
 
     @Override
     public void disabledPeriodic() {
@@ -140,13 +150,14 @@ public class Robot extends IterativeRobot {
         double throttle = controls.getThrottle();
         double turn = controls.getTurn();
         if (controls.getBaseLock()) {
-            drive.baseLock();
+            // drive.baseLock();
         } else {
-            drive.setOpenLoop(cdh.cheesyDrive(throttle, turn, controls.getQuickTurn()));
+            // drive.setOpenLoop(cdh.cheesyDrive(throttle, turn,
+            // controls.getQuickTurn()));
         }
 
         // turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));
-        // flywheel.setOpenLoop(throttle);
+        flywheel.setOpenLoop(throttle);
         // test_servo.set(throttle);
         // test_servo2.set(-throttle);
         // intake.set(throttle);
