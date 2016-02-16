@@ -32,17 +32,17 @@ public class Turret extends Subsystem {
         talon_.reverseOutput(false);
     }
 
-    public synchronized void setDesiredAngle(Rotation2d angle) {
+    synchronized void setDesiredAngle(Rotation2d angle) {
         talon_.changeControlMode(CANTalon.TalonControlMode.Position);
         talon_.set(angle.getRadians() / (2 * Math.PI * Constants.kTurretGearReduction));
     }
 
-    public synchronized void setOpenLoop(double speed) {
+    synchronized void setOpenLoop(double speed) {
         talon_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         talon_.set(speed);
     }
 
-    public synchronized void reset(Rotation2d actual_rotation) {
+    synchronized void reset(Rotation2d actual_rotation) {
         talon_.setPosition(actual_rotation.getRadians() / (2 * Math.PI * Constants.kTurretGearReduction));
     }
 

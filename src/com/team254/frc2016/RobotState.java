@@ -138,7 +138,7 @@ public class RobotState {
         return rv;
     }
 
-    public synchronized List<Shooter.AimingParameters> aimTowardsGoals() {
+    public synchronized List<Shooter.AimingParameters> getAimingParameters() {
         List<Shooter.AimingParameters> rv = new ArrayList<>();
         Pose2d capture_time_turret_fixed_to_camera = Pose2d
                 .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_))

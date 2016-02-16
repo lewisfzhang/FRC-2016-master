@@ -7,6 +7,7 @@ import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.SynchronousPID;
 
 import edu.wpi.first.wpilibj.ContinuousRotationServo;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,6 +15,7 @@ public class Hood extends Subsystem {
     ContinuousRotationServo left_servo_;
     ContinuousRotationServo right_servo_;
     MA3Encoder encoder_;
+    Solenoid stow_solenoid_;
     boolean has_homed_;
     SynchronousPID pid_;
 
@@ -69,6 +71,7 @@ public class Hood extends Subsystem {
         right_servo_ = new ContinuousRotationServo(Constants.kSensorSideServoPWM);
         encoder_ = new MA3Encoder(Constants.kHoodEncoderDIO);
         pid_ = new SynchronousPID(Constants.kHoodKp, Constants.kHoodKi, Constants.kHoodKd);
+        stow_solenoid_ = new Solenoid(Constants.kHoodStowSolenoidId);
 
         has_homed_ = false;
         pid_.setSetpoint(Constants.kMinHoodAngle);
@@ -151,5 +154,13 @@ public class Hood extends Subsystem {
     @Override
     public synchronized void zeroSensors() {
         encoder_.zero();
+    }
+
+    public boolean isStowed() {
+        return !stow_solenoid_.get();
+    }
+
+    void setStowed(boolean stow) {
+        stow_solenoid_.set(!stow);
     }
 }

@@ -37,6 +37,11 @@ public class Constants extends ConstantsBase {
 
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 100.0;
+    public static double kFlywheelBatterRpmSetpoint = 6000.0;
+    public static double kFlywheelAutoAimRpmSetpoint = 6000.0;
+
+    // Auto aiming constnats
+    public static double kAutoAimRangeHysteresis = 5.0;
 
     public static int kAndroidAppTcpPort = 8254;
 
@@ -112,6 +117,7 @@ public class Constants extends ConstantsBase {
 
     // SOLENOIDS
     public static final int kShifterSolenoidId = 1; // TODO: determine this
+    public static final int kHoodStowSolenoidId = 2; // TODO: determine this
 
     // DIGITAL IO
     public static final int kHoodEncoderDIO = 0;

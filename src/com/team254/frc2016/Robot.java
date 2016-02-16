@@ -141,7 +141,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledPeriodic() {
         if (mControls.getQuickTurn()) {
-            mShooter.getTurret().reset(new Rotation2d());
+            mShooter.zeroTurret();
         }
 
         outputAllToSmartDashboard();
