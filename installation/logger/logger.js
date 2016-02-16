@@ -5,7 +5,8 @@ var DEFAULT_NUM_POINTS = 2000;
 
 $(document).ready(function() {
   logDiv = $("#log_div");
-  client = new Paho.MQTT.Client('10.2.52.2', 11883, "clientId" + parseInt(Math.random() * 100000));
+  client = new Paho.MQTT.Client(
+    location.hostname, 11883, "clientId" + parseInt(Math.random() * 100000));
 
   // set callback handlers
   client.onConnectionLost = onConnectionLost;
@@ -48,7 +49,7 @@ function onMessageArrived(message) {
 
   for (var i = 0; i < logMessageArray.length; ++i) {
     var data = logMessageArray[i];
-    console.log(data);
+    // console.log(data);
     if (data.type=="timeplot") {
       addPoint(data.category, data.field, Number(data.walltime), Number(data.value));
     }
