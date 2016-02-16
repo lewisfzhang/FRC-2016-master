@@ -4,6 +4,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * AdbBridge interfaces to an Android Debug Bridge (adb) binary,
+ * which is needed to communicate to Android devices over USB.
+ *
+ * adb binary provided by https://github.com/Spectrum3847/RIOdroid
+ *
+ * @author Tom
+ */
 public class AdbBridge {
     Path bin_location_;
     public final static Path DEFAULT_LOCATION = Paths.get("/usr/bin/adb");
