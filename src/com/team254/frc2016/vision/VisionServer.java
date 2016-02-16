@@ -2,6 +2,8 @@ package com.team254.frc2016.vision;
 
 import com.team254.frc2016.Constants;
 
+import edu.wpi.first.wpilibj.Timer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
@@ -16,7 +18,7 @@ public class VisionServer implements Runnable {
     private int m_port;
     private ArrayList<VisionUpdateReceiver> receivers = new ArrayList<>();
     AdbBridge adb = new AdbBridge();
-    long lastMessageReceivedNanoTime = 0;
+    double lastMessageReceivedTime = 0;
 
     public static VisionServer getInstance() {
         if (s_instance == null) {
@@ -42,8 +44,8 @@ public class VisionServer implements Runnable {
                 byte[] buffer = new byte[2048];
                 int read;
                 while (m_socket.isConnected() && (read = is.read(buffer)) != -1) {
-                    long timestamp = System.nanoTime();
-                    lastMessageReceivedNanoTime = timestamp;
+                    double timestamp = Timer.getFPGATimestamp();
+                    lastMessageReceivedTime = timestamp;
                     String message = new String(buffer, 0, read);
                     if ("PING".equals(message)) {
                         m_socket.getOutputStream().write("PONG".getBytes());
@@ -118,7 +120,7 @@ public class VisionServer implements Runnable {
         @Override
         public void run() {
             while (true) {
-                if (System.nanoTime() - lastMessageReceivedNanoTime > 100E6) {
+                if (Timer.getFPGATimestamp() - lastMessageReceivedTime > .1) {
                     adb.reversePortForward(m_port, m_port);
                 }
                 try {

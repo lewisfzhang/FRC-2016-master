@@ -5,8 +5,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.team254.lib.util.Rotation2d;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +13,7 @@ public class VisionUpdate {
     protected boolean valid = false;
     protected long capturedAgoMs;
     protected List<TargetInfo> targets;
-    protected long capturedAtMs = 0;
+    protected double capturedAtTimestamp = 0;
 
     private static long getOptLong(Object n, long defaultValue) {
         if (n == null) {
@@ -36,9 +34,8 @@ public class VisionUpdate {
     }
 
     // Example json string
-    // { "capturedAgoMs" : 100, "targets": [{"angle": 5.4, "distance": 5.5}] }
-    public static VisionUpdate generateFromJsonString(long timestampNanos, String updateString) {
-        long startMs = timestampNanos / 1000000L;
+    // { "capturedAgoMs" : 100, "targets": [{"y": 5.4, "z": 5.5}] }
+    public static VisionUpdate generateFromJsonString(double current_time, String updateString) {
         VisionUpdate update = new VisionUpdate();
         try {
             JSONObject j = (JSONObject) parser.parse(updateString);
@@ -48,19 +45,18 @@ public class VisionUpdate {
                 return update;
             }
             update.capturedAgoMs = capturedAgoMs;
-            update.capturedAtMs = startMs - capturedAgoMs;
+            update.capturedAtTimestamp = current_time - capturedAgoMs / 1000.0;
             JSONArray targets = (JSONArray) j.get("targets");
             ArrayList<TargetInfo> targetInfos = new ArrayList<>(targets.size());
             for (Object targetObj : targets) {
                 JSONObject target = (JSONObject) targetObj;
-                Optional<Double> distance = parseDouble(target, "distance");
-                Optional<Double> angleRaw = parseDouble(target, "angle");
-                if (!(distance.isPresent() && angleRaw.isPresent())) {
+                Optional<Double> y = parseDouble(target, "y");
+                Optional<Double> z = parseDouble(target, "z");
+                if (!(y.isPresent() && z.isPresent())) {
                     update.valid = false;
                     return update;
                 }
-                Rotation2d angle = Rotation2d.fromDegrees((double) target.get("angle"));
-                targetInfos.add(new TargetInfo(distance.get(), angle));
+                targetInfos.add(new TargetInfo(y.get(), z.get()));
             }
             update.targets = targetInfos;
             update.valid = true;
@@ -86,8 +82,8 @@ public class VisionUpdate {
         return capturedAgoMs;
     }
 
-    public long getCapturedAtMs() {
-        return capturedAtMs;
+    public double getCapturedAtTimestamp() {
+        return capturedAtTimestamp;
     }
 
 }

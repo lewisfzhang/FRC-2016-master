@@ -7,7 +7,7 @@ public class VisionServerTest {
             System.out.println("num targets: " + update.getTargets().size());
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
-                System.out.println("Target: " + target.getAngle() + ", " + target.getDistance());
+                System.out.println("Target: " + target.getY() + ", " + target.getZ());
             }
         }
     }

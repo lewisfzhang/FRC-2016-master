@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.RobotState;
+import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
@@ -112,14 +113,14 @@ public class TestRobotState {
         // robot at (1, 0, 0 deg), turret at (45 deg)
         // target detected straight ahead in camera frame
         List<TargetInfo> vision_updates = new ArrayList<TargetInfo>();
-        vision_updates.add(new TargetInfo(100, Rotation2d.fromDegrees(0)));
+        vision_updates.add(new TargetInfo(0, 0));
         rs.addVisionUpdate(next_time, vision_updates);
         assertTrue(rs.canSeeTarget());
 
         // Turret already pointing at target
-        List<TargetInfo> desired_turret_angles = rs.getDesiredTurretRotationToGoals();
-        assertEquals(1, desired_turret_angles.size());
-        assertEquals(45, desired_turret_angles.get(0).getAngle().getDegrees(), kTestEpsilon);
+        List<Shooter.AimingParameters> targeting_info = rs.aimTowardsGoals();
+        assertEquals(1, targeting_info.size());
+        assertEquals(45, targeting_info.get(0).getTurretAngle().getDegrees(), kTestEpsilon);
 
         // t=20ms
         // robot at (2, 0, 0 deg), turret at (45 deg)
@@ -134,19 +135,19 @@ public class TestRobotState {
 
         // t=30ms
         // robot at (3, 0, 0 deg), turret at (45 deg)
-        // target detected at to the right in the camera frame
+        // target detected to the right in the camera frame
         next_time += 10000000;
         rs.addObservations(next_time, new Pose2d(new Translation2d(3, 0), Rotation2d.fromDegrees(0)),
                 Rotation2d.fromDegrees(45));
 
-        vision_updates.add(new TargetInfo(100, Rotation2d.fromDegrees(-45)));
+        vision_updates.add(new TargetInfo(-1.0, 0));
         rs.addVisionUpdate(next_time, vision_updates);
         assertTrue(rs.canSeeTarget());
-        desired_turret_angles = rs.getDesiredTurretRotationToGoals();
-        assertEquals(1, desired_turret_angles.size());
+        targeting_info = rs.aimTowardsGoals();
+        assertEquals(1, targeting_info.size());
         // Would be straight ahead, but camera is offset back a bit
-        System.out.println("Desired angle: " + desired_turret_angles.get(0).getAngle().getDegrees());
-        assertTrue(0 > desired_turret_angles.get(0).getAngle().getDegrees());
-        assertTrue(-3 < desired_turret_angles.get(0).getAngle().getDegrees());
+        System.out.println("Desired angle: " + targeting_info.get(0).getTurretAngle().getDegrees());
+        assertTrue(-9 > targeting_info.get(0).getTurretAngle().getDegrees());
+        assertTrue(-10 < targeting_info.get(0).getTurretAngle().getDegrees());
     }
 }

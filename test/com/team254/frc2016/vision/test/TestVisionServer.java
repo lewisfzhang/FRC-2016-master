@@ -13,7 +13,7 @@ public class TestVisionServer {
         public void gotUpdate(VisionUpdate update) {
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
-                System.out.println("" + target.getAngle().getDegrees() + " : " + target.getDistance());
+                System.out.println("" + target.getY() + " : " + target.getZ());
             }
         }
     }

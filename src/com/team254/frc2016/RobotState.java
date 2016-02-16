@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
@@ -77,6 +78,8 @@ public class RobotState {
     protected List<Translation2d> camera_to_goals_;
     protected double latest_camera_to_goals_detected_timestamp_;
     protected double latest_camera_to_goals_undetected_timestamp_;
+    protected Rotation2d camera_pitch_correction_;
+    protected double differential_height_;
 
     protected RobotState() {
         reset(0, new Pose2d(), new Rotation2d());
@@ -91,6 +94,8 @@ public class RobotState {
         camera_to_goals_ = new ArrayList<Translation2d>();
         latest_camera_to_goals_detected_timestamp_ = 0;
         latest_camera_to_goals_undetected_timestamp_ = start_time;
+        camera_pitch_correction_ = Rotation2d.fromDegrees(-Constants.kCameraPitchAngleDegrees);
+        differential_height_ = Constants.kCenterOfTargetHeight - Constants.kCameraZOffset;
     }
 
     public synchronized Pose2d getOdometricToVehicle(double timestamp) {
@@ -133,8 +138,8 @@ public class RobotState {
         return rv;
     }
 
-    public synchronized List<TargetInfo> getDesiredTurretRotationToGoals() {
-        List<TargetInfo> rv = new ArrayList<>();
+    public synchronized List<Shooter.AimingParameters> aimTowardsGoals() {
+        List<Shooter.AimingParameters> rv = new ArrayList<>();
         Pose2d capture_time_turret_fixed_to_camera = Pose2d
                 .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_))
                 .transformBy(kTurretRotatingToCamera);
@@ -150,7 +155,7 @@ public class RobotState {
 
             // We can actually disregard the angular portion of this pose. It is
             // the bearing that we care about!
-            rv.add(new TargetInfo(latest_turret_fixed_to_goal.getTranslation().norm(),
+            rv.add(new Shooter.AimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(),
                     new Rotation2d(latest_turret_fixed_to_goal.getTranslation().getX(),
                             latest_turret_fixed_to_goal.getTranslation().getY(), true)));
         }
@@ -178,8 +183,20 @@ public class RobotState {
             latest_camera_to_goals_detected_timestamp_ = timestamp;
             camera_to_goals_.clear();
             for (TargetInfo target : vision_update) {
-                camera_to_goals_.add(new Translation2d(target.getDistance() * target.getAngle().cos(),
-                        target.getDistance() * target.getAngle().sin()));
+                // Compensate for camera pitch
+                double xr = target.getZ() * camera_pitch_correction_.sin()
+                        + target.getX() * camera_pitch_correction_.cos();
+                double yr = target.getY();
+                double zr = target.getZ() * camera_pitch_correction_.cos()
+                        - target.getX() * camera_pitch_correction_.sin();
+
+                // find intersection with the goal
+                if (zr > 0) {
+                    double scaling = differential_height_ / zr;
+                    double distance = Math.hypot(xr, yr) * scaling;
+                    Rotation2d angle = new Rotation2d(xr, yr, true);
+                    camera_to_goals_.add(new Translation2d(distance * angle.cos(), distance * angle.sin()));
+                }
             }
         }
     }

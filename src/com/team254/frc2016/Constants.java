@@ -3,6 +3,8 @@ package com.team254.frc2016;
 import com.team254.lib.util.ConstantsBase;
 
 public class Constants extends ConstantsBase {
+    public static double kCenterOfTargetHeight = 89.0; // inches
+
     // Pose of the turret frame w.r.t. the vehicle frame
     public static double kTurretXOffset = -7.376;
     public static double kTurretYOffset = 0.0;
@@ -12,6 +14,8 @@ public class Constants extends ConstantsBase {
     // TODO measure these
     public static double kCameraXOffset = -5.0;
     public static double kCameraYOffset = 0.0;
+    public static double kCameraZOffset = 21.0;
+    public static double kCameraPitchAngleDegrees = 40.0;
     public static double kCameraAngleOffsetDegrees = 0.0;
 
     // Wheel diameter

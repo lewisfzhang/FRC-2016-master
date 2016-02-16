@@ -5,6 +5,24 @@ import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.Rotation2d;
 
 public class Shooter extends Subsystem {
+    public static class AimingParameters {
+        double range;
+        Rotation2d turret_angle;
+
+        public AimingParameters(double range, Rotation2d turret_angle) {
+            this.range = range;
+            this.turret_angle = turret_angle;
+        }
+
+        public double getRange() {
+            return range;
+        }
+
+        public Rotation2d getTurretAngle() {
+            return turret_angle;
+        }
+    }
+
     static Shooter mInstance = new Shooter();
 
     public static Shooter getInstance() {

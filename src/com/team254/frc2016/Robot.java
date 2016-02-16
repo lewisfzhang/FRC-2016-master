@@ -47,22 +47,16 @@ public class Robot extends IterativeRobot {
 
         @Override
         public void gotUpdate(VisionUpdate update) {
+            mRobotState.addVisionUpdate(update.getCapturedAtTimestamp(), update.getTargets());
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
                 // System.out.println(i + " : " + target.getAngle().getDegrees()
                 // + " : " + target.getDistance());
-                mCheesyLogger.sendTimePlotPoint(
-                        "vision_angle",
-                        "angle",
-                        target.getAngle().getDegrees(),
-                        1);
-                mCheesyLogger.sendTimePlotPoint(
-                        "vision_distance",
-                        "distance",
-                        target.getDistance(),
-                        1);
-                SmartDashboard.putNumber("Angle", target.getAngle().getDegrees());
-                SmartDashboard.putNumber("Distance", target.getDistance());
+                mCheesyLogger.sendTimePlotPoint("vision", "x", target.getX(), 1);
+                mCheesyLogger.sendTimePlotPoint("vision", "y", target.getY(), 1);
+                mCheesyLogger.sendTimePlotPoint("vision", "z", target.getZ(), 1);
+                SmartDashboard.putNumber("goal_centroid_x", target.getX());
+                SmartDashboard.putNumber("goal_centroid_y", target.getY());
             }
 
         }

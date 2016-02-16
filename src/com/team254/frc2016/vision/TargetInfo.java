@@ -1,21 +1,24 @@
 package com.team254.frc2016.vision;
 
-import com.team254.lib.util.Rotation2d;
-
 public class TargetInfo {
-    protected Rotation2d angle_;
-    protected double distance_;
+    protected double x = 1.0;
+    protected double y;
+    protected double z;
 
-    public TargetInfo(double distance, Rotation2d angle) {
-        distance_ = distance;
-        angle_ = angle;
+    public TargetInfo(double y, double z) {
+        this.y = y;
+        this.z = z;
     }
 
-    public Rotation2d getAngle() {
-        return angle_;
+    public double getX() {
+        return x;
     }
 
-    public double getDistance() {
-        return distance_;
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
     }
 }
