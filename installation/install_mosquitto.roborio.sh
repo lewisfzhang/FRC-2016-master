@@ -4,8 +4,8 @@ cd ~/
 
 # copy installation files into their expected places
 echo "[mosquitto] Copy files..."
-mkdir -p /usr/local/arm-frc-linux-gnueabi/lib/
-cp libzlib.so libwebsockets.so /usr/local/arm-frc-linux-gnueabi/lib/
+mkdir -p /usr/local/lib/
+cp libzlib.so libwebsockets.so /usr/local/lib/
 
 mkdir -p /usr/local/bin/
 cp mosquitto /usr/local/bin/
@@ -19,5 +19,7 @@ echo "[mosquitto] Configure init..."
 # Create the mosquitto RC info
 cd /etc/init.d/
 update-rc.d mosquitto.init.sh defaults
+
+ldconfig
 
 echo "[mosquitto] Finished"
