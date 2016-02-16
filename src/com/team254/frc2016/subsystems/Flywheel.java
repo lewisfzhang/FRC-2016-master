@@ -57,6 +57,11 @@ public class Flywheel extends Subsystem {
         master_talon_.set(speed);
     }
 
+    public synchronized boolean isOnTarget() {
+        return (master_talon_.getControlMode() == CANTalon.TalonControlMode.Speed
+                && Math.abs(master_talon_.getError()) < Constants.kFlywheelOnTargetTolerance);
+    }
+
     @Override
     public synchronized void stop() {
         setOpenLoop(0);
@@ -66,6 +71,7 @@ public class Flywheel extends Subsystem {
     public void outputToSmartDashboard() {
         SmartDashboard.putNumber("flywheel_rpm", getRpm());
         SmartDashboard.putNumber("flywheel_setpoint", master_talon_.getSetpoint());
+        SmartDashboard.putBoolean("flywheel_on_target", isOnTarget());
     }
 
     @Override

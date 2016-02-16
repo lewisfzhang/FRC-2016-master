@@ -38,13 +38,9 @@ public class Turret extends Subsystem {
         talon_.reverseOutput(false);
     }
 
-    double getReduction() {
-        return 14.0 / 50.0 * 14.0 / 322.0;
-    }
-
     public synchronized void setDesiredAngle(Rotation2d angle) {
         talon_.changeControlMode(CANTalon.TalonControlMode.Position);
-        talon_.set(angle.getRadians() / (2 * Math.PI * getReduction()));
+        talon_.set(angle.getRadians() / (2 * Math.PI * Constants.kTurretGearReduction));
     }
 
     public synchronized void setOpenLoop(double speed) {
@@ -53,11 +49,11 @@ public class Turret extends Subsystem {
     }
 
     public synchronized void reset(Rotation2d actual_rotation) {
-        talon_.setPosition(actual_rotation.getRadians() / (2 * Math.PI * getReduction()));
+        talon_.setPosition(actual_rotation.getRadians() / (2 * Math.PI * Constants.kTurretGearReduction));
     }
 
     public synchronized Rotation2d getAngle() {
-        return Rotation2d.fromRadians(getReduction() * talon_.getPosition() * 2 * Math.PI);
+        return Rotation2d.fromRadians(Constants.kTurretGearReduction * talon_.getPosition() * 2 * Math.PI);
     }
 
     public synchronized boolean getForwardLimitSwitch() {
@@ -68,6 +64,11 @@ public class Turret extends Subsystem {
         return talon_.isRevLimitSwitchClosed();
     }
 
+    public synchronized boolean isOnTarget() {
+        return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && Math.abs(
+                Constants.kTurretGearReduction * talon_.getError() * 2 * Math.PI) < Constants.kTurretOnTargetTolerance);
+    }
+
     @Override
     public synchronized void stop() {
         setOpenLoop(0);
@@ -76,10 +77,10 @@ public class Turret extends Subsystem {
     @Override
     public void outputToSmartDashboard() {
         SmartDashboard.putNumber("turret_angle", getAngle().getDegrees());
-        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() / (360.0 * getReduction()));
+        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() / (360.0 * Constants.kTurretGearReduction));
         SmartDashboard.putBoolean("turret_fwd_limit", getForwardLimitSwitch());
         SmartDashboard.putBoolean("turret_rev_limit", getReverseLimitSwitch());
-
+        SmartDashboard.putBoolean("turret_on_target", isOnTarget());
     }
 
     @Override

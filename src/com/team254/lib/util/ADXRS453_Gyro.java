@@ -136,7 +136,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
             m_spi.resetAccumulator();
         }
     }
-    
+
     public synchronized double getCenter() {
         return m_last_center;
     }

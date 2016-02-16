@@ -27,10 +27,10 @@ public abstract class ConstantsBase {
 
     public static class Constant {
         public String name;
-        public Class type;
+        public Class<?> type;
         public Object value;
 
-        public Constant(String name, Class type, Object value) {
+        public Constant(String name, Class<?> type, Object value) {
             this.name = name;
             this.type = type;
             this.value = value;
@@ -39,7 +39,7 @@ public abstract class ConstantsBase {
         @Override
         public boolean equals(Object o) {
             String itsName = ((Constant) o).name;
-            Class itsType = ((Constant) o).type;
+            Class<?> itsType = ((Constant) o).type;
             Object itsValue = ((Constant) o).value;
             return o instanceof Constant && this.name.equals(itsName) && this.type.equals(itsType)
                     && this.value.equals(itsValue);
@@ -157,7 +157,7 @@ public abstract class ConstantsBase {
     public void loadFromFile() {
         try {
             JSONObject jsonObject = getJSONObjectFromFile();
-            Set keys = jsonObject.keySet();
+            Set<?> keys = jsonObject.keySet();
             for (Object o : keys) {
                 String key = (String) o;
                 Object value = jsonObject.get(o);

@@ -20,10 +20,18 @@ public class Constants extends ConstantsBase {
     // Hood constants
     public static double kMinHoodAngle = 26.0; // TODO tune this
     public static double kMaxHoodAngle = 59.0; // TODO tune this
+    public static double kHoodOnTargetTolerance = 0.5;
+    public static double kHoodGearReduction = 32.0 / 708.0; // TODO check this
+                                                            // with Colin
 
     // Turret constants
     public static double kMaxTurretAngle = 110.0; // TODO tune this
     public static double kMinTurretAngle = -110.0; // TODO tune this
+    public static double kTurretOnTargetTolerance = 0.5;
+    public static double kTurretGearReduction = 14.0 / 50.0 * 14.0 / 322.0;
+
+    // Flywheel constants
+    public static double kFlywheelOnTargetTolerance = 100.0;
 
     public static int kAndroidAppTcpPort = 8254;
 

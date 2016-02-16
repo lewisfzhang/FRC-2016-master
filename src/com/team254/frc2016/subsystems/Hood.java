@@ -84,10 +84,6 @@ public class Hood extends Subsystem {
         return hood_loop_;
     }
 
-    double getHoodGearRatio() {
-        return 32 / 708; // TODO check with Colin
-    }
-
     public synchronized void setDesiredAngle(double angle) {
         if (control_mode_ != ControlMode.HOMING && control_mode_ != ControlMode.POSITION) {
             control_mode_ = ControlMode.POSITION;
@@ -97,7 +93,7 @@ public class Hood extends Subsystem {
     }
 
     public synchronized double getAngle() {
-        return encoder_.getContinuousAngleDegrees() * getHoodGearRatio() + Constants.kMinHoodAngle;
+        return encoder_.getContinuousAngleDegrees() * Constants.kHoodGearReduction + Constants.kMinHoodAngle;
     }
 
     synchronized void set(double power) {
@@ -136,11 +132,17 @@ public class Hood extends Subsystem {
         return has_homed_;
     }
 
+    public synchronized boolean isOnTarget() {
+        return (has_homed_ && control_mode_ == ControlMode.OPEN_LOOP
+                && Math.abs(pid_.getError()) < Constants.kHoodOnTargetTolerance);
+    }
+
     @Override
     public void outputToSmartDashboard() {
         SmartDashboard.putBoolean("has_hood_homed", has_homed_);
         SmartDashboard.putNumber("hood_angle", getAngle());
         SmartDashboard.putNumber("hood_setpoint", pid_.getSetpoint());
+        SmartDashboard.putBoolean("hood_on_target", isOnTarget());
     }
 
     @Override
