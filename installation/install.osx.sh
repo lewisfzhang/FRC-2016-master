@@ -8,6 +8,8 @@ then
     exit -1;
 fi;
 
+ssh admin@$1 "rm -r ~/*"
+
 FILES_TO_COPY="\
 ./install_mosquitto.roborio.sh \
 ./libwebsockets.so \
@@ -19,4 +21,6 @@ FILES_TO_COPY="\
 ./RIOdroid.tar.gz"
 
 scp $FILES_TO_COPY admin@$1:~/
+scp -r logger admin@$1:~/logger
+
 ssh admin@$1 "./install_mosquitto.roborio.sh && ./RIOdroid.roborio.sh"
