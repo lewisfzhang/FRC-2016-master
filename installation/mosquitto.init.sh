@@ -8,13 +8,13 @@ set -e
 
 start() {
 	echo "Starting Mosquitto"
-	start-stop-daemon -S -x /home/admin/mosquitto -- -c /home/admin/mosquitto.conf --daemon
-        echo "done."
+	start-stop-daemon -S -x /usr/local/bin/mosquitto -- -c /usr/local/conf/mosquitto.roborio.conf --daemon
+    echo "done."
 }
 
 stop() {
 	echo "Stopping Mosquitto"
-	start-stop-daemon -K -x "/home/admin/mosquitto"
+	start-stop-daemon -K -x "/usr/local/bin/mosquitto"
 	echo "done."
 }
 
@@ -33,7 +33,7 @@ case "$1" in
 	;;
 
   status)
-	status /home/admin/mosquitto
+	status /usr/local/bin/mosquitto
 	exit $?
   ;;
 
