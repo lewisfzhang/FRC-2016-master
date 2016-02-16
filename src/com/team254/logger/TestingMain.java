@@ -7,15 +7,15 @@ package com.team254.logger;
 public class TestingMain {
 
     public static void main(String[] argv) {
-        CheesyLogger cheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
+        CheesyLogger cheesyLogger = CheesyLogger.makeCheesyLogger("10.2.52.2");
         cheesyLogger.sendLogMessage("hello");
-        cheesyLogger.sendTimePlotPoint("my_plot", "pi", 3.14, 100);
+        // cheesyLogger.sendTimePlotPoint("my_plot", "pi", 3.14, 100);
         cheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
 
         int modeChangeCount = 0;
         while (true) {
-            cheesyLogger.sendTimePlotPoint("my_plot", "test_value", System.currentTimeMillis() % 10000, 100);
-            cheesyLogger.sendTimePlotPoint("my_other_plot", "test_value2", System.currentTimeMillis() % 1000, 100);
+            cheesyLogger.sendTimePlotPoint("my_plot", "test_value", System.currentTimeMillis() % 10000, 1);
+            cheesyLogger.sendTimePlotPoint("my_plot", "test_value2", System.currentTimeMillis() % 1000, 1);
 
             modeChangeCount++;
             if (modeChangeCount == 1000) {
