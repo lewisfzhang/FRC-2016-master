@@ -1,7 +1,7 @@
 var client;
 var logDiv;
 
-var DEFAULT_NUM_POINTS = 9000;
+var DEFAULT_NUM_POINTS = 2000;
 
 $(document).ready(function() {
   logDiv = $("#log_div");
