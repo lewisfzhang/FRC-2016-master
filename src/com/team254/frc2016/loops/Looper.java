@@ -8,12 +8,6 @@ import edu.wpi.first.wpilibj.Notifier;
 public class Looper {
     public final double kPeriod = 0.01; // 100Hz
 
-    static Looper instance_ = new Looper();
-
-    public static Looper getInstance() {
-        return instance_;
-    }
-
     Notifier notifier_;
     boolean running_;
     List<Loop> loops_;
@@ -31,7 +25,7 @@ public class Looper {
         }
     };
 
-    Looper() {
+    public Looper() {
         notifier_ = new Notifier(runnable_);
         running_ = false;
         loops_ = new ArrayList<>();

@@ -1,8 +1,10 @@
 
 package com.team254.frc2016;
 
+import com.team254.frc2016.loops.GyroCalibrator;
 import com.team254.frc2016.loops.Looper;
 import com.team254.frc2016.loops.RobotStateEstimator;
+import com.team254.frc2016.loops.TurretResetter;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Flywheel;
 import com.team254.frc2016.subsystems.Hood;
@@ -12,7 +14,6 @@ import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
-import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
@@ -21,29 +22,26 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the IterativeRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the manifest file in the resource
- * directory.
- */
 public class Robot extends IterativeRobot {
     private final CheesyLogger mCheesyLogger;
-    Turret turret = Turret.getInstance();
-    Drive drive = Drive.getInstance();
-    Flywheel flywheel = Flywheel.getInstance();
-    Intake intake = Intake.getInstance();
-    Hood hood = Hood.getInstance();
 
-    CheesyDriveHelper cdh = new CheesyDriveHelper();
-    ControlBoard controls = ControlBoard.getInstance();
-    VisionServer visionServer = VisionServer.getInstance();
-    RobotState robot_state = RobotState.getInstance();
+    // Subsystems
+    Turret mTurret = Turret.getInstance();
+    Drive mDrive = Drive.getInstance();
+    Flywheel mFlywheel = Flywheel.getInstance();
+    Intake mIntake = Intake.getInstance();
+    Hood mHood = Hood.getInstance();
 
-    Looper looper = Looper.getInstance();
+    // Other parts of the robot
+    CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
+    ControlBoard mControls = ControlBoard.getInstance();
+    VisionServer mVisionServer = VisionServer.getInstance();
+    RobotState mRobotState = RobotState.getInstance();
 
-    double gyroCalibrationStartTime = 0;
+    // Enabled looper is called at 100Hz whenever the robot is enabled
+    Looper mEnabledLooper = new Looper();
+    // Disabled looper is called at 100Hz whenever the robot is disabled
+    Looper mDisabledLooper = new Looper();
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("10.2.54.195");
@@ -67,27 +65,27 @@ public class Robot extends IterativeRobot {
     }
 
     public void stopAll() {
-        drive.stop();
-        intake.stop();
-        hood.stop();
-        turret.stop();
-        flywheel.stop();
+        mDrive.stop();
+        mIntake.stop();
+        mHood.stop();
+        mTurret.stop();
+        mFlywheel.stop();
     }
 
     public void outputAllToSmartDashboard() {
-        drive.outputToSmartDashboard();
-        intake.outputToSmartDashboard();
-        hood.outputToSmartDashboard();
-        turret.outputToSmartDashboard();
-        flywheel.outputToSmartDashboard();
+        mDrive.outputToSmartDashboard();
+        mIntake.outputToSmartDashboard();
+        mHood.outputToSmartDashboard();
+        mTurret.outputToSmartDashboard();
+        mFlywheel.outputToSmartDashboard();
     }
 
     public void zeroAllSensors() {
-        drive.zeroSensors();
-        intake.zeroSensors();
-        hood.zeroSensors();
-        turret.zeroSensors();
-        flywheel.zeroSensors();
+        mDrive.zeroSensors();
+        mIntake.zeroSensors();
+        mHood.zeroSensors();
+        mTurret.zeroSensors();
+        mFlywheel.zeroSensors();
     }
 
     /**
@@ -97,49 +95,60 @@ public class Robot extends IterativeRobot {
     @Override
     public void robotInit() {
         mCheesyLogger.sendLogMessage("Robot Init-ed");
-        visionServer.addVisionUpdateReceiver(new TestReceiver());
+        mVisionServer.addVisionUpdateReceiver(new TestReceiver());
 
+        // Reset all state
         zeroAllSensors();
-        looper.register(RobotStateEstimator.getInstance());
-        robot_state.reset(System.nanoTime(), new Pose2d(), new Rotation2d());
+        mRobotState.reset(Timer.getFPGATimestamp(), new Pose2d(), new Rotation2d());
+
+        // Configure loopers
+        mEnabledLooper.register(new TurretResetter());
+        mEnabledLooper.register(RobotStateEstimator.getInstance());
+        mEnabledLooper.register(mHood.getLoop());
+        mDisabledLooper.register(new GyroCalibrator());
     }
 
     @Override
     public void disabledInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
-        looper.stop();
+
+        // Configure loopers
+        mEnabledLooper.stop();
+        mDisabledLooper.start();
+
+        // Stop all actuators
         stopAll();
     }
 
     @Override
     public void autonomousInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
-        robot_state.reset(System.nanoTime(), new Pose2d(), new Rotation2d());
-        drive.getGyro().cancelCalibrate();
-        drive.zeroSensors();
-        looper.start();
+
+        // Reset all state
+        mRobotState.reset(Timer.getFPGATimestamp(), new Pose2d(), new Rotation2d());
+        zeroAllSensors();
+
+        // Configure loopers
+        mDisabledLooper.stop();
+        mEnabledLooper.start();
     }
 
     @Override
     public void teleopInit() {
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
-        robot_state.reset(System.nanoTime(), new Pose2d(), new Rotation2d());
-        drive.getGyro().cancelCalibrate();
-        drive.resetEncoders();
-        looper.start();
+
+        // Reset drive
+        mDrive.resetEncoders();
+
+        // Configure loopers
+        mDisabledLooper.stop();
+        mEnabledLooper.start();
     }
 
     @Override
     public void disabledPeriodic() {
-        double now = Timer.getFPGATimestamp();
-        // Keep re-calibrating the gyro every 5 seconds
-        if (now - gyroCalibrationStartTime > ADXRS453_Gyro.kCalibrationSampleTime) {
-            drive.getGyro().endCalibrate();
-            gyroCalibrationStartTime = now;
-            drive.getGyro().startCalibrate();
-        }
-        if (controls.getQuickTurn()) {
-            turret.reset(new Rotation2d());
+        if (mControls.getQuickTurn()) {
+            mTurret.reset(new Rotation2d());
         }
 
         outputAllToSmartDashboard();
@@ -147,9 +156,9 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        double throttle = controls.getThrottle();
-        double turn = controls.getTurn();
-        if (controls.getBaseLock()) {
+        double throttle = mControls.getThrottle();
+        double turn = mControls.getTurn();
+        if (mControls.getBaseLock()) {
             // drive.baseLock();
         } else {
             // drive.setOpenLoop(cdh.cheesyDrive(throttle, turn,
@@ -157,7 +166,7 @@ public class Robot extends IterativeRobot {
         }
 
         // turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));
-        flywheel.setOpenLoop(throttle);
+        mFlywheel.setOpenLoop(throttle);
         // test_servo.set(throttle);
         // test_servo2.set(-throttle);
         // intake.set(throttle);

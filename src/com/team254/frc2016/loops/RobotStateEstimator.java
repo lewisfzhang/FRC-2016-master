@@ -6,6 +6,8 @@ import com.team254.frc2016.subsystems.Turret;
 import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 
+import edu.wpi.first.wpilibj.Timer;
+
 public class RobotStateEstimator implements Loop {
     static RobotStateEstimator instance_ = new RobotStateEstimator();
 
@@ -30,7 +32,7 @@ public class RobotStateEstimator implements Loop {
 
     @Override
     public void onLoop() {
-        long time = System.nanoTime();
+        double time = Timer.getFPGATimestamp();
         double left_distance = drive_.getLeftDistanceInches();
         double right_distance = drive_.getRightDistanceInches();
         Rotation2d gyro_angle = drive_.getGyroAngle();

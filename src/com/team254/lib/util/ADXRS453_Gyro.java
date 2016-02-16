@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
@@ -125,7 +124,6 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
         if (m_is_calibrating) {
             m_is_calibrating = false;
             m_last_center = m_spi.getAccumulatorAverage();
-            SmartDashboard.putNumber("gyro center", m_last_center);
             m_spi.setAccumulatorCenter((int) Math.round(m_last_center));
             m_spi.resetAccumulator();
         }
@@ -137,6 +135,10 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
             m_spi.setAccumulatorCenter((int) m_last_center);
             m_spi.resetAccumulator();
         }
+    }
+    
+    public synchronized double getCenter() {
+        return m_last_center;
     }
 
     private boolean calcParity(int v) {

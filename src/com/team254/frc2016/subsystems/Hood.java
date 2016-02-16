@@ -2,11 +2,11 @@ package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.loops.Loop;
-import com.team254.frc2016.loops.Looper;
 import com.team254.lib.util.MA3Encoder;
 import com.team254.lib.util.SynchronousPID;
 
 import edu.wpi.first.wpilibj.ContinuousRotationServo;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Hood extends Subsystem {
@@ -29,9 +29,9 @@ public class Hood extends Subsystem {
     ControlMode control_mode_;
 
     Loop hood_loop_ = new Loop() {
-        static final long kHomingTimeNanos = 4000000000L; // 4 seconds
+        static final double kHomingTimeSeconds = 4.0;
         ControlMode last_iteration_control_mode_ = ControlMode.OPEN_LOOP;
-        long homing_start_time_ = 0;
+        double homing_start_time_ = 0;
 
         @Override
         public void onLoop() {
@@ -39,8 +39,8 @@ public class Hood extends Subsystem {
                 if (control_mode_ == ControlMode.HOMING) {
                     if (control_mode_ != last_iteration_control_mode_) {
                         startHoming();
-                        homing_start_time_ = System.nanoTime();
-                    } else if (System.nanoTime() >= homing_start_time_ + kHomingTimeNanos) {
+                        homing_start_time_ = Timer.getFPGATimestamp();
+                    } else if (Timer.getFPGATimestamp() >= homing_start_time_ + kHomingTimeSeconds) {
                         stopHoming(true);
                     }
                 } else if (control_mode_ == ControlMode.POSITION) {
@@ -78,8 +78,10 @@ public class Hood extends Subsystem {
         has_homed_ = false;
         pid_.setSetpoint(Constants.kMinHoodAngle);
         control_mode_ = ControlMode.OPEN_LOOP;
+    }
 
-        Looper.getInstance().register(hood_loop_);
+    public Loop getLoop() {
+        return hood_loop_;
     }
 
     double getHoodGearRatio() {

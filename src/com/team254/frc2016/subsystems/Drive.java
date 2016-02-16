@@ -211,6 +211,7 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("left_velocity", getLeftVelocityInchesPerSec());
         SmartDashboard.putNumber("right_velocity", getRightVelocityInchesPerSec());
         SmartDashboard.putNumber("gyro_angle", getGyro().getAngle());
+        SmartDashboard.putNumber("gyro_center", getGyro().getCenter());
     }
 
     @Override
