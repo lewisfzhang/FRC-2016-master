@@ -1,8 +1,0 @@
-*.o
-client/mosquitto_pub
-client/mosquitto_sub
-lib/cpp/libmosquittopp.so.1
-lib/libmosquitto.a
-lib/libmosquitto.so.1
-src/mosquitto
-src/mosquitto_passwd
