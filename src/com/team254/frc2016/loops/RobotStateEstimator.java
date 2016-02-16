@@ -2,6 +2,7 @@ package com.team254.frc2016.loops;
 
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.subsystems.Drive;
+import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.subsystems.Turret;
 import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
@@ -20,7 +21,7 @@ public class RobotStateEstimator implements Loop {
 
     RobotState robot_state_ = RobotState.getInstance();
     Drive drive_ = Drive.getInstance();
-    Turret turret_ = Turret.getInstance();
+    Turret turret_ = Shooter.getInstance().getTurret();
     double left_encoder_prev_distance_ = 0;
     double right_encoder_prev_distance_ = 0;
 

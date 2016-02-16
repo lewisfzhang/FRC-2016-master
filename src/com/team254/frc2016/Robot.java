@@ -6,10 +6,8 @@ import com.team254.frc2016.loops.Looper;
 import com.team254.frc2016.loops.RobotStateEstimator;
 import com.team254.frc2016.loops.TurretResetter;
 import com.team254.frc2016.subsystems.Drive;
-import com.team254.frc2016.subsystems.Flywheel;
-import com.team254.frc2016.subsystems.Hood;
 import com.team254.frc2016.subsystems.Intake;
-import com.team254.frc2016.subsystems.Turret;
+import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
@@ -26,11 +24,9 @@ public class Robot extends IterativeRobot {
     private final CheesyLogger mCheesyLogger;
 
     // Subsystems
-    Turret mTurret = Turret.getInstance();
     Drive mDrive = Drive.getInstance();
-    Flywheel mFlywheel = Flywheel.getInstance();
     Intake mIntake = Intake.getInstance();
-    Hood mHood = Hood.getInstance();
+    Shooter mShooter = Shooter.getInstance();
 
     // Other parts of the robot
     CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
@@ -75,17 +71,13 @@ public class Robot extends IterativeRobot {
     public void stopAll() {
         mDrive.stop();
         mIntake.stop();
-        mHood.stop();
-        mTurret.stop();
-        mFlywheel.stop();
+        mShooter.stop();
     }
 
     public void outputAllToSmartDashboard() {
         mDrive.outputToSmartDashboard();
         mIntake.outputToSmartDashboard();
-        mHood.outputToSmartDashboard();
-        mTurret.outputToSmartDashboard();
-        mFlywheel.outputToSmartDashboard();
+        mShooter.outputToSmartDashboard();
 
         mRobotState.outputToSmartDashboard();
     }
@@ -93,9 +85,7 @@ public class Robot extends IterativeRobot {
     public void zeroAllSensors() {
         mDrive.zeroSensors();
         mIntake.zeroSensors();
-        mHood.zeroSensors();
-        mTurret.zeroSensors();
-        mFlywheel.zeroSensors();
+        mShooter.zeroSensors();
         mRobotState.reset(Timer.getFPGATimestamp(), new Pose2d(), new Rotation2d());
     }
 
@@ -114,7 +104,7 @@ public class Robot extends IterativeRobot {
         // Configure loopers
         mEnabledLooper.register(new TurretResetter());
         mEnabledLooper.register(RobotStateEstimator.getInstance());
-        mEnabledLooper.register(mHood.getLoop());
+        mEnabledLooper.register(Shooter.getInstance().getLoop());
         mDisabledLooper.register(new GyroCalibrator());
     }
 
@@ -157,7 +147,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledPeriodic() {
         if (mControls.getQuickTurn()) {
-            mTurret.reset(new Rotation2d());
+            mShooter.getTurret().reset(new Rotation2d());
         }
 
         outputAllToSmartDashboard();
@@ -175,7 +165,7 @@ public class Robot extends IterativeRobot {
         }
 
         // turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));
-        mFlywheel.setOpenLoop(throttle);
+        // mFlywheel.setOpenLoop(throttle);
         // test_servo.set(throttle);
         // test_servo2.set(-throttle);
         // intake.set(throttle);

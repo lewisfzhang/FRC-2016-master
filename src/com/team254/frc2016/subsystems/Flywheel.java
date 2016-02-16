@@ -7,12 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel extends Subsystem {
-    static Flywheel instance_ = new Flywheel();
-
-    public static Flywheel getInstance() {
-        return instance_;
-    }
-
     CANTalon master_talon_;
     CANTalon slave_talon_;
 
@@ -47,12 +41,12 @@ public class Flywheel extends Subsystem {
         return master_talon_.getSpeed();
     }
 
-    public synchronized void setRpm(double rpm) {
+    synchronized void setRpm(double rpm) {
         master_talon_.changeControlMode(CANTalon.TalonControlMode.Speed);
         master_talon_.set(rpm);
     }
 
-    public synchronized void setOpenLoop(double speed) {
+    synchronized void setOpenLoop(double speed) {
         master_talon_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         master_talon_.set(speed);
     }

@@ -20,6 +20,7 @@ public class Constants extends ConstantsBase {
     // Hood constants
     public static double kMinHoodAngle = 26.0; // TODO tune this
     public static double kMaxHoodAngle = 59.0; // TODO tune this
+    public static double kHoodNeutralAngle = 42.5;
     public static double kHoodOnTargetTolerance = 0.5;
     public static double kHoodGearReduction = 32.0 / 708.0; // TODO check this
                                                             // with Colin

@@ -3,6 +3,7 @@ package com.team254.frc2016.subsystems;
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.MA3Encoder;
+import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.SynchronousPID;
 
 import edu.wpi.first.wpilibj.ContinuousRotationServo;
@@ -10,12 +11,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Hood extends Subsystem {
-    static Hood instance_ = new Hood();
-
-    public static Hood getInstance() {
-        return instance_;
-    }
-
     ContinuousRotationServo left_servo_;
     ContinuousRotationServo right_servo_;
     MA3Encoder encoder_;
@@ -44,7 +39,7 @@ public class Hood extends Subsystem {
                         stopHoming(true);
                     }
                 } else if (control_mode_ == ControlMode.POSITION) {
-                    set(pid_.calculate(getAngle()));
+                    set(pid_.calculate(getAngle().getDegrees()));
                 }
                 last_iteration_control_mode_ = control_mode_;
             }
@@ -80,28 +75,29 @@ public class Hood extends Subsystem {
         control_mode_ = ControlMode.OPEN_LOOP;
     }
 
-    public Loop getLoop() {
+    Loop getLoop() {
         return hood_loop_;
     }
 
-    public synchronized void setDesiredAngle(double angle) {
+    synchronized void setDesiredAngle(Rotation2d angle) {
         if (control_mode_ != ControlMode.HOMING && control_mode_ != ControlMode.POSITION) {
             control_mode_ = ControlMode.POSITION;
             pid_.reset();
         }
-        pid_.setSetpoint(angle);
+        pid_.setSetpoint(angle.getDegrees());
     }
 
-    public synchronized double getAngle() {
-        return encoder_.getContinuousAngleDegrees() * Constants.kHoodGearReduction + Constants.kMinHoodAngle;
+    public synchronized Rotation2d getAngle() {
+        return Rotation2d.fromDegrees(
+                encoder_.getContinuousAngleDegrees() * Constants.kHoodGearReduction + Constants.kMinHoodAngle);
     }
 
-    synchronized void set(double power) {
+    private synchronized void set(double power) {
         left_servo_.set(power);
         right_servo_.set(-power);
     }
 
-    public synchronized void setOpenLoop(double power) {
+    synchronized void setOpenLoop(double power) {
         if (control_mode_ != ControlMode.HOMING) {
             set(power);
             control_mode_ = ControlMode.OPEN_LOOP;
@@ -140,7 +136,7 @@ public class Hood extends Subsystem {
     @Override
     public void outputToSmartDashboard() {
         SmartDashboard.putBoolean("has_hood_homed", has_homed_);
-        SmartDashboard.putNumber("hood_angle", getAngle());
+        SmartDashboard.putNumber("hood_angle", getAngle().getDegrees());
         SmartDashboard.putNumber("hood_setpoint", pid_.getSetpoint());
         SmartDashboard.putBoolean("hood_on_target", isOnTarget());
     }

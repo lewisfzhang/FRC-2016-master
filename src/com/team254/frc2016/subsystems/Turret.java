@@ -8,15 +8,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Turret extends Subsystem {
-    private static Turret instance_ = new Turret();
-
-    public static Turret getInstance() {
-        return instance_;
-    }
-
     private CANTalon talon_;
 
-    private Turret() {
+    Turret() {
         talon_ = new CANTalon(Constants.kTurretTalonId);
         talon_.enableBrakeMode(true);
         talon_.enableLimitSwitch(true, true);

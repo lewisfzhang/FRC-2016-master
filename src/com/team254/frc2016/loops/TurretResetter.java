@@ -1,11 +1,12 @@
 package com.team254.frc2016.loops;
 
 import com.team254.frc2016.Constants;
+import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.subsystems.Turret;
 import com.team254.lib.util.Rotation2d;
 
 public class TurretResetter implements Loop {
-    Turret turret = Turret.getInstance();
+    Turret turret = Shooter.getInstance().getTurret();
 
     @Override
     public void onStart() {
