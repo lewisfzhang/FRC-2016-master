@@ -38,10 +38,12 @@ public class Constants extends ConstantsBase {
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 100.0;
     public static double kFlywheelBatterRpmSetpoint = 6000.0;
-    public static double kFlywheelAutoAimRpmSetpoint = 6000.0;
+    public static double kFlywheelAutoAimNominalRpmSetpoint = 6000.0;
 
-    // Auto aiming constnats
+    // Auto aiming constants
     public static double kAutoAimRangeHysteresis = 5.0;
+    public static double kAutoAimMinRange = 10.0;
+    public static double kAutoAimMaxRange = 200.0;
 
     public static int kAndroidAppTcpPort = 8254;
 

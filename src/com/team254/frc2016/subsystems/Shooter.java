@@ -29,6 +29,10 @@ public class Shooter extends Subsystem {
                     return 1;
                 } else {
                     // Compare to current turret angle
+                    // It is theoretically possible that this computation will
+                    // assume rotation opposite the hard stops on the turret,
+                    // but this is basically guaranteed not to happen because of
+                    // the FOV of the camera relative to turret rotation.
                     double relative_angle_o1 = Math
                             .abs(mCurrentAngleInverse.rotateBy(o1.getTurretAngle()).getRadians());
                     double relative_angle_o2 = Math
@@ -91,15 +95,23 @@ public class Shooter extends Subsystem {
                 // Calculate new setpoint if necessary
                 if (mState == State.AUTOAIMING) {
                     List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters();
-                    if (aiming_parameters.size() == 0) {
-                        mSeesGoal = false;
-                    } else {
-                        mSeesGoal = true;
+                    mSeesGoal = false;
+                    if (aiming_parameters.size() > 0) {
                         Collections.sort(aiming_parameters, new AimingParameters.Comparator(mTurret.getAngle()));
-                        mHood.setDesiredAngle(getHoodAngleForRange(aiming_parameters.get(0).getRange()));
-                        mTurret.setDesiredAngle(aiming_parameters.get(0).getTurretAngle());
-                        // TODO deal with out of bounds. choose other target or
-                        // set error bit?
+                        for (AimingParameters param : aiming_parameters) {
+                            // Deal with parameters outside of the shooter range
+                            double turret_angle_degrees = param.getTurretAngle().getDegrees();
+                            if (turret_angle_degrees >= Constants.kMinTurretAngle
+                                    && turret_angle_degrees <= Constants.kMaxTurretAngle
+                                    && param.getRange() >= Constants.kAutoAimMinRange
+                                    && param.getRange() <= Constants.kAutoAimMaxRange) {
+                                mFlywheel.setRpm(getRpmForRange(param.getRange()));
+                                mHood.setDesiredAngle(getHoodAngleForRange(param.getRange()));
+                                mTurret.setDesiredAngle(param.getTurretAngle());
+                                mSeesGoal = true;
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -143,6 +155,10 @@ public class Shooter extends Subsystem {
         return Rotation2d.fromDegrees(40.0);
     }
 
+    double getRpmForRange(double range) {
+        return Constants.kFlywheelAutoAimNominalRpmSetpoint;
+    }
+
     public synchronized void stow() {
         mState = State.WANTS_TO_STOW;
         mFlywheel.stop();
@@ -167,7 +183,7 @@ public class Shooter extends Subsystem {
     public synchronized void autoAim() {
         mHood.setStowed(false);
         mState = State.AUTOAIMING;
-        mFlywheel.setRpm(Constants.kFlywheelAutoAimRpmSetpoint);
+        mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
     }
 
     public synchronized void setManualMode() {
