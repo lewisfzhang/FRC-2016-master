@@ -8,6 +8,9 @@ import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.Rotation2d;
 
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
+
 public class Shooter extends Subsystem {
     public static class AimingParameters {
         double range;
@@ -68,14 +71,21 @@ public class Shooter extends Subsystem {
         return mInstance;
     }
 
-    public enum State {
+    public enum SubsystemState {
         WANTS_TO_STOW, STOWED, AUTOAIMING, BATTER, MANUAL
     }
 
-    State mState = State.STOWED;
+    public enum ShootState {
+        IDLE, START_SHOOT_NOW, START_AUTO_SHOOT, SHOOTING
+    }
+
+    SubsystemState mSubsystemState = SubsystemState.STOWED;
+    ShootState mShootState = ShootState.IDLE;
+    double mShootStartTime = 0;
     Turret mTurret = new Turret();
     Flywheel mFlywheel = new Flywheel();
     Hood mHood = new Hood();
+    Solenoid mShooterSolenoid = new Solenoid(Constants.kShooterSolenoidId);
     RobotState mRobotState = RobotState.getInstance();
     boolean mOnTarget = false;
     boolean mSeesGoal = false;
@@ -84,7 +94,8 @@ public class Shooter extends Subsystem {
         @Override
         public void onStart() {
             synchronized (Shooter.this) {
-                mState = State.STOWED;
+                mSubsystemState = SubsystemState.STOWED;
+                mShootState = ShootState.IDLE;
                 mHood.getLoop().onStart();
             }
         }
@@ -93,7 +104,7 @@ public class Shooter extends Subsystem {
         public void onLoop() {
             synchronized (Shooter.this) {
                 // Calculate new setpoint if necessary
-                if (mState == State.AUTOAIMING) {
+                if (mSubsystemState == SubsystemState.AUTOAIMING) {
                     List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters();
                     mSeesGoal = false;
                     if (aiming_parameters.size() > 0) {
@@ -119,13 +130,27 @@ public class Shooter extends Subsystem {
                 mHood.getLoop().onLoop();
 
                 // Check if we are ready to transition state
-                if (mState == State.WANTS_TO_STOW && mTurret.isOnTarget() && mHood.isOnTarget()) {
+                if (mSubsystemState == SubsystemState.WANTS_TO_STOW && mTurret.isOnTarget() && mHood.isOnTarget()) {
                     stowNow();
-                } else if (mState == State.BATTER || mState == State.AUTOAIMING) {
+                } else if (mSubsystemState == SubsystemState.BATTER || mSubsystemState == SubsystemState.AUTOAIMING) {
                     if (mTurret.isOnTarget() && mHood.isOnTarget() && mFlywheel.isOnTarget()) {
                         mOnTarget = true;
                     } else {
                         mOnTarget = false;
+                    }
+                }
+
+                // Check shooter state
+                if ((mShootState == ShootState.START_AUTO_SHOOT && mOnTarget && mSeesGoal)
+                        || mShootState == ShootState.START_SHOOT_NOW) {
+                    mShootStartTime = Timer.getFPGATimestamp();
+                    mShootState = ShootState.SHOOTING;
+                    mShooterSolenoid.set(true);
+                }
+                if (mShootState == ShootState.SHOOTING) {
+                    if (Timer.getFPGATimestamp() - mShootStartTime >= Constants.kShootActuationTime) {
+                        mShootState = ShootState.IDLE;
+                        mShooterSolenoid.set(false);
                     }
                 }
             }
@@ -134,7 +159,8 @@ public class Shooter extends Subsystem {
         @Override
         public void onStop() {
             synchronized (Shooter.this) {
-                mState = State.STOWED;
+                mSubsystemState = SubsystemState.STOWED;
+                mShootState = ShootState.IDLE;
                 mHood.getLoop().onStop();
                 mFlywheel.stop();
                 mHood.stop();
@@ -160,7 +186,7 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized void stow() {
-        mState = State.WANTS_TO_STOW;
+        mSubsystemState = SubsystemState.WANTS_TO_STOW;
         mFlywheel.stop();
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
         mTurret.setDesiredAngle(new Rotation2d());
@@ -168,13 +194,13 @@ public class Shooter extends Subsystem {
 
     public synchronized void stowNow() {
         mHood.setStowed(true);
-        mState = State.STOWED;
+        mSubsystemState = SubsystemState.STOWED;
         stop();
     }
 
     public synchronized void batterMode() {
         mHood.setStowed(false);
-        mState = State.BATTER;
+        mSubsystemState = SubsystemState.BATTER;
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kMinHoodAngle));
         mFlywheel.setRpm(Constants.kFlywheelBatterRpmSetpoint);
         mTurret.setDesiredAngle(new Rotation2d());
@@ -182,36 +208,54 @@ public class Shooter extends Subsystem {
 
     public synchronized void autoAim() {
         mHood.setStowed(false);
-        mState = State.AUTOAIMING;
+        mSubsystemState = SubsystemState.AUTOAIMING;
         mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
     }
 
     public synchronized void setManualMode() {
         stop();
-        mState = State.MANUAL;
+        mSubsystemState = SubsystemState.MANUAL;
     }
 
     public synchronized void moveHoodOpenLoop(double power) {
-        if (mState == State.MANUAL) {
+        if (mSubsystemState == SubsystemState.MANUAL) {
             mHood.setOpenLoop(power);
         }
     }
 
     public synchronized void deployHood() {
-        if (mState == State.MANUAL) {
+        if (mSubsystemState == SubsystemState.MANUAL) {
             mHood.setStowed(false);
         }
     }
 
     public synchronized void moveTurretOpenLoop(double power) {
-        if (mState == State.MANUAL || (mState == State.AUTOAIMING && !mSeesGoal)) {
+        if (mSubsystemState == SubsystemState.MANUAL || (mSubsystemState == SubsystemState.AUTOAIMING && !mSeesGoal)) {
             mTurret.setOpenLoop(power);
         }
     }
 
     public synchronized void setFlywheelSpeedOpenLoop(double power) {
-        if (mState == State.MANUAL) {
+        if (mSubsystemState == SubsystemState.MANUAL) {
             mFlywheel.setOpenLoop(power);
+        }
+    }
+
+    public synchronized void shootNow() {
+        if (mSubsystemState != SubsystemState.STOWED || mSubsystemState != SubsystemState.WANTS_TO_STOW) {
+            if (mShootState == ShootState.IDLE || mShootState == ShootState.START_AUTO_SHOOT) {
+                mShootState = ShootState.START_SHOOT_NOW;
+            }
+        }
+    }
+
+    public synchronized void setAutoShoot(boolean on) {
+        if (mSubsystemState != SubsystemState.STOWED || mSubsystemState != SubsystemState.WANTS_TO_STOW) {
+            if (mShootState == ShootState.IDLE && on) {
+                mShootState = ShootState.START_AUTO_SHOOT;
+            } else if (mShootState == ShootState.START_AUTO_SHOOT && !on) {
+                mShootState = ShootState.IDLE;
+            }
         }
     }
 
