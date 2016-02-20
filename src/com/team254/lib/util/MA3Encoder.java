@@ -94,7 +94,7 @@ public class MA3Encoder {
     }
 
     public synchronized double getContinuousAngleDegrees() {
-        return getRawAngle().getDegrees() + num_rotations_ * 360.0 - home_.getDegrees();
+        return getRawAngle().getDegrees() + num_rotations_ * 360.0 + home_.getDegrees();
     }
 
 }
