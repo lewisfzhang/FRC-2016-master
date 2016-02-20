@@ -162,26 +162,28 @@ public class Robot extends IterativeRobot {
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
         }
 
-        if (mControls.getAutoIntake()) {
+        if (mControls.getDeployAndRunIntake()) {
             mIntake.deploy(true);
             mIntake.set(1.0);
-        } else {
+        } else if (mControls.getRetractIntake()) {
             mIntake.deploy(false);
+            mIntake.set(0.0);
+        } else {
             mIntake.set(0.0);
         }
 
         if (mControls.getManualMode()) {
-            mShooter.setManualMode();
+            mShooter.wantManualMode();
         } else if (mControls.getAutoAim()) {
-            mShooter.autoAim();
+            mShooter.wantAutoAim();
         } else {
-            mShooter.stow();
+            mShooter.wantStow();
         }
 
-        mShooter.moveTurretOpenLoop(mControls.getTurretManual());
+        mShooter.moveTurretManual(mControls.getTurretManual());
 
         if (mControls.getAutoFireButton()) {
-            mShooter.shootNow();
+            mShooter.wantShootNow();
         }
 
         // turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));

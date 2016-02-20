@@ -11,11 +11,10 @@ public class Constants extends ConstantsBase {
     public static double kTurretAngleOffsetDegrees = 0.0;
 
     // Pose of the camera frame w.r.t. the turret frame
-    // TODO measure these
-    public static double kCameraXOffset = -5.0;
-    public static double kCameraYOffset = 0.0;
-    public static double kCameraZOffset = 21.0;
-    public static double kCameraPitchAngleDegrees = 40.0;
+    public static double kCameraXOffset = -5.535;
+    public static double kCameraYOffset = 2.034;
+    public static double kCameraZOffset = 20.765;
+    public static double kCameraPitchAngleDegrees = 30.0;
     public static double kCameraAngleOffsetDegrees = 0.0;
 
     // Wheel diameter
@@ -30,8 +29,8 @@ public class Constants extends ConstantsBase {
                                                             // with Colin
 
     // Turret constants
-    public static double kMaxTurretAngle = 110.0; // TODO tune this
-    public static double kMinTurretAngle = -110.0; // TODO tune this
+    public static double kMaxTurretAngle = 109.5;
+    public static double kMinTurretAngle = -116.5;
     public static double kTurretOnTargetTolerance = 0.5;
     public static double kTurretGearReduction = 14.0 / 50.0 * 14.0 / 322.0;
 

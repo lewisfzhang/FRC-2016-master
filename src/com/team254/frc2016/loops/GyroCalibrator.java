@@ -21,6 +21,7 @@ public class GyroCalibrator implements Loop {
         // Keep re-calibrating the gyro every 5 seconds
         if (now - mCalibrationStartTime > ADXRS453_Gyro.kCalibrationSampleTime) {
             mGyro.endCalibrate();
+            System.out.println("Gyro calibrated, new zero is " + mGyro.getCenter());
             mCalibrationStartTime = now;
             mGyro.startCalibrate();
         }

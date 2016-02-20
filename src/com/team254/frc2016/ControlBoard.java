@@ -49,11 +49,11 @@ public class ControlBoard {
         return mButtonBoard.getRawAxis(3) > 0.1;
     }
 
-    public boolean getAutoIntake() {
+    public boolean getDeployAndRunIntake() {
         return mButtonBoard.getRawButton(7);
     }
 
-    public boolean getLowBarButton() {
+    public boolean getRetractIntake() {
         return mButtonBoard.getRawButton(8);
     }
 

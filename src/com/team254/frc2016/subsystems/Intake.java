@@ -40,6 +40,7 @@ public class Intake extends Subsystem {
     @Override
     public synchronized void stop() {
         set(0);
+        deploy(false);
     }
 
     @Override

@@ -132,7 +132,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     public synchronized void cancelCalibrate() {
         if (m_is_calibrating) {
             m_is_calibrating = false;
-            m_spi.setAccumulatorCenter((int) m_last_center);
+            m_spi.setAccumulatorCenter((int) Math.round(m_last_center));
             m_spi.resetAccumulator();
         }
     }
@@ -200,7 +200,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
         if (m_spi == null)
             return 0.0;
         if (m_is_calibrating) {
-            cancelCalibrate();
+            return 0.0;
         }
         return m_spi.getAccumulatorValue() * kDegreePerSecondPerLSB * kSamplePeriod;
     }
@@ -213,7 +213,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
         if (m_spi == null)
             return 0.0;
         if (m_is_calibrating) {
-            cancelCalibrate();
+            return 0.0;
         }
         return m_spi.getAccumulatorLastValue() * kDegreePerSecondPerLSB;
     }
