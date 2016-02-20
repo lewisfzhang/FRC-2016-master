@@ -33,16 +33,53 @@ public class ControlBoard {
     }
 
     public boolean getBaseLock() {
-        return mThrottleStick.getRawButton(1);
+        return mTurnStick.getRawButton(2);
     }
 
     public boolean getLowGear() {
-        return mThrottleStick.getRawButton(0);
+        return mThrottleStick.getRawButton(2);
     }
 
     public boolean getAutoFireButton() {
-        return mTurnStick.getRawButton(0);
+        return mThrottleStick.getRawButton(1);
     }
 
     // OPERATOR CONTROLS
+    public boolean getAutoTargetingOn() {
+        return mButtonBoard.getRawAxis(3) > 0.1;
+    }
+
+    public boolean getAutoIntake() {
+        return mButtonBoard.getRawButton(7);
+    }
+
+    public boolean getLowBarButton() {
+        return mButtonBoard.getRawButton(8);
+    }
+
+    public double getTurretManual() {
+        if (mButtonBoard.getRawButton(11)) {
+            return 1.0;
+        } else if (mButtonBoard.getRawButton(12)) {
+            return -1.0;
+        } else {
+            return 0.0;
+        }
+    }
+
+    public boolean getAutoAim() {
+        return mButtonBoard.getRawButton(3);
+    }
+
+    public boolean getBatterShot() {
+        return mButtonBoard.getRawButton(4);
+    }
+
+    public boolean getBailButton() {
+        return mButtonBoard.getRawAxis(0) < 0.0;
+    }
+
+    public boolean getManualMode() {
+        return mButtonBoard.getRawButton(2);
+    }
 }

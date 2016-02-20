@@ -29,8 +29,8 @@ public class Drive extends Subsystem {
         leftSlave_ = new CANTalon(Constants.kLeftDriveSlaveId);
         rightMaster_ = new CANTalon(Constants.kRightDriveMasterId);
         rightSlave_ = new CANTalon(Constants.kRightDriveSlaveId);
-        shifter_ = new Solenoid(Constants.kShifterSolenoidId);
-        shifter_.set(false); // low gear
+        shifter_ = new Solenoid(Constants.kShifterSolenoidId / 8, Constants.kShifterSolenoidId % 8);
+        shifter_.set(false); // high gear
         gyro_ = new ADXRS453_Gyro();
 
         // Get status at 100Hz
@@ -177,7 +177,6 @@ public class Drive extends Subsystem {
             leftMaster_.enableBrakeMode(true);
             leftSlave_.enableBrakeMode(true);
             leftMaster_.set(leftMaster_.getPosition());
-            setHighGear(false);
         }
         if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
             rightMaster_.setProfile(kBaseLockControlSlot);
@@ -186,12 +185,12 @@ public class Drive extends Subsystem {
             rightMaster_.enableBrakeMode(true);
             rightSlave_.enableBrakeMode(true);
             rightMaster_.set(rightMaster_.getPosition());
-            setHighGear(false);
         }
+        setHighGear(false);
     }
 
     public void setHighGear(boolean high_gear) {
-        shifter_.set(high_gear);
+        shifter_.set(!high_gear);
     }
 
     public synchronized void resetEncoders() {

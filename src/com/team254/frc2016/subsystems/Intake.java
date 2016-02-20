@@ -24,11 +24,12 @@ public class Intake extends Subsystem {
         fixed_talon_ = new CANTalon(Constants.kFixedRollerTalonId);
         fixed_talon_.changeControlMode(TalonControlMode.PercentVbus);
         fixed_talon_.enableBrakeMode(false);
-        solenoid_ = new Solenoid(Constants.kIntakeSolenoidId);
+        solenoid_ = new Solenoid(Constants.kIntakeSolenoidId / 8, Constants.kIntakeSolenoidId % 8);
     }
 
+    // Positive intakes balls, negative exhausts
     public synchronized void set(double power) {
-        intake_talon_.set(power);
+        intake_talon_.set(-power);
         fixed_talon_.set(-power);
     }
 

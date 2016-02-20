@@ -59,8 +59,8 @@ public class Turret extends Subsystem {
     }
 
     public synchronized boolean isOnTarget() {
-        return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && Math.abs(
-                Constants.kTurretGearReduction * talon_.getError() * 2 * Math.PI) < Constants.kTurretOnTargetTolerance);
+        return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && Math.abs(getAngle().getDegrees()
+                - talon_.getSetpoint() * Constants.kTurretGearReduction * 360.0) < Constants.kTurretOnTargetTolerance);
     }
 
     @Override

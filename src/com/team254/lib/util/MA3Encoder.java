@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * A 12-bit PWM MA3 absolute encoder.
@@ -13,7 +14,7 @@ import edu.wpi.first.wpilibj.Notifier;
  */
 public class MA3Encoder {
     static final double kNominalPeriodS = 4098 * 1E-6;
-    static final double kPeriodToleranceS = 100 * 1E-6;
+    static final double kPeriodToleranceS = 200 * 1E-6;
 
     protected DigitalInput digital_input_;
     protected Counter high_counter_; // access only from inner class after
@@ -93,7 +94,7 @@ public class MA3Encoder {
     }
 
     public synchronized double getContinuousAngleDegrees() {
-        return getCalibratedAngle().getDegrees() + num_rotations_ * 360.0;
+        return getRawAngle().getDegrees() + num_rotations_ * 360.0 - home_.getDegrees();
     }
 
 }

@@ -85,7 +85,7 @@ public class Shooter extends Subsystem {
     Turret mTurret = new Turret();
     Flywheel mFlywheel = new Flywheel();
     Hood mHood = new Hood();
-    Solenoid mShooterSolenoid = new Solenoid(Constants.kShooterSolenoidId);
+    Solenoid mShooterSolenoid = new Solenoid(Constants.kShooterSolenoidId / 8, Constants.kShooterSolenoidId % 8);
     RobotState mRobotState = RobotState.getInstance();
     boolean mOnTarget = false;
     boolean mSeesGoal = false;
@@ -186,10 +186,12 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized void stow() {
-        mSubsystemState = SubsystemState.WANTS_TO_STOW;
-        mFlywheel.stop();
-        mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
-        mTurret.setDesiredAngle(new Rotation2d());
+        if (mSubsystemState != SubsystemState.WANTS_TO_STOW && mSubsystemState != SubsystemState.STOWED) {
+            mSubsystemState = SubsystemState.WANTS_TO_STOW;
+            mFlywheel.stop();
+            mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
+            mTurret.setDesiredAngle(new Rotation2d());
+        }
     }
 
     public synchronized void stowNow() {
@@ -207,25 +209,24 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized void autoAim() {
+        if (mSubsystemState != SubsystemState.AUTOAIMING) {
+            mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
+        }
         mHood.setStowed(false);
         mSubsystemState = SubsystemState.AUTOAIMING;
-        mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
     }
 
     public synchronized void setManualMode() {
-        stop();
+        if (mSubsystemState != SubsystemState.MANUAL) {
+            stop();
+        }
+        mHood.setStowed(false);
         mSubsystemState = SubsystemState.MANUAL;
     }
 
     public synchronized void moveHoodOpenLoop(double power) {
         if (mSubsystemState == SubsystemState.MANUAL) {
             mHood.setOpenLoop(power);
-        }
-    }
-
-    public synchronized void deployHood() {
-        if (mSubsystemState == SubsystemState.MANUAL) {
-            mHood.setStowed(false);
         }
     }
 

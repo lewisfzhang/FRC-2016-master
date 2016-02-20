@@ -26,7 +26,7 @@ public class Constants extends ConstantsBase {
     public static double kMaxHoodAngle = 59.0; // TODO tune this
     public static double kHoodNeutralAngle = 42.5;
     public static double kHoodOnTargetTolerance = 0.5;
-    public static double kHoodGearReduction = 32.0 / 708.0; // TODO check this
+    public static double kHoodGearReduction = 12.0 / 708.0; // TODO check this
                                                             // with Colin
 
     // Turret constants
@@ -54,7 +54,7 @@ public class Constants extends ConstantsBase {
     // Units: error is degrees of hood rotation. Max output is +/- 1.0.
     // Loop runs at 100Hz
     // TODO tune this
-    public static double kHoodKp = 1.0;
+    public static double kHoodKp = 0.0;
     public static double kHoodKi = 0.0;
     public static double kHoodKd = 0.0;
 
@@ -82,7 +82,7 @@ public class Constants extends ConstantsBase {
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kTurretKp = 0.06;
+    public static double kTurretKp = 0.08;
     public static double kTurretKi = 0.00006;
     public static double kTurretKd = 6.0;
     public static double kTurretKf = 0;
@@ -92,10 +92,9 @@ public class Constants extends ConstantsBase {
 
     // PID gains for turret position loop
     // Units: error is (4096 counts/rev)/100ms. Max output is +/- 1023 units.
-    // TODO: tune me
-    public static double kFlywheelKp = 0.0;
+    public static double kFlywheelKp = 0.075;
     public static double kFlywheelKi = 0.0;
-    public static double kFlywheelKd = 0.0;
+    public static double kFlywheelKd = 0.5;
     public static double kFlywheelKf = 0.015;
     public static int kFlywheelIZone = 0;
     public static double kFlywheelRampRate = 0;
@@ -119,13 +118,13 @@ public class Constants extends ConstantsBase {
     public static final int kFixedRollerTalonId = 8;
 
     // SOLENOIDS
-    public static final int kShifterSolenoidId = 1; // TODO: determine this
-    public static final int kHoodStowSolenoidId = 2; // TODO: determine this
-    public static final int kIntakeSolenoidId = 3; // TODO: determine this
-    public static final int kShooterSolenoidId = 4; // TODO: determine this
+    public static final int kShifterSolenoidId = 11; // PCM 1, Solenoid 3
+    public static final int kHoodStowSolenoidId = 1; // PCM 0, Solenoid 1
+    public static final int kIntakeSolenoidId = 10; // PCM 1, Solenoid 2
+    public static final int kShooterSolenoidId = 0; // PCM 0, Solenoid 0
 
     // DIGITAL IO
-    public static final int kHoodEncoderDIO = 0;
+    public static final int kHoodEncoderDIO = 9;
 
     // PWM
     public static final int kSensorSideServoPWM = 0;

@@ -26,7 +26,7 @@ public class Hood extends Subsystem {
     ControlMode control_mode_;
 
     Loop hood_loop_ = new Loop() {
-        static final double kHomingTimeSeconds = 4.0;
+        static final double kHomingTimeSeconds = 0.5;
         ControlMode last_iteration_control_mode_ = ControlMode.OPEN_LOOP;
         double homing_start_time_ = 0;
 
@@ -71,7 +71,7 @@ public class Hood extends Subsystem {
         right_servo_ = new ContinuousRotationServo(Constants.kSensorSideServoPWM);
         encoder_ = new MA3Encoder(Constants.kHoodEncoderDIO);
         pid_ = new SynchronousPID(Constants.kHoodKp, Constants.kHoodKi, Constants.kHoodKd);
-        stow_solenoid_ = new Solenoid(Constants.kHoodStowSolenoidId);
+        stow_solenoid_ = new Solenoid(Constants.kHoodStowSolenoidId / 8, Constants.kHoodStowSolenoidId % 8);
 
         has_homed_ = false;
         pid_.setSetpoint(Constants.kMinHoodAngle);
@@ -132,8 +132,10 @@ public class Hood extends Subsystem {
     }
 
     public synchronized boolean isOnTarget() {
-        return (has_homed_ && control_mode_ == ControlMode.OPEN_LOOP
-                && Math.abs(pid_.getError()) < Constants.kHoodOnTargetTolerance);
+        return true; // FIXME: Servos need to be fixed before we can use the
+                     // hood
+        // return (has_homed_ && control_mode_ == ControlMode.OPEN_LOOP
+        // && Math.abs(pid_.getError()) < Constants.kHoodOnTargetTolerance);
     }
 
     @Override

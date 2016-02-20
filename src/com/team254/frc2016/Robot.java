@@ -16,6 +16,7 @@ import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,6 +28,7 @@ public class Robot extends IterativeRobot {
     Drive mDrive = Drive.getInstance();
     Intake mIntake = Intake.getInstance();
     Shooter mShooter = Shooter.getInstance();
+    Compressor mCompressor = new Compressor(1);
 
     // Other parts of the robot
     CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
@@ -100,6 +102,8 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.register(RobotStateEstimator.getInstance());
         mEnabledLooper.register(Shooter.getInstance().getLoop());
         mDisabledLooper.register(new GyroCalibrator());
+
+        mCompressor.start();
     }
 
     @Override
@@ -152,10 +156,32 @@ public class Robot extends IterativeRobot {
         double throttle = mControls.getThrottle();
         double turn = mControls.getTurn();
         if (mControls.getBaseLock()) {
-            // drive.baseLock();
+            mDrive.baseLock();
         } else {
-            // drive.setOpenLoop(cdh.cheesyDrive(throttle, turn,
-            // controls.getQuickTurn()));
+            mDrive.setHighGear(!mControls.getLowGear());
+            mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
+        }
+
+        if (mControls.getAutoIntake()) {
+            mIntake.deploy(true);
+            mIntake.set(1.0);
+        } else {
+            mIntake.deploy(false);
+            mIntake.set(0.0);
+        }
+
+        if (mControls.getManualMode()) {
+            mShooter.setManualMode();
+        } else if (mControls.getAutoAim()) {
+            mShooter.autoAim();
+        } else {
+            mShooter.stow();
+        }
+
+        mShooter.moveTurretOpenLoop(mControls.getTurretManual());
+
+        if (mControls.getAutoFireButton()) {
+            mShooter.shootNow();
         }
 
         // turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));

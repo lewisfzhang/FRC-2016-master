@@ -67,12 +67,14 @@ public class AdbBridge {
     }
 
     public void portForward(int local_port, int remote_port) {
-        System.out.println("Adb port forwarding " + local_port + " to " + remote_port);
+        // System.out.println("Adb port forwarding " + local_port + " to " +
+        // remote_port);
         runCommand("forward tcp:" + local_port + " tcp:" + remote_port);
     }
 
     public void reversePortForward(int remote_port, int local_port) {
-        System.out.println("Adb reverse forwarding " + remote_port + " to " + local_port);
+        // System.out.println("Adb reverse forwarding " + remote_port + " to " +
+        // local_port);
         runCommand("reverse tcp:" + remote_port + " tcp:" + local_port);
     }
 }

@@ -14,9 +14,6 @@ public class Flywheel extends Subsystem {
         master_talon_ = new CANTalon(Constants.kShooterMasterId);
         slave_talon_ = new CANTalon(Constants.kShooterSlaveId);
 
-        master_talon_.enableBrakeMode(false);
-        slave_talon_.enableBrakeMode(false);
-
         master_talon_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
         if (master_talon_.isSensorPresent(
                 CANTalon.FeedbackDevice.CtreMagEncoder_Relative) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
@@ -30,11 +27,15 @@ public class Flywheel extends Subsystem {
         master_talon_.setPID(Constants.kFlywheelKp, Constants.kFlywheelKi, Constants.kFlywheelKd, Constants.kFlywheelKf,
                 Constants.kFlywheelIZone, Constants.kFlywheelRampRate, 0);
         master_talon_.setProfile(0);
-        master_talon_.configNominalOutputVoltage(0, 0);
-        master_talon_.configPeakOutputVoltage(12, 0);
         master_talon_.reverseSensor(false);
         master_talon_.reverseOutput(false);
         slave_talon_.reverseOutput(true);
+
+        master_talon_.enableBrakeMode(false);
+        slave_talon_.enableBrakeMode(false);
+
+        master_talon_.clearStickyFaults();
+        slave_talon_.clearStickyFaults();
     }
 
     public synchronized double getRpm() {
@@ -53,7 +54,7 @@ public class Flywheel extends Subsystem {
 
     public synchronized boolean isOnTarget() {
         return (master_talon_.getControlMode() == CANTalon.TalonControlMode.Speed
-                && Math.abs(master_talon_.getError()) < Constants.kFlywheelOnTargetTolerance);
+                && Math.abs(getRpm() - master_talon_.getSetpoint()) < Constants.kFlywheelOnTargetTolerance);
     }
 
     @Override
