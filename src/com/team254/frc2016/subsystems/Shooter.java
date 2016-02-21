@@ -6,10 +6,13 @@ import java.util.List;
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
+import com.team254.lib.util.InterpolatingDouble;
+import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.Rotation2d;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends Subsystem {
     public static class AimingParameters {
@@ -79,6 +82,7 @@ public class Shooter extends Subsystem {
         IDLE, START_SHOOT_NOW, START_AUTO_SHOOT, SHOOTING
     }
 
+    static final double kFlywheelDelay = 0.5;
     SubsystemState mDesiredSubsystemState = SubsystemState.STOWED;
     SubsystemState mActualSubsystemState = SubsystemState.STOWED;
     ShootState mShootState = ShootState.IDLE;
@@ -90,6 +94,12 @@ public class Shooter extends Subsystem {
     RobotState mRobotState = RobotState.getInstance();
     boolean mOnTarget = false;
     boolean mSeesGoal = false;
+    double mHoodDeployTime = 0;
+    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodAutoAimMap = new InterpolatingTreeMap();
+    double mHoodAutoAimBias = 0;
+    
+    double mCurrentRange = 0;
+    double mCurrentAngle = 0;
 
     Loop mLoop = new Loop() {
         @Override
@@ -111,26 +121,36 @@ public class Shooter extends Subsystem {
                         if (mDesiredSubsystemState == SubsystemState.AUTOAIMING) {
                             System.out.println("Enter state AUTOAIMING");
                             // Start AUTOAIMING
-                            mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
+                            Intake.getInstance().overrideIntaking(true);
+                            mRobotState.resetVision();
+                            mFlywheel.stop();
                             mHood.setStowed(false);
+                            mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
+                            mHoodDeployTime = Timer.getFPGATimestamp();
                             mActualSubsystemState = mDesiredSubsystemState;
                         } else if (mDesiredSubsystemState == SubsystemState.BATTER) {
                             System.out.println("Enter state BATTER");
                             // Start BATTER
+                            Intake.getInstance().overrideIntaking(true);
                             mFlywheel.setRpm(Constants.kFlywheelBatterRpmSetpoint);
                             mHood.setStowed(false);
+                            mHoodDeployTime = Timer.getFPGATimestamp();
                             mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kMinHoodAngle));
                             mTurret.setDesiredAngle(new Rotation2d());
                             mActualSubsystemState = mDesiredSubsystemState;
                         } else if (mDesiredSubsystemState == SubsystemState.MANUAL) {
                             System.out.println("Enter state MANUAL");
                             // Start MANUAL
+                            Intake.getInstance().overrideIntaking(true);
                             stop();
                             mHood.setStowed(false);
+                            mHoodDeployTime = Timer.getFPGATimestamp();
+                            mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kMinHoodAngle));
                             mActualSubsystemState = mDesiredSubsystemState;
                         } else if (mDesiredSubsystemState == SubsystemState.WANTS_TO_STOW
                                 && mActualSubsystemState != SubsystemState.STOWED) {
                             System.out.println("Enter state WANTS_TO_STOW");
+                            Intake.getInstance().overrideIntaking(true);
                             // Start WANTS_TO_STOW
                             mActualSubsystemState = SubsystemState.WANTS_TO_STOW;
                             mFlywheel.stop();
@@ -143,27 +163,36 @@ public class Shooter extends Subsystem {
                         && mHood.isOnTarget()) {
                     System.out.println("Enter state STOWED");
                     // WANTS_TO_STOW -> STOWED
+                    Intake.getInstance().overrideIntaking(false);
                     stowNow();
                 }
 
                 // Calculate new setpoint if necessary
-                if (mActualSubsystemState == SubsystemState.AUTOAIMING) {
-                    List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters();
-                    mSeesGoal = false;
-                    if (aiming_parameters.size() > 0) {
-                        Collections.sort(aiming_parameters, new AimingParameters.Comparator(mTurret.getAngle()));
-                        for (AimingParameters param : aiming_parameters) {
-                            // Deal with parameters outside of the shooter range
-                            double turret_angle_degrees = param.getTurretAngle().getDegrees();
-                            if (turret_angle_degrees >= Constants.kMinTurretAngle
-                                    && turret_angle_degrees <= Constants.kMaxTurretAngle
-                                    && param.getRange() >= Constants.kAutoAimMinRange
-                                    && param.getRange() <= Constants.kAutoAimMaxRange) {
-                                mFlywheel.setRpm(getRpmForRange(param.getRange()));
-                                mHood.setDesiredAngle(getHoodAngleForRange(param.getRange()));
-                                mTurret.setDesiredAngle(param.getTurretAngle());
-                                mSeesGoal = true;
-                                break;
+                if (mActualSubsystemState == SubsystemState.AUTOAIMING && mShootState != ShootState.SHOOTING) {
+                    if (Timer.getFPGATimestamp() - mHoodDeployTime < kFlywheelDelay) {
+                        mRobotState.resetVision();
+                    } else {
+                        List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters();
+                        mSeesGoal = false;
+                        if (aiming_parameters.size() > 0) {
+                            Collections.sort(aiming_parameters, new AimingParameters.Comparator(mTurret.getAngle()));
+                            for (AimingParameters param : aiming_parameters) {
+                                // Deal with parameters outside of the shooter
+                                // range
+                                double turret_angle_degrees = param.getTurretAngle().getDegrees();
+                                if (turret_angle_degrees >= Constants.kMinTurretAngle
+                                        && turret_angle_degrees <= Constants.kMaxTurretAngle
+                                        && param.getRange() >= Constants.kAutoAimMinRange
+                                        && param.getRange() <= Constants.kAutoAimMaxRange) {
+                                    mCurrentRange = param.getRange();
+                                    mCurrentAngle = param.getTurretAngle().getDegrees();
+                                    mFlywheel.setRpm(getRpmForRange(param.getRange()));
+                                    mHood.setDesiredAngle(Rotation2d
+                                            .fromDegrees(getHoodAngleForRange(param.getRange()) + mHoodAutoAimBias));
+                                    mTurret.setDesiredAngle(param.getTurretAngle());
+                                    mSeesGoal = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -190,6 +219,7 @@ public class Shooter extends Subsystem {
                     mShooterSolenoid.set(true);
                 }
                 if (mShootState == ShootState.SHOOTING) {
+                    mFlywheel.setOpenLoop(1.0);
                     if (Timer.getFPGATimestamp() - mShootStartTime >= Constants.kShootActuationTime) {
                         mShootState = ShootState.IDLE;
                         mShooterSolenoid.set(false);
@@ -212,15 +242,22 @@ public class Shooter extends Subsystem {
     };
 
     private Shooter() {
+        mHoodAutoAimMap.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
+        mHoodAutoAimMap.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
+        mHoodAutoAimMap.put(new InterpolatingDouble(70.0), new InterpolatingDouble(47.0));
+        mHoodAutoAimMap.put(new InterpolatingDouble(75.0), new InterpolatingDouble(49.0));
+        mHoodAutoAimMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(50.0));
+        mHoodAutoAimMap.put(new InterpolatingDouble(90.0), new InterpolatingDouble(54.0));
+        mHoodAutoAimMap.put(new InterpolatingDouble(98.0), new InterpolatingDouble(55.0));
+        mHoodAutoAimMap.put(new InterpolatingDouble(113.0), new InterpolatingDouble(56.5));
     }
 
     public Loop getLoop() {
         return mLoop;
     }
 
-    Rotation2d getHoodAngleForRange(double range) {
-        // TODO implement using InterpolatingTreeMap
-        return Rotation2d.fromDegrees(40.0);
+    double getHoodAngleForRange(double range) {
+        return mHoodAutoAimMap.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
     double getRpmForRange(double range) {
@@ -291,6 +328,9 @@ public class Shooter extends Subsystem {
         mFlywheel.outputToSmartDashboard();
         mHood.outputToSmartDashboard();
         mTurret.outputToSmartDashboard();
+        SmartDashboard.putNumber("hood_bias", mHoodAutoAimBias);
+        SmartDashboard.putNumber("current_range", mCurrentRange);
+        SmartDashboard.putNumber("current_angle", mCurrentAngle);
     }
 
     @Override
@@ -317,6 +357,14 @@ public class Shooter extends Subsystem {
 
     public synchronized void zeroTurret() {
         mTurret.reset(new Rotation2d());
+    }
+
+    public synchronized void setHoodBias(double bias) {
+        mHoodAutoAimBias = bias;
+    }
+
+    public synchronized double getHoodBias() {
+        return mHoodAutoAimBias;
     }
 
     public Turret getTurret() {

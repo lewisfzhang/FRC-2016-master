@@ -16,6 +16,7 @@ public class Intake extends Subsystem {
     CANTalon intake_talon_;
     CANTalon fixed_talon_;
     Solenoid solenoid_;
+    boolean overridden_ = false;
 
     Intake() {
         intake_talon_ = new CANTalon(Constants.kIntakeTalonId);
@@ -27,10 +28,19 @@ public class Intake extends Subsystem {
         solenoid_ = new Solenoid(Constants.kIntakeSolenoidId / 8, Constants.kIntakeSolenoidId % 8);
     }
 
+    synchronized void overrideIntaking(boolean enable) {
+        overridden_ = enable;
+    }
+
     // Positive intakes balls, negative exhausts
     public synchronized void set(double power) {
-        intake_talon_.set(-power);
-        fixed_talon_.set(-power);
+        if (!overridden_) {
+            intake_talon_.set(-power);
+            fixed_talon_.set(-power);
+        } else {
+            intake_talon_.set(0);
+            fixed_talon_.set(0);
+        }
     }
 
     public void deploy(boolean deploy) {

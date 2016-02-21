@@ -12,6 +12,7 @@ import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -63,6 +64,7 @@ public class RobotState {
     }
 
     public static final int kObservationBufferSize = 100;
+    public static final double kMaxTargetAge = 0.4;
 
     public static final Pose2d kVehicleToTurretFixed = new Pose2d(
             new Translation2d(Constants.kTurretXOffset, Constants.kTurretYOffset),
@@ -140,12 +142,15 @@ public class RobotState {
 
     public synchronized List<Shooter.AimingParameters> getAimingParameters() {
         List<Shooter.AimingParameters> rv = new ArrayList<>();
+        if (Timer.getFPGATimestamp() - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
+            return rv;
+        }
         Pose2d capture_time_turret_fixed_to_camera = Pose2d
-                .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_))
+                .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_ - .12))
                 .transformBy(kTurretRotatingToCamera);
         Pose2d latest_turret_fixed_to_capture_time_turret_fixed = getLatestOdometricToVehicle().getValue()
                 .transformBy(kVehicleToTurretFixed).inverse()
-                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_)
+                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_ - .12)
                         .transformBy(kVehicleToTurretFixed));
         for (Translation2d pos : camera_to_goals_) {
             Pose2d capture_time_turret_fixed_to_goal = capture_time_turret_fixed_to_camera
@@ -199,6 +204,10 @@ public class RobotState {
                 }
             }
         }
+    }
+    
+    public synchronized void resetVision() {
+        latest_camera_to_goals_detected_timestamp_ = 0;
     }
 
     public Pose2d generateOdometryFromSensors(double left_encoder_delta_distance, double right_encoder_delta_distance,

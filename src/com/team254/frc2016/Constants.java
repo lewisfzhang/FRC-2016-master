@@ -15,7 +15,7 @@ public class Constants extends ConstantsBase {
     public static double kCameraYOffset = 2.034;
     public static double kCameraZOffset = 20.765;
     public static double kCameraPitchAngleDegrees = 30.0;
-    public static double kCameraAngleOffsetDegrees = 0.0;
+    public static double kCameraAngleOffsetDegrees = 2.0;
 
     // Wheel diameter
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
@@ -31,7 +31,7 @@ public class Constants extends ConstantsBase {
     // Turret constants
     public static double kMaxTurretAngle = 109.5;
     public static double kMinTurretAngle = -116.5;
-    public static double kTurretOnTargetTolerance = 0.5;
+    public static double kTurretOnTargetTolerance = 1.0;
     public static double kTurretGearReduction = 14.0 / 50.0 * 14.0 / 322.0;
 
     // Flywheel constants
@@ -40,7 +40,7 @@ public class Constants extends ConstantsBase {
     public static double kFlywheelAutoAimNominalRpmSetpoint = 6000.0;
 
     // Auto aiming/shooter constants
-    public static double kAutoAimRangeHysteresis = 5.0;
+    public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
     public static double kShootActuationTime = 1.0;
@@ -53,9 +53,9 @@ public class Constants extends ConstantsBase {
     // Units: error is degrees of hood rotation. Max output is +/- 1.0.
     // Loop runs at 100Hz
     // TODO tune this
-    public static double kHoodKp = 0.0;
-    public static double kHoodKi = 0.0;
-    public static double kHoodKd = 0.0;
+    public static double kHoodKp = 0.08;
+    public static double kHoodKi = 0.0003;
+    public static double kHoodKd = 0.5;
 
     // PID gains for drive velocity loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
@@ -81,11 +81,11 @@ public class Constants extends ConstantsBase {
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kTurretKp = 0.08;
+    public static double kTurretKp = 0.06;
     public static double kTurretKi = 0.00006;
     public static double kTurretKd = 6.0;
     public static double kTurretKf = 0;
-    public static int kTurretIZone = 10000;
+    public static int kTurretIZone = 17050;
     public static double kTurretRampRate = 0;
     public static int kTurretAllowableError = 200;
 
@@ -111,8 +111,8 @@ public class Constants extends ConstantsBase {
     public static final int kLeftDriveSlaveId = 12;
     public static final int kRightDriveMasterId = 4;
     public static final int kRightDriveSlaveId = 3;
-    public static final int kShooterMasterId = 5;
-    public static final int kShooterSlaveId = 6;
+    public static final int kShooterMasterId = 1;
+    public static final int kShooterSlaveId = 2;
     public static final int kIntakeTalonId = 7;
     public static final int kFixedRollerTalonId = 8;
 

@@ -8,7 +8,7 @@ public class ContinuousRotationServo extends PWM {
     public ContinuousRotationServo(int channel) {
         super(channel);
 
-        setBounds(1.0, 1.49, 1.5, 1.51, 2.0);
+        setBounds(1.0, 1.46, 1.5, 1.54, 2.0);
     }
 
     public void set(double value) {

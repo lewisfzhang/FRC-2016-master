@@ -26,7 +26,7 @@ public class Hood extends Subsystem {
     ControlMode control_mode_;
 
     Loop hood_loop_ = new Loop() {
-        static final double kHomingTimeSeconds = 0.5;
+        static final double kHomingTimeSeconds = 1.0;
         ControlMode last_iteration_control_mode_ = ControlMode.OPEN_LOOP;
         double homing_start_time_ = 0;
 
@@ -96,8 +96,8 @@ public class Hood extends Subsystem {
     }
 
     private synchronized void set(double power) {
-        left_servo_.set(power);
-        right_servo_.set(-power);
+        left_servo_.set(-power);
+        right_servo_.set(power);
     }
 
     synchronized void setOpenLoop(double power) {
@@ -113,7 +113,7 @@ public class Hood extends Subsystem {
 
     synchronized void startHoming() {
         control_mode_ = ControlMode.HOMING;
-        set(1.0);
+        set(-1.0);
     }
 
     synchronized void stopHoming(boolean success) {
@@ -132,10 +132,8 @@ public class Hood extends Subsystem {
     }
 
     public synchronized boolean isOnTarget() {
-        return true; // FIXME: Servos need to be fixed before we can use the
-                     // hood
-        // return (has_homed_ && control_mode_ == ControlMode.OPEN_LOOP
-        // && Math.abs(pid_.getError()) < Constants.kHoodOnTargetTolerance);
+        return (has_homed_ && control_mode_ == ControlMode.POSITION
+                && Math.abs(pid_.getError()) < Constants.kHoodOnTargetTolerance);
     }
 
     @Override

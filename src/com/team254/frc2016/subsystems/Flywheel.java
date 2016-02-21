@@ -4,6 +4,7 @@ import com.team254.frc2016.Constants;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel extends Subsystem {
@@ -30,6 +31,9 @@ public class Flywheel extends Subsystem {
         master_talon_.reverseSensor(false);
         master_talon_.reverseOutput(false);
         slave_talon_.reverseOutput(true);
+
+        master_talon_.setVoltageRampRate(36.0);
+        slave_talon_.setVoltageRampRate(36.0);
 
         master_talon_.enableBrakeMode(false);
         slave_talon_.enableBrakeMode(false);

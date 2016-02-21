@@ -183,14 +183,22 @@ public class Robot extends IterativeRobot {
         mShooter.moveTurretManual(mControls.getTurretManual());
 
         if (mControls.getAutoFireButton()) {
-            mShooter.wantShootNow();
+            mShooter.setAutoShoot(true);
+        } else {
+            mShooter.setAutoShoot(false);
         }
-
-        // turret.setDesiredAngle(Rotation2d.fromDegrees(180 * turn));
-        // mFlywheel.setOpenLoop(throttle);
-        // test_servo.set(throttle);
-        // test_servo2.set(-throttle);
-        // intake.set(throttle);
+        
+        if (mControls.getButton5()) {
+            mShooter.setHoodBias(mShooter.getHoodBias() + .1);
+        } else if (mControls.getButton6()) {
+            mShooter.setHoodBias(mShooter.getHoodBias() - .1);
+        }
+        
+        if (mControls.getBatterShot()) {
+            mShooter.setFlywheelSpeedManual(1.0);
+        } else {
+            mShooter.setFlywheelSpeedManual(0.0);
+        }
 
         outputAllToSmartDashboard();
     }
