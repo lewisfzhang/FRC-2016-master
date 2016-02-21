@@ -205,7 +205,7 @@ public class RobotState {
             }
         }
     }
-    
+
     public synchronized void resetVision() {
         latest_camera_to_goals_detected_timestamp_ = 0;
     }

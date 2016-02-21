@@ -97,7 +97,7 @@ public class Shooter extends Subsystem {
     double mHoodDeployTime = 0;
     InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodAutoAimMap = new InterpolatingTreeMap();
     double mHoodAutoAimBias = 0;
-    
+
     double mCurrentRange = 0;
     double mCurrentAngle = 0;
 

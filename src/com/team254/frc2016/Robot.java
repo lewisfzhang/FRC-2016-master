@@ -187,13 +187,13 @@ public class Robot extends IterativeRobot {
         } else {
             mShooter.setAutoShoot(false);
         }
-        
+
         if (mControls.getButton5()) {
             mShooter.setHoodBias(mShooter.getHoodBias() + .1);
         } else if (mControls.getButton6()) {
             mShooter.setHoodBias(mShooter.getHoodBias() - .1);
         }
-        
+
         if (mControls.getBatterShot()) {
             mShooter.setFlywheelSpeedManual(1.0);
         } else {

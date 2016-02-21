@@ -82,7 +82,7 @@ public class ControlBoard {
     public boolean getManualMode() {
         return mButtonBoard.getRawButton(2);
     }
-    
+
     public boolean getButton5() {
         return mButtonBoard.getRawButton(5);
     }
