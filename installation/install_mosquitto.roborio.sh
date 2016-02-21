@@ -5,7 +5,10 @@ cd ~/
 # copy installation files into their expected places
 echo "[mosquitto] Copy files..."
 mkdir -p /usr/local/lib/
-cp libzlib.so libwebsockets.so /usr/local/lib/
+cp libwebsockets.so /usr/local/lib/
+
+mkdir -p /usr/local/arm-frc-linux-gnueabi/lib/
+cp libzlib.so /usr/local/arm-frc-linux-gnueabi/lib/
 
 mkdir -p /usr/local/bin/
 cp mosquitto /usr/local/bin/
