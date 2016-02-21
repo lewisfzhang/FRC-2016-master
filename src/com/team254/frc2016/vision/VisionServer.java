@@ -19,6 +19,7 @@ public class VisionServer implements Runnable {
     private ArrayList<VisionUpdateReceiver> receivers = new ArrayList<>();
     AdbBridge adb = new AdbBridge();
     double lastMessageReceivedTime = 0;
+    private boolean m_use_java_time = false;
 
     public static VisionServer getInstance() {
         if (s_instance == null) {
@@ -44,18 +45,21 @@ public class VisionServer implements Runnable {
                 byte[] buffer = new byte[2048];
                 int read;
                 while (m_socket.isConnected() && (read = is.read(buffer)) != -1) {
-                    double timestamp = Timer.getFPGATimestamp();
+                    double timestamp = getTimestamp();
                     lastMessageReceivedTime = timestamp;
-                    String message = new String(buffer, 0, read);
-                    if ("PING".equals(message)) {
-                        m_socket.getOutputStream().write("PONG".getBytes());
-                        continue;
-                    }
-                    VisionUpdate update = VisionUpdate.generateFromJsonString(timestamp, message);
-                    receivers.removeAll(Collections.singleton(null));
-                    if (update.isValid()) {
-                        for (VisionUpdateReceiver receiver : receivers) {
-                            receiver.gotUpdate(update);
+                    String messageRaw = new String(buffer, 0, read);
+                    String[] messages = messageRaw.split("\n");
+                    for (String message : messages) {
+                        if ("PING".equals(message)) {
+                            m_socket.getOutputStream().write("PONG".getBytes());
+                            continue;
+                        }
+                        VisionUpdate update = VisionUpdate.generateFromJsonString(timestamp, message);
+                        receivers.removeAll(Collections.singleton(null));
+                        if (update.isValid()) {
+                            for (VisionUpdateReceiver receiver : receivers) {
+                                receiver.gotUpdate(update);
+                            }
                         }
                     }
                 }
@@ -80,6 +84,12 @@ public class VisionServer implements Runnable {
             m_server_socket = new ServerSocket(port);
             adb.start();
             adb.reversePortForward(port, port);
+            try {
+                String useJavaTime = System.getenv("USE_JAVA_TIME");
+                m_use_java_time = "true".equals(useJavaTime);
+            } catch (NullPointerException e) {
+                m_use_java_time = false;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,7 +130,7 @@ public class VisionServer implements Runnable {
         @Override
         public void run() {
             while (true) {
-                if (Timer.getFPGATimestamp() - lastMessageReceivedTime > .1) {
+                if (getTimestamp() - lastMessageReceivedTime > .1) {
                     adb.reversePortForward(m_port, m_port);
                 }
                 try {
@@ -129,6 +139,14 @@ public class VisionServer implements Runnable {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    private double getTimestamp() {
+        if (m_use_java_time) {
+            return System.currentTimeMillis();
+        } else {
+            return Timer.getFPGATimestamp();
         }
     }
 }
