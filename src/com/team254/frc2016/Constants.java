@@ -43,6 +43,7 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
+    public static double kAutoAimLagTime = .12;
     public static double kShootActuationTime = 1.0;
 
     public static int kAndroidAppTcpPort = 8254;

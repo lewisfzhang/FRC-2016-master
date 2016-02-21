@@ -146,12 +146,12 @@ public class RobotState {
             return rv;
         }
         Pose2d capture_time_turret_fixed_to_camera = Pose2d
-                .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_ - .12))
+                .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_ - Constants.kAutoAimLagTime))
                 .transformBy(kTurretRotatingToCamera);
         Pose2d latest_turret_fixed_to_capture_time_turret_fixed = getLatestOdometricToVehicle().getValue()
-                .transformBy(kVehicleToTurretFixed).inverse()
-                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_ - .12)
-                        .transformBy(kVehicleToTurretFixed));
+                .transformBy(kVehicleToTurretFixed).inverse().transformBy(
+                        getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_ - Constants.kAutoAimLagTime)
+                                .transformBy(kVehicleToTurretFixed));
         for (Translation2d pos : camera_to_goals_) {
             Pose2d capture_time_turret_fixed_to_goal = capture_time_turret_fixed_to_camera
                     .transformBy(Pose2d.fromTranslation(pos));
