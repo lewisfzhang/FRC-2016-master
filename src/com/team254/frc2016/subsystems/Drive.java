@@ -1,10 +1,13 @@
 package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
+import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Rotation2d;
 
+import com.team254.lib.util.SynchronousPID;
+import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -15,14 +18,53 @@ public class Drive extends Subsystem {
     protected static final int kBaseLockControlSlot = 1;
 
     private static Drive instance_ = new Drive();
+    private double mLastHeadingErrorDegrees;
 
     public static Drive getInstance() {
         return instance_;
     }
 
+    private enum DriveControlState {
+        OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL
+    }
+
     private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
     private final Solenoid shifter_;
     private final ADXRS453_Gyro gyro_;
+
+    private DriveControlState driveControlState_;
+    private VelocityHeadingSetpoint velocityHeadingSetpoint_;
+    private SynchronousPID velocityHeadingPid_;
+
+    private final Loop mLoop = new Loop() {
+        @Override
+        public void onStart() {
+            setOpenLoop(DriveSignal.NEUTRAL);
+        }
+
+        @Override
+        public void onLoop() {
+            System.out.println(driveControlState_);
+            switch (driveControlState_) {
+                case OPEN_LOOP:
+                case BASE_LOCKED:
+                case VELOCITY_SETPOINT:
+                    // Talons are updating the control loop state
+                    return;
+                case VELOCITY_HEADING_CONTROL:
+                    updateVelocityHeadingSetpoint();
+                    return;
+                default:
+                    System.out.println("WTF: unexpected drive control state: " + driveControlState_);
+                    break;
+            }
+        }
+
+        @Override
+        public void onStop() {
+            setOpenLoop(DriveSignal.NEUTRAL);
+        }
+    };
 
     private Drive() {
         leftMaster_ = new CANTalon(Constants.kLeftDriveMasterId);
@@ -83,6 +125,19 @@ public class Drive extends Subsystem {
         rightMaster_.setPID(Constants.kDriveBaseLockKp, Constants.kDriveBaseLockKi, Constants.kDriveBaseLockKd,
                 Constants.kDriveBaseLockKf, Constants.kDriveBaseLockIZone, Constants.kDriveBaseLockRampRate,
                 kBaseLockControlSlot);
+
+        velocityHeadingPid_ = new SynchronousPID(
+                Constants.kDriveHeadingVeloctyKp,
+                Constants.kDriveHeadingVeloctyKi,
+                Constants.kDriveHeadingVeloctyKd);
+        velocityHeadingPid_.setOutputRange(-30, 30);
+
+
+        setOpenLoop(DriveSignal.NEUTRAL);
+    }
+
+    public Loop getLoop() {
+        return mLoop;
     }
 
     protected synchronized void setLeftRightPower(double left, double right) {
@@ -102,22 +157,46 @@ public class Drive extends Subsystem {
             rightSlave_.enableBrakeMode(false);
         }
         setLeftRightPower(signal.leftMotor, signal.rightMotor);
+        driveControlState_ = DriveControlState.OPEN_LOOP;
     }
 
-    private double rotationsToInches(double rotations) {
-        return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
+    public synchronized void setBaseLockOn() {
+        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
+            leftMaster_.setProfile(kBaseLockControlSlot);
+            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
+            leftMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
+            leftMaster_.enableBrakeMode(true);
+            leftSlave_.enableBrakeMode(true);
+            leftMaster_.set(leftMaster_.getPosition());
+        }
+        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
+            rightMaster_.setProfile(kBaseLockControlSlot);
+            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
+            rightMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
+            rightMaster_.enableBrakeMode(true);
+            rightSlave_.enableBrakeMode(true);
+            rightMaster_.set(rightMaster_.getPosition());
+        }
+        setHighGear(false);
+        driveControlState_ = DriveControlState.BASE_LOCKED;
     }
 
-    private double rpmToInchesPerSecond(double rpm) {
-        return rotationsToInches(rpm) / 60;
+    public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+        configureTalonsForSpeedControl();
+        driveControlState_ = DriveControlState.VELOCITY_SETPOINT;
+        updateVelocitySetpoint(left_inches_per_sec, right_inches_per_sec);
     }
 
-    private double inchesToRotations(double inches) {
-        return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
-    }
-
-    private double inchesPerSecondToRpm(double inches_per_second) {
-        return inchesToRotations(inches_per_second) * 60;
+    public synchronized void setVelocityHeadingSetpoint(
+            double forward_inches_per_sec,
+            Rotation2d headingSetpoint) {
+        configureTalonsForSpeedControl();
+        setHighGear(false);
+        velocityHeadingSetpoint_ =
+                new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
+        driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
+        velocityHeadingPid_.reset();
+        updateVelocityHeadingSetpoint();
     }
 
     public double getLeftDistanceInches() {
@@ -144,50 +223,6 @@ public class Drive extends Subsystem {
         return Rotation2d.fromDegrees(gyro_.getAngle());
     }
 
-    protected synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-        leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
-        rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
-    }
-
-    public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
-            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
-            leftMaster_.setProfile(kVelocityControlSlot);
-            leftMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
-            leftMaster_.enableBrakeMode(true);
-            leftSlave_.enableBrakeMode(true);
-            setHighGear(true);
-        }
-        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
-            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
-            rightMaster_.setProfile(kVelocityControlSlot);
-            rightMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
-            rightMaster_.enableBrakeMode(true);
-            rightSlave_.enableBrakeMode(true);
-            setHighGear(true);
-        }
-        updateVelocitySetpoint(left_inches_per_sec, right_inches_per_sec);
-    }
-
-    public synchronized void baseLock() {
-        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
-            leftMaster_.setProfile(kBaseLockControlSlot);
-            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
-            leftMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
-            leftMaster_.enableBrakeMode(true);
-            leftSlave_.enableBrakeMode(true);
-            leftMaster_.set(leftMaster_.getPosition());
-        }
-        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
-            rightMaster_.setProfile(kBaseLockControlSlot);
-            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
-            rightMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
-            rightMaster_.enableBrakeMode(true);
-            rightSlave_.enableBrakeMode(true);
-            rightMaster_.set(rightMaster_.getPosition());
-        }
-        setHighGear(false);
-    }
 
     public void setHighGear(boolean high_gear) {
         shifter_.set(!high_gear);
@@ -211,11 +246,75 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("right_velocity", getRightVelocityInchesPerSec());
         SmartDashboard.putNumber("gyro_angle", getGyro().getAngle());
         SmartDashboard.putNumber("gyro_center", getGyro().getCenter());
+        SmartDashboard.putNumber("heading_error", mLastHeadingErrorDegrees);
     }
 
     @Override
     public synchronized void zeroSensors() {
         resetEncoders();
         gyro_.reset();
+    }
+
+    private void configureTalonsForSpeedControl() {
+        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
+            leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
+            leftMaster_.setProfile(kVelocityControlSlot);
+            leftMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
+            leftMaster_.enableBrakeMode(true);
+            leftSlave_.enableBrakeMode(true);
+            setHighGear(true);
+        }
+        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
+            rightMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
+            rightMaster_.setProfile(kVelocityControlSlot);
+            rightMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
+            rightMaster_.enableBrakeMode(true);
+            rightSlave_.enableBrakeMode(true);
+            setHighGear(true);
+        }
+    }
+
+    private synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+        System.out.println("left: " + left_inches_per_sec + " right: " + right_inches_per_sec);
+        leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
+        rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
+    }
+
+    private void updateVelocityHeadingSetpoint() {
+        Rotation2d actualGyroAngle = getGyroAngle();
+
+        mLastHeadingErrorDegrees = velocityHeadingSetpoint_.headingSetpoint_.rotateBy(
+                actualGyroAngle.inverse()).getDegrees();
+
+        double deltaSpeed = velocityHeadingPid_.calculate(mLastHeadingErrorDegrees);
+        updateVelocitySetpoint(
+                velocityHeadingSetpoint_.forwardInchesPerSec_ + deltaSpeed / 2,
+                velocityHeadingSetpoint_.forwardInchesPerSec_ - deltaSpeed / 2);
+    }
+
+    private static double rotationsToInches(double rotations) {
+        return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
+    }
+
+    private static double rpmToInchesPerSecond(double rpm) {
+        return rotationsToInches(rpm) / 60;
+    }
+
+    private static double inchesToRotations(double inches) {
+        return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
+    }
+
+    private static double inchesPerSecondToRpm(double inches_per_second) {
+        return inchesToRotations(inches_per_second) * 60;
+    }
+
+    private static class VelocityHeadingSetpoint {
+        private final double forwardInchesPerSec_;
+        private final Rotation2d headingSetpoint_;
+
+        public VelocityHeadingSetpoint(double forwardInchesPerSec, Rotation2d headingSetpoint) {
+            forwardInchesPerSec_ = forwardInchesPerSec;
+            headingSetpoint_ = headingSetpoint;
+        }
     }
 }

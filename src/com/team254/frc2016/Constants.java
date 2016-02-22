@@ -61,11 +61,18 @@ public class Constants extends ConstantsBase {
     // PID gains for drive velocity loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     // TODO: tune these!
-    public static double kDriveVelocityKp = 0.1;
+    public static double kDriveVelocityKp = 0.6;
     public static double kDriveVelocityKi = 0;
-    public static double kDriveVelocityKd = 0;
-    public static double kDriveVelocityKf = 1023 / (15 * 12 / 100); // 15 fps
-                                                                    // open loop
+    public static double kDriveVelocityKd = 6.0;
+    public static double kDriveVelocityKf = 2 * 1023.0 / (4096.0 * (300.0 / 600.0)); // 15 fps
+    /*
+     * Highs gear consts
+    public static double kDriveVelocityKp = 0.3;
+    public static double kDriveVelocityKi = 0;
+    public static double kDriveVelocityKd = 3.0;
+    public static double kDriveVelocityKf = 1023.0 / (4096.0 * (300.0 / 600.0)); // 15 fps
+    */
+    // open loop
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0;
     public static int kDriveVelocityAllowableError = 0;
@@ -79,6 +86,12 @@ public class Constants extends ConstantsBase {
     public static int kDriveBaseLockIZone = 0;
     public static double kDriveBaseLockRampRate = 0;
     public static int kDriveBaseLockAllowableError = 10;
+
+    // PID gains for constant heading velocity control
+    // Units: Error is degrees. Output is inches/second difference to left/right.
+    public static double kDriveHeadingVeloctyKp = 6.0;
+    public static double kDriveHeadingVeloctyKi = 0.0;
+    public static double kDriveHeadingVeloctyKd = 0.0;
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.

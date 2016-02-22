@@ -52,6 +52,7 @@ public class Looper {
             running_ = false;
             notifier_.stop();
             for (Loop loop : loops_) {
+                System.out.println("Stopping " + loop);
                 loop.onStop();
             }
         }

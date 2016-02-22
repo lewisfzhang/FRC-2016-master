@@ -12,6 +12,7 @@ import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
+import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
@@ -101,6 +102,7 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.register(new TurretResetter());
         mEnabledLooper.register(RobotStateEstimator.getInstance());
         mEnabledLooper.register(Shooter.getInstance().getLoop());
+        mEnabledLooper.register(mDrive.getLoop());
         mDisabledLooper.register(new GyroCalibrator());
 
         mCompressor.start();
@@ -114,6 +116,7 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.stop();
         mDisabledLooper.start();
 
+        mDrive.setOpenLoop(DriveSignal.NEUTRAL);
         // Stop all actuators
         stopAll();
     }
@@ -128,6 +131,9 @@ public class Robot extends IterativeRobot {
         // Configure loopers
         mDisabledLooper.stop();
         mEnabledLooper.start();
+
+        mDrive.setHighGear(false);
+        mDrive.setVelocityHeadingSetpoint(30, new Rotation2d(1, 0, true));
     }
 
     @Override
@@ -140,6 +146,7 @@ public class Robot extends IterativeRobot {
         // Configure loopers
         mDisabledLooper.stop();
         mEnabledLooper.start();
+        mDrive.setOpenLoop(DriveSignal.NEUTRAL);
     }
 
     @Override
@@ -156,7 +163,7 @@ public class Robot extends IterativeRobot {
         double throttle = mControls.getThrottle();
         double turn = mControls.getTurn();
         if (mControls.getBaseLock()) {
-            mDrive.baseLock();
+            mDrive.setBaseLockOn();
         } else {
             mDrive.setHighGear(!mControls.getLowGear());
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
@@ -200,6 +207,11 @@ public class Robot extends IterativeRobot {
             mShooter.setFlywheelSpeedManual(0.0);
         }
 
+        outputAllToSmartDashboard();
+    }
+
+    @Override
+    public void autonomousPeriodic() {
         outputAllToSmartDashboard();
     }
 }
