@@ -95,7 +95,7 @@ public class Shooter extends Subsystem {
     boolean mOnTarget = false;
     boolean mSeesGoal = false;
     double mHoodDeployTime = 0;
-    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodAutoAimMap = new InterpolatingTreeMap();
+    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodAutoAimMap = new InterpolatingTreeMap<>();
     double mHoodAutoAimBias = 0;
 
     double mCurrentRange = 0;

@@ -169,43 +169,47 @@ public class Robot extends IterativeRobot {
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
         }
 
-        if (mControls.getDeployAndRunIntake()) {
+        if (mControls.getIntakeButton()) {
             mIntake.deploy(true);
             mIntake.set(1.0);
-        } else if (mControls.getRetractIntake()) {
+        } else if (mControls.getStowIntakeButton()) {
             mIntake.deploy(false);
             mIntake.set(0.0);
+        } else if (mControls.getExhaustButton()) {
+            mIntake.set(-1.0);
         } else {
             mIntake.set(0.0);
         }
 
-        if (mControls.getManualMode()) {
-            mShooter.wantManualMode();
-        } else if (mControls.getAutoAim()) {
+        if (mControls.getAutoAim()) {
             mShooter.wantAutoAim();
+        } else if (mControls.getBatterShot()) {
+            mShooter.wantBatterMode();
         } else {
             mShooter.wantStow();
         }
 
         mShooter.moveTurretManual(mControls.getTurretManual());
 
-        if (mControls.getAutoFireButton()) {
-            mShooter.setAutoShoot(true);
-        } else {
-            mShooter.setAutoShoot(false);
+        if (mControls.getFireButton()) {
+            mShooter.wantShootNow();
         }
 
+        // TODO: Remove these before competition
         if (mControls.getButton5()) {
             mShooter.setHoodBias(mShooter.getHoodBias() + .1);
         } else if (mControls.getButton6()) {
             mShooter.setHoodBias(mShooter.getHoodBias() - .1);
+        } else if (mControls.getButton4()) {
+            mShooter.setHoodBias(0);
         }
 
+        /*
         if (mControls.getBatterShot()) {
             mShooter.setFlywheelSpeedManual(1.0);
         } else {
             mShooter.setFlywheelSpeedManual(0.0);
-        }
+        }*/
 
         outputAllToSmartDashboard();
     }

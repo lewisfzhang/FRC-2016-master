@@ -38,8 +38,8 @@ public class Intake extends Subsystem {
             intake_talon_.set(-power);
             fixed_talon_.set(-power);
         } else {
-            intake_talon_.set(0);
-            fixed_talon_.set(0);
+            intake_talon_.set(Math.max(-power, 0));
+            fixed_talon_.set(Math.max(-power, 0));
         }
     }
 

@@ -40,20 +40,20 @@ public class ControlBoard {
         return mThrottleStick.getRawButton(2);
     }
 
-    public boolean getAutoFireButton() {
+    public boolean getFireButton() {
         return mThrottleStick.getRawButton(1);
     }
 
     // OPERATOR CONTROLS
-    public boolean getAutoTargetingOn() {
+    public boolean getAutoHangEnabled() {
         return mButtonBoard.getRawAxis(3) > 0.1;
     }
 
-    public boolean getDeployAndRunIntake() {
+    public boolean getHang() {
         return mButtonBoard.getRawButton(7);
     }
 
-    public boolean getRetractIntake() {
+    public boolean getDeployHanger() {
         return mButtonBoard.getRawButton(8);
     }
 
@@ -68,19 +68,19 @@ public class ControlBoard {
     }
 
     public boolean getAutoAim() {
-        return mButtonBoard.getRawButton(3);
+        return mButtonBoard.getRawButton(10);
     }
 
     public boolean getBatterShot() {
-        return mButtonBoard.getRawButton(4);
+        return mButtonBoard.getRawButton(9);
     }
 
     public boolean getBailButton() {
-        return mButtonBoard.getRawAxis(0) < 0.0;
+        return mButtonBoard.getRawButton(3);
     }
-
-    public boolean getManualMode() {
-        return mButtonBoard.getRawButton(2);
+    
+    public boolean getButton4() {
+        return mButtonBoard.getRawButton(4);
     }
 
     public boolean getButton5() {
@@ -89,5 +89,17 @@ public class ControlBoard {
 
     public boolean getButton6() {
         return mButtonBoard.getRawButton(6);
+    }
+    
+    public boolean getIntakeButton() {
+        return mButtonBoard.getRawAxis(2) < -0.1;
+    }
+    
+    public boolean getStowIntakeButton() {
+        return mButtonBoard.getRawAxis(1) < -0.1;
+    }
+    
+    public boolean getExhaustButton() {
+        return mButtonBoard.getRawAxis(0) < -0.1;
     }
 }
