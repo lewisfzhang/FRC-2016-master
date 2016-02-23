@@ -9,10 +9,8 @@ import com.team254.lib.util.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 
 public class GoalTrack {
-    public static final double kMaxAge = 0.5;
-    public static final double kMaxTrackerDistance = 12.0;
     Map<Double, Translation2d> mObservedPositions = new TreeMap<>();
-    Translation2d mSmoothedPosition = new Translation2d();
+    Translation2d mSmoothedPosition = null;
 
     GoalTrack() {
     }
@@ -31,7 +29,7 @@ public class GoalTrack {
     // Returns true if the track was updated
     public boolean tryUpdate(double timestamp, Translation2d new_observation) {
         double distance = mSmoothedPosition.inverse().translateBy(new_observation).norm();
-        if (distance < kMaxTrackerDistance) {
+        if (distance < Constants.kMaxTrackerDistance) {
             mObservedPositions.put(timestamp, new_observation);
             pruneByTime();
             return true;
@@ -46,12 +44,15 @@ public class GoalTrack {
     }
 
     void pruneByTime() {
-        double delete_before = Timer.getFPGATimestamp() - kMaxAge;
+        double delete_before = Timer.getFPGATimestamp() - Constants.kMaxGoalTrackAge;
         for (Iterator<Map.Entry<Double, Translation2d>> it = mObservedPositions.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Double, Translation2d> entry = it.next();
             if (entry.getKey() < delete_before) {
                 it.remove();
             }
+        }
+        if (mObservedPositions.isEmpty()) {
+            mSmoothedPosition = null;
         }
     }
 
@@ -71,5 +72,9 @@ public class GoalTrack {
 
     public Translation2d getSmoothedPosition() {
         return mSmoothedPosition;
+    }
+
+    public double getLatestTimestamp() {
+        return mObservedPositions.keySet().stream().max(Double::compareTo).orElse(0.0);
     }
 }

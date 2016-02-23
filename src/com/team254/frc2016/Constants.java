@@ -46,6 +46,10 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimMaxRange = 200.0;
     public static double kShootActuationTime = 1.0;
 
+    // Goal tracker constants
+    public static double kMaxGoalTrackAge = 0.5;
+    public static double kMaxTrackerDistance = 12.0;
+
     public static int kAndroidAppTcpPort = 8254;
 
     // CONTROL LOOP GAINS
