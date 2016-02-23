@@ -27,6 +27,11 @@ public class VisionServer implements Runnable {
         }
         return s_instance;
     }
+    
+    private boolean mIsConnect = false;
+    public boolean isConnected() {
+        return mIsConnect;
+    }
 
     protected class ServerThread implements Runnable {
         private Socket m_socket;
@@ -132,6 +137,9 @@ public class VisionServer implements Runnable {
             while (true) {
                 if (getTimestamp() - lastMessageReceivedTime > .1) {
                     adb.reversePortForward(m_port, m_port);
+                    mIsConnect = false;
+                } else {
+                    mIsConnect = true;
                 }
                 try {
                     Thread.sleep(200);
