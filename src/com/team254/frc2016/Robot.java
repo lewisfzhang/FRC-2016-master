@@ -210,13 +210,6 @@ public class Robot extends IterativeRobot {
             mShooter.setHoodBias(0);
         }
 
-        /*
-        if (mControls.getBatterShot()) {
-            mShooter.setFlywheelSpeedManual(1.0);
-        } else {
-            mShooter.setFlywheelSpeedManual(0.0);
-        }*/
-
         outputAllToSmartDashboard();
     }
 

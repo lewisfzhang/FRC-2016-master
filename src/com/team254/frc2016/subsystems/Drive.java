@@ -225,7 +225,7 @@ public class Drive extends Subsystem {
 
 
     public void setHighGear(boolean high_gear) {
-        shifter_.set(!high_gear);
+        shifter_.set(high_gear);
     }
 
     public synchronized void resetEncoders() {

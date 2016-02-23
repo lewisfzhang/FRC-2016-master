@@ -43,7 +43,7 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
-    public static double kAutoAimLagTime = .12;
+    public static double kAutoAimLagTime = 0.0;  // .12
     public static double kShootActuationTime = 1.0;
 
     public static int kAndroidAppTcpPort = 8254;
@@ -53,26 +53,16 @@ public class Constants extends ConstantsBase {
     // PID gains for hood position loop
     // Units: error is degrees of hood rotation. Max output is +/- 1.0.
     // Loop runs at 100Hz
-    // TODO tune this
-    public static double kHoodKp = 0.08;
-    public static double kHoodKi = 0.0003;
-    public static double kHoodKd = 0.5;
+    public static double kHoodKp = 0.05;
+    public static double kHoodKi = 0.0001;
+    public static double kHoodKd = 0.0;
 
-    // PID gains for drive velocity loop
+    // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    // TODO: tune these!
     public static double kDriveVelocityKp = 0.6;
     public static double kDriveVelocityKi = 0;
     public static double kDriveVelocityKd = 6.0;
-    public static double kDriveVelocityKf = 2 * 1023.0 / (4096.0 * (300.0 / 600.0)); // 15 fps
-    /*
-     * Highs gear consts
-    public static double kDriveVelocityKp = 0.3;
-    public static double kDriveVelocityKi = 0;
-    public static double kDriveVelocityKd = 3.0;
-    public static double kDriveVelocityKf = 1023.0 / (4096.0 * (300.0 / 600.0)); // 15 fps
-    */
-    // open loop
+    public static double kDriveVelocityKf = 1.0;
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0;
     public static int kDriveVelocityAllowableError = 0;
@@ -95,13 +85,13 @@ public class Constants extends ConstantsBase {
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kTurretKp = 0.06;
-    public static double kTurretKi = 0.00006;
-    public static double kTurretKd = 6.0;
+    public static double kTurretKp = 0.5;
+    public static double kTurretKi = 0.005;
+    public static double kTurretKd = 20.0;
     public static double kTurretKf = 0;
-    public static int kTurretIZone = 17050;
+    public static int kTurretIZone = (int)(1023.0 / kTurretKp);
     public static double kTurretRampRate = 0;
-    public static int kTurretAllowableError = 200;
+    public static int kTurretAllowableError = 0;
 
     // PID gains for turret position loop
     // Units: error is (4096 counts/rev)/100ms. Max output is +/- 1023 units.
