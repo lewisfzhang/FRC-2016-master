@@ -114,6 +114,7 @@ public class Shooter extends Subsystem {
         @Override
         public void onLoop() {
             synchronized (Shooter.this) {
+                double now = Timer.getFPGATimestamp();
                 // Shooter state machine
                 if (mActualSubsystemState != mDesiredSubsystemState) {
                     // Lock out state changes if we are actively shooting
@@ -126,7 +127,7 @@ public class Shooter extends Subsystem {
                             mFlywheel.stop();
                             mHood.setStowed(false);
                             mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
-                            mHoodDeployTime = Timer.getFPGATimestamp();
+                            mHoodDeployTime = now;
                             mActualSubsystemState = mDesiredSubsystemState;
                         } else if (mDesiredSubsystemState == SubsystemState.BATTER) {
                             System.out.println("Enter state BATTER");
@@ -134,7 +135,7 @@ public class Shooter extends Subsystem {
                             Intake.getInstance().overrideIntaking(true);
                             mFlywheel.setRpm(Constants.kFlywheelBatterRpmSetpoint);
                             mHood.setStowed(false);
-                            mHoodDeployTime = Timer.getFPGATimestamp();
+                            mHoodDeployTime = now;
                             mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
                             mTurret.setDesiredAngle(new Rotation2d());
                             mActualSubsystemState = mDesiredSubsystemState;
@@ -144,7 +145,7 @@ public class Shooter extends Subsystem {
                             Intake.getInstance().overrideIntaking(true);
                             stop();
                             mHood.setStowed(false);
-                            mHoodDeployTime = Timer.getFPGATimestamp();
+                            mHoodDeployTime = now;
                             mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kMinHoodAngle));
                             mActualSubsystemState = mDesiredSubsystemState;
                         } else if (mDesiredSubsystemState == SubsystemState.WANTS_TO_STOW
@@ -169,10 +170,10 @@ public class Shooter extends Subsystem {
 
                 // Calculate new setpoint if necessary
                 if (mActualSubsystemState == SubsystemState.AUTOAIMING && mShootState != ShootState.SHOOTING) {
-                    if (Timer.getFPGATimestamp() - mHoodDeployTime < kFlywheelDelay) {
+                    if (now - mHoodDeployTime < kFlywheelDelay) {
                         mRobotState.resetVision();
                     } else {
-                        List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters();
+                        List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters(now);
                         mSeesGoal = false;
                         if (aiming_parameters.size() > 0) {
                             Collections.sort(aiming_parameters, new AimingParameters.Comparator(mTurret.getAngle()));
@@ -214,13 +215,13 @@ public class Shooter extends Subsystem {
                 // Shooting action
                 if ((mShootState == ShootState.START_AUTO_SHOOT && mOnTarget && mSeesGoal)
                         || mShootState == ShootState.START_SHOOT_NOW) {
-                    mShootStartTime = Timer.getFPGATimestamp();
+                    mShootStartTime = now;
                     mShootState = ShootState.SHOOTING;
                     mShooterSolenoid.set(true);
                 }
                 if (mShootState == ShootState.SHOOTING) {
                     mFlywheel.setOpenLoop(1.0);
-                    if (Timer.getFPGATimestamp() - mShootStartTime >= Constants.kShootActuationTime) {
+                    if (now - mShootStartTime >= Constants.kShootActuationTime) {
                         mShootState = ShootState.IDLE;
                         mShooterSolenoid.set(false);
                     }

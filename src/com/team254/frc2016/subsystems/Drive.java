@@ -7,7 +7,6 @@ import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Rotation2d;
 
 import com.team254.lib.util.SynchronousPID;
-import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;

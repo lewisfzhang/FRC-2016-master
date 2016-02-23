@@ -56,8 +56,6 @@ public class Robot extends IterativeRobot {
             mRobotState.addVisionUpdate(update.getCapturedAtTimestamp(), update.getTargets());
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
-                // System.out.println(i + " : " + target.getAngle().getDegrees()
-                // + " : " + target.getDistance());
                 mCheesyLogger.sendTimePlotPoint("vision", "x", target.getX(), 1);
                 mCheesyLogger.sendTimePlotPoint("vision", "y", target.getY(), 1);
                 mCheesyLogger.sendTimePlotPoint("vision", "z", target.getZ(), 1);

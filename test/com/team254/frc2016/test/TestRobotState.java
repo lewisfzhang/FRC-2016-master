@@ -118,7 +118,7 @@ public class TestRobotState {
         assertTrue(rs.canSeeTarget());
 
         // Turret already pointing at target
-        List<Shooter.AimingParameters> targeting_info = rs.getAimingParameters();
+        List<Shooter.AimingParameters> targeting_info = rs.getAimingParameters(next_time);
         assertEquals(1, targeting_info.size());
         assertEquals(45, targeting_info.get(0).getTurretAngle().getDegrees(), kTestEpsilon);
 
@@ -143,7 +143,7 @@ public class TestRobotState {
         vision_updates.add(new TargetInfo(-1.0, 0));
         rs.addVisionUpdate(next_time, vision_updates);
         assertTrue(rs.canSeeTarget());
-        targeting_info = rs.getAimingParameters();
+        targeting_info = rs.getAimingParameters(next_time);
         assertEquals(1, targeting_info.size());
         // Would be straight ahead, but camera is offset back a bit
         System.out.println("Desired angle: " + targeting_info.get(0).getTurretAngle().getDegrees());

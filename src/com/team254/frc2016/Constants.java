@@ -44,7 +44,6 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
-    public static double kAutoAimLagTime = 0.0; // .12
     public static double kShootActuationTime = 1.0;
 
     public static int kAndroidAppTcpPort = 8254;
@@ -95,7 +94,7 @@ public class Constants extends ConstantsBase {
     public static double kTurretRampRate = 0;
     public static int kTurretAllowableError = 0;
 
-    // PID gains for turret position loop
+    // PID gains for flywheel velocity loop
     // Units: error is (4096 counts/rev)/100ms. Max output is +/- 1023 units.
     public static double kFlywheelKp = 0.075;
     public static double kFlywheelKi = 0.0;

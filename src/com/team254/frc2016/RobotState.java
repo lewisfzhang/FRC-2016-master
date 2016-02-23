@@ -12,7 +12,6 @@ import com.team254.lib.util.Pose2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -139,10 +138,10 @@ public class RobotState {
         return rv;
     }
 
-    public synchronized List<Shooter.AimingParameters> getAimingParameters() {
+    public synchronized List<Shooter.AimingParameters> getAimingParameters(double current_timestamp) {
         // TODO this no longer returns a list
         List<Shooter.AimingParameters> rv = new ArrayList<>();
-        if (Timer.getFPGATimestamp() - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
+        if (current_timestamp - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
             return rv;
         }
         Translation2d smoothed_odometric_to_goal = goal_tracker_.getLatestSmoothedTrack();
@@ -151,9 +150,9 @@ public class RobotState {
         }
 
         Pose2d latest_turret_fixed_to_capture_time_turret_fixed = getLatestOdometricToVehicle().getValue()
-                .transformBy(kVehicleToTurretFixed).inverse().transformBy(
-                        getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_ - Constants.kAutoAimLagTime)
-                                .transformBy(kVehicleToTurretFixed));
+                .transformBy(kVehicleToTurretFixed).inverse()
+                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_)
+                        .transformBy(kVehicleToTurretFixed));
         Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_capture_time_turret_fixed
                 .transformBy(kVehicleToTurretFixed.inverse())
                 .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_).inverse())
@@ -213,6 +212,7 @@ public class RobotState {
 
     public synchronized void resetVision() {
         latest_camera_to_goals_detected_timestamp_ = 0;
+        goal_tracker_.reset();
     }
 
     public Pose2d generateOdometryFromSensors(double left_encoder_delta_distance, double right_encoder_delta_distance,
