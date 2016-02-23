@@ -78,7 +78,7 @@ public class ControlBoard {
     public boolean getBailButton() {
         return mButtonBoard.getRawButton(3);
     }
-    
+
     public boolean getButton4() {
         return mButtonBoard.getRawButton(4);
     }
@@ -90,15 +90,15 @@ public class ControlBoard {
     public boolean getButton6() {
         return mButtonBoard.getRawButton(6);
     }
-    
+
     public boolean getIntakeButton() {
         return mButtonBoard.getRawAxis(2) < -0.1;
     }
-    
+
     public boolean getStowIntakeButton() {
         return mButtonBoard.getRawAxis(1) < -0.1;
     }
-    
+
     public boolean getExhaustButton() {
         return mButtonBoard.getRawAxis(0) < -0.1;
     }

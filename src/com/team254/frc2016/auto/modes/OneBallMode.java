@@ -40,7 +40,8 @@ public class OneBallMode extends AutoModeBase {
         }
 
         @Override
-        public void update() {}
+        public void update() {
+        }
 
         @Override
         public boolean isFinished() {

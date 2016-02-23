@@ -23,6 +23,7 @@ public class Constants extends ConstantsBase {
     // Hood constants
     public static double kMinHoodAngle = 26.0; // TODO tune this
     public static double kMaxHoodAngle = 59.0; // TODO tune this
+    public static double kBatterHoodAngle = 28.0;
     public static double kHoodNeutralAngle = 42.5;
     public static double kHoodOnTargetTolerance = 0.5;
     public static double kHoodGearReduction = 12.0 / 708.0; // TODO check this
@@ -43,7 +44,7 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
-    public static double kAutoAimLagTime = 0.0;  // .12
+    public static double kAutoAimLagTime = 0.0; // .12
     public static double kShootActuationTime = 1.0;
 
     public static int kAndroidAppTcpPort = 8254;
@@ -78,7 +79,8 @@ public class Constants extends ConstantsBase {
     public static int kDriveBaseLockAllowableError = 10;
 
     // PID gains for constant heading velocity control
-    // Units: Error is degrees. Output is inches/second difference to left/right.
+    // Units: Error is degrees. Output is inches/second difference to
+    // left/right.
     public static double kDriveHeadingVeloctyKp = 6.0;
     public static double kDriveHeadingVeloctyKi = 0.0;
     public static double kDriveHeadingVeloctyKd = 0.0;
@@ -87,9 +89,9 @@ public class Constants extends ConstantsBase {
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     public static double kTurretKp = 0.5;
     public static double kTurretKi = 0.005;
-    public static double kTurretKd = 20.0;
+    public static double kTurretKd = 30.0;
     public static double kTurretKf = 0;
-    public static int kTurretIZone = (int)(1023.0 / kTurretKp);
+    public static int kTurretIZone = (int) (1023.0 / kTurretKp);
     public static double kTurretRampRate = 0;
     public static int kTurretAllowableError = 0;
 

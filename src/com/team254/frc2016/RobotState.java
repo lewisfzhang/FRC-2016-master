@@ -77,7 +77,7 @@ public class RobotState {
     // FPGATimestamp -> Pose2d or Rotation2d
     protected InterpolatingTreeMap<InterpolatingDouble, Pose2d> odometric_to_vehicle_;
     protected InterpolatingTreeMap<InterpolatingDouble, Rotation2d> turret_rotation_;
-    protected List<Translation2d> camera_to_goals_;
+    protected GoalTracker goal_tracker_;
     protected double latest_camera_to_goals_detected_timestamp_;
     protected double latest_camera_to_goals_undetected_timestamp_;
     protected Rotation2d camera_pitch_correction_;
@@ -93,7 +93,7 @@ public class RobotState {
         odometric_to_vehicle_.put(new InterpolatingDouble(start_time), initial_odometric_to_vehicle);
         turret_rotation_ = new InterpolatingTreeMap<>(kObservationBufferSize);
         turret_rotation_.put(new InterpolatingDouble(start_time), initial_turret_rotation);
-        camera_to_goals_ = new ArrayList<Translation2d>();
+        goal_tracker_ = new GoalTracker();
         latest_camera_to_goals_detected_timestamp_ = 0;
         latest_camera_to_goals_undetected_timestamp_ = start_time;
         camera_pitch_correction_ = Rotation2d.fromDegrees(-Constants.kCameraPitchAngleDegrees);
@@ -130,40 +130,40 @@ public class RobotState {
         return latest_camera_to_goals_detected_timestamp_ > latest_camera_to_goals_undetected_timestamp_;
     }
 
-    public synchronized List<Pose2d> getCaptureTimeOdometricToGoals() {
+    public synchronized List<Pose2d> getCaptureTimeOdometricToGoal() {
         List<Pose2d> rv = new ArrayList<>();
-
-        Pose2d odometric_to_camera = getOdometricToCamera(latest_camera_to_goals_detected_timestamp_);
-        for (Translation2d pos : camera_to_goals_) {
-            rv.add(odometric_to_camera.transformBy(Pose2d.fromTranslation(pos)));
+        Translation2d latest = goal_tracker_.getLatestSmoothedTrack();
+        if (latest != null) {
+            rv.add(Pose2d.fromTranslation(latest));
         }
         return rv;
     }
 
     public synchronized List<Shooter.AimingParameters> getAimingParameters() {
+        // TODO this no longer returns a list
         List<Shooter.AimingParameters> rv = new ArrayList<>();
         if (Timer.getFPGATimestamp() - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
             return rv;
         }
-        Pose2d capture_time_turret_fixed_to_camera = Pose2d
-                .fromRotation(getTurretRotation(latest_camera_to_goals_detected_timestamp_ - Constants.kAutoAimLagTime))
-                .transformBy(kTurretRotatingToCamera);
+        Translation2d smoothed_odometric_to_goal = goal_tracker_.getLatestSmoothedTrack();
+        if (smoothed_odometric_to_goal == null) {
+            return rv;
+        }
+
         Pose2d latest_turret_fixed_to_capture_time_turret_fixed = getLatestOdometricToVehicle().getValue()
                 .transformBy(kVehicleToTurretFixed).inverse().transformBy(
                         getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_ - Constants.kAutoAimLagTime)
                                 .transformBy(kVehicleToTurretFixed));
-        for (Translation2d pos : camera_to_goals_) {
-            Pose2d capture_time_turret_fixed_to_goal = capture_time_turret_fixed_to_camera
-                    .transformBy(Pose2d.fromTranslation(pos));
-            Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_capture_time_turret_fixed
-                    .transformBy(capture_time_turret_fixed_to_goal);
+        Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_capture_time_turret_fixed
+                .transformBy(kVehicleToTurretFixed.inverse())
+                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_).inverse())
+                .transformBy(Pose2d.fromTranslation(smoothed_odometric_to_goal));
 
-            // We can actually disregard the angular portion of this pose. It is
-            // the bearing that we care about!
-            rv.add(new Shooter.AimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(),
-                    new Rotation2d(latest_turret_fixed_to_goal.getTranslation().getX(),
-                            latest_turret_fixed_to_goal.getTranslation().getY(), true)));
-        }
+        // We can actually disregard the angular portion of this pose. It is
+        // the bearing that we care about!
+        rv.add(new Shooter.AimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(),
+                new Rotation2d(latest_turret_fixed_to_goal.getTranslation().getX(),
+                        latest_turret_fixed_to_goal.getTranslation().getY(), true)));
         return rv;
     }
 
@@ -182,11 +182,12 @@ public class RobotState {
     }
 
     public synchronized void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
+        List<Translation2d> odometric_to_goals = new ArrayList<>();
+        Pose2d odometric_to_camera = getOdometricToCamera(timestamp);
         if (vision_update == null || vision_update.isEmpty()) {
             latest_camera_to_goals_undetected_timestamp_ = timestamp;
         } else {
             latest_camera_to_goals_detected_timestamp_ = timestamp;
-            camera_to_goals_.clear();
             for (TargetInfo target : vision_update) {
                 // Compensate for camera pitch
                 double xr = target.getZ() * camera_pitch_correction_.sin()
@@ -200,10 +201,14 @@ public class RobotState {
                     double scaling = differential_height_ / zr;
                     double distance = Math.hypot(xr, yr) * scaling;
                     Rotation2d angle = new Rotation2d(xr, yr, true);
-                    camera_to_goals_.add(new Translation2d(distance * angle.cos(), distance * angle.sin()));
+                    odometric_to_goals.add(odometric_to_camera
+                            .transformBy(Pose2d
+                                    .fromTranslation(new Translation2d(distance * angle.cos(), distance * angle.sin())))
+                            .getTranslation());
                 }
             }
         }
+        goal_tracker_.update(timestamp, odometric_to_goals);
     }
 
     public synchronized void resetVision() {
@@ -226,10 +231,11 @@ public class RobotState {
         SmartDashboard.putNumber("robot_pose_x", odometry.getTranslation().getX());
         SmartDashboard.putNumber("robot_pose_y", odometry.getTranslation().getY());
         SmartDashboard.putNumber("robot_pose_theta", odometry.getRotation().getDegrees());
-        if (camera_to_goals_.size() > 0) {
-            List<Pose2d> poses = getCaptureTimeOdometricToGoals();
-            SmartDashboard.putNumber("goal_pose_x", poses.get(0).getTranslation().getX());
-            SmartDashboard.putNumber("goal_pose_y", poses.get(0).getTranslation().getY());
+        List<Pose2d> poses = getCaptureTimeOdometricToGoal();
+        // TODO clean up
+        for (Pose2d pose : poses) {
+            SmartDashboard.putNumber("goal_pose_x", pose.getTranslation().getX());
+            SmartDashboard.putNumber("goal_pose_y", pose.getTranslation().getY());
         }
     }
 }

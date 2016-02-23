@@ -131,7 +131,10 @@ public class VisionServer implements Runnable {
         public void run() {
             while (true) {
                 if (getTimestamp() - lastMessageReceivedTime > .1) {
+                    // camera disconnected
                     adb.reversePortForward(m_port, m_port);
+                } else {
+                    // camera connected
                 }
                 try {
                     Thread.sleep(200);

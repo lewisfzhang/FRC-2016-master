@@ -135,7 +135,7 @@ public class Shooter extends Subsystem {
                             mFlywheel.setRpm(Constants.kFlywheelBatterRpmSetpoint);
                             mHood.setStowed(false);
                             mHoodDeployTime = Timer.getFPGATimestamp();
-                            mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kMinHoodAngle));
+                            mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
                             mTurret.setDesiredAngle(new Rotation2d());
                             mActualSubsystemState = mDesiredSubsystemState;
                         } else if (mDesiredSubsystemState == SubsystemState.MANUAL) {

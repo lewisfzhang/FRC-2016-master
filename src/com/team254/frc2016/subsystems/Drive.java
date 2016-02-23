@@ -44,19 +44,19 @@ public class Drive extends Subsystem {
 
         @Override
         public void onLoop() {
-            System.out.println(driveControlState_);
+            // System.out.println(driveControlState_);
             switch (driveControlState_) {
-                case OPEN_LOOP:
-                case BASE_LOCKED:
-                case VELOCITY_SETPOINT:
-                    // Talons are updating the control loop state
-                    return;
-                case VELOCITY_HEADING_CONTROL:
-                    updateVelocityHeadingSetpoint();
-                    return;
-                default:
-                    System.out.println("WTF: unexpected drive control state: " + driveControlState_);
-                    break;
+            case OPEN_LOOP:
+            case BASE_LOCKED:
+            case VELOCITY_SETPOINT:
+                // Talons are updating the control loop state
+                return;
+            case VELOCITY_HEADING_CONTROL:
+                updateVelocityHeadingSetpoint();
+                return;
+            default:
+                System.out.println("WTF: unexpected drive control state: " + driveControlState_);
+                break;
             }
         }
 
@@ -126,12 +126,9 @@ public class Drive extends Subsystem {
                 Constants.kDriveBaseLockKf, Constants.kDriveBaseLockIZone, Constants.kDriveBaseLockRampRate,
                 kBaseLockControlSlot);
 
-        velocityHeadingPid_ = new SynchronousPID(
-                Constants.kDriveHeadingVeloctyKp,
-                Constants.kDriveHeadingVeloctyKi,
+        velocityHeadingPid_ = new SynchronousPID(Constants.kDriveHeadingVeloctyKp, Constants.kDriveHeadingVeloctyKi,
                 Constants.kDriveHeadingVeloctyKd);
         velocityHeadingPid_.setOutputRange(-30, 30);
-
 
         setOpenLoop(DriveSignal.NEUTRAL);
     }
@@ -187,13 +184,10 @@ public class Drive extends Subsystem {
         updateVelocitySetpoint(left_inches_per_sec, right_inches_per_sec);
     }
 
-    public synchronized void setVelocityHeadingSetpoint(
-            double forward_inches_per_sec,
-            Rotation2d headingSetpoint) {
+    public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_sec, Rotation2d headingSetpoint) {
         configureTalonsForSpeedControl();
         setHighGear(false);
-        velocityHeadingSetpoint_ =
-                new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
+        velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
         driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
         velocityHeadingPid_.reset();
         updateVelocityHeadingSetpoint();
@@ -222,7 +216,6 @@ public class Drive extends Subsystem {
     public synchronized Rotation2d getGyroAngle() {
         return Rotation2d.fromDegrees(gyro_.getAngle());
     }
-
 
     public void setHighGear(boolean high_gear) {
         shifter_.set(high_gear);
@@ -283,12 +276,11 @@ public class Drive extends Subsystem {
     private void updateVelocityHeadingSetpoint() {
         Rotation2d actualGyroAngle = getGyroAngle();
 
-        mLastHeadingErrorDegrees = velocityHeadingSetpoint_.headingSetpoint_.rotateBy(
-                actualGyroAngle.inverse()).getDegrees();
+        mLastHeadingErrorDegrees = velocityHeadingSetpoint_.headingSetpoint_.rotateBy(actualGyroAngle.inverse())
+                .getDegrees();
 
         double deltaSpeed = velocityHeadingPid_.calculate(mLastHeadingErrorDegrees);
-        updateVelocitySetpoint(
-                velocityHeadingSetpoint_.forwardInchesPerSec_ + deltaSpeed / 2,
+        updateVelocitySetpoint(velocityHeadingSetpoint_.forwardInchesPerSec_ + deltaSpeed / 2,
                 velocityHeadingSetpoint_.forwardInchesPerSec_ - deltaSpeed / 2);
     }
 
