@@ -1,6 +1,8 @@
 
 package com.team254.frc2016;
 
+import com.team254.frc2016.auto.AutoModeExecuter;
+import com.team254.frc2016.auto.modes.OneBallMode;
 import com.team254.frc2016.loops.GyroCalibrator;
 import com.team254.frc2016.loops.Looper;
 import com.team254.frc2016.loops.RobotStateEstimator;
@@ -30,6 +32,7 @@ public class Robot extends IterativeRobot {
     Intake mIntake = Intake.getInstance();
     Shooter mShooter = Shooter.getInstance();
     Compressor mCompressor = new Compressor(1);
+    AutoModeExecuter mAutoModeExecuter = new AutoModeExecuter();
 
     // Other parts of the robot
     CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
@@ -110,6 +113,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void disabledInit() {
+        mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
 
         // Configure loopers
@@ -123,6 +127,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
+        mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
 
         // Reset all state
@@ -132,12 +137,13 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
 
-        mDrive.setHighGear(false);
-        mDrive.setVelocityHeadingSetpoint(30, new Rotation2d(1, 0, true));
+        mAutoModeExecuter.setAutoMode(new OneBallMode(mDrive, mShooter));
+        mAutoModeExecuter.start();
     }
 
     @Override
     public void teleopInit() {
+        mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
 
         // Reset drive

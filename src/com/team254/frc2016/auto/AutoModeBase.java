@@ -8,8 +8,6 @@ public abstract class AutoModeBase {
 
     protected abstract void routine() throws AutoModeEndedException;
 
-    public abstract void prestart();
-
     public void run() {
         m_active = true;
         try {

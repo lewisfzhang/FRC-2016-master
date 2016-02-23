@@ -383,4 +383,7 @@ public class Shooter extends Subsystem {
         return mOnTarget;
     }
 
+    public boolean isIdle() {
+        return mShootState == ShootState.IDLE;
+    }
 }
