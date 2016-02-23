@@ -11,7 +11,7 @@ import com.team254.frc2016.Constants;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.vision.TargetInfo;
-import com.team254.lib.util.Pose2d;
+import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
@@ -23,7 +23,7 @@ public class TestRobotState {
         // Start at the identity.
         double start_time = System.nanoTime();
         RobotState rs = RobotState.getInstance();
-        rs.reset(start_time, new Pose2d(), new Rotation2d());
+        rs.reset(start_time, new RigidTransform2d(), new Rotation2d());
         System.out.println("Latest time is " + rs.getLatestOdometricToVehicle().getKey().value);
 
         // Check the latest state.
@@ -37,7 +37,7 @@ public class TestRobotState {
         // Add a new measurement 10 milliseconds later
         double next_time = rs.getLatestOdometricToVehicle().getKey().value + 10000000;
         System.out.println("Next time is " + next_time);
-        rs.addObservations(next_time, new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(10)),
+        rs.addObservations(next_time, new RigidTransform2d(new Translation2d(1, 0), Rotation2d.fromDegrees(10)),
                 Rotation2d.fromDegrees(-15));
 
         // Check the latest state.
@@ -65,7 +65,7 @@ public class TestRobotState {
     public void simulatedTest() {
         double start_time = System.nanoTime();
         RobotState rs = RobotState.getInstance();
-        rs.reset(start_time, new Pose2d(), new Rotation2d());
+        rs.reset(start_time, new RigidTransform2d(), new Rotation2d());
 
         final double kTimestep = 10000000; // 10ms
 
@@ -99,12 +99,12 @@ public class TestRobotState {
     public void targetingTest() {
         double start_time = System.nanoTime();
         RobotState rs = RobotState.getInstance();
-        rs.reset(start_time, new Pose2d(), new Rotation2d());
+        rs.reset(start_time, new RigidTransform2d(), new Rotation2d());
 
         // t=10ms
         // robot at (1, 0, 0 deg), turret at (45 deg)
         double next_time = rs.getLatestOdometricToVehicle().getKey().value + 10000000;
-        rs.addObservations(next_time, new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0)),
+        rs.addObservations(next_time, new RigidTransform2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0)),
                 Rotation2d.fromDegrees(45));
 
         assertTrue(!rs.canSeeTarget());
@@ -125,7 +125,7 @@ public class TestRobotState {
         // t=20ms
         // robot at (2, 0, 0 deg), turret at (45 deg)
         next_time += 10000000;
-        rs.addObservations(next_time, new Pose2d(new Translation2d(2, 0), Rotation2d.fromDegrees(0)),
+        rs.addObservations(next_time, new RigidTransform2d(new Translation2d(2, 0), Rotation2d.fromDegrees(0)),
                 Rotation2d.fromDegrees(45));
 
         // Can't see target anymore
@@ -137,7 +137,7 @@ public class TestRobotState {
         // robot at (3, 0, 0 deg), turret at (45 deg)
         // target detected to the right in the camera frame
         next_time += 10000000;
-        rs.addObservations(next_time, new Pose2d(new Translation2d(3, 0), Rotation2d.fromDegrees(0)),
+        rs.addObservations(next_time, new RigidTransform2d(new Translation2d(3, 0), Rotation2d.fromDegrees(0)),
                 Rotation2d.fromDegrees(45));
 
         vision_updates.add(new TargetInfo(-1.0, 0));

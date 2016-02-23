@@ -4,7 +4,7 @@ import com.team254.frc2016.RobotState;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.subsystems.Turret;
-import com.team254.lib.util.Pose2d;
+import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -38,8 +38,8 @@ public class RobotStateEstimator implements Loop {
         double right_distance = drive_.getRightDistanceInches();
         Rotation2d gyro_angle = drive_.getGyroAngle();
         Rotation2d turret_angle = turret_.getAngle();
-        Pose2d odometry = robot_state_.generateOdometryFromSensors(left_distance - left_encoder_prev_distance_,
-                right_distance - right_encoder_prev_distance_, gyro_angle);
+        RigidTransform2d odometry = robot_state_.generateOdometryFromSensors(
+                left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
         robot_state_.addObservations(time, odometry, turret_angle);
         left_encoder_prev_distance_ = left_distance;
         right_encoder_prev_distance_ = right_distance;

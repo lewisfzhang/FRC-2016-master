@@ -15,7 +15,7 @@ import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.DriveSignal;
-import com.team254.lib.util.Pose2d;
+import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
 
@@ -84,7 +84,7 @@ public class Robot extends IterativeRobot {
         mDrive.zeroSensors();
         mIntake.zeroSensors();
         mShooter.zeroSensors();
-        mRobotState.reset(Timer.getFPGATimestamp(), new Pose2d(), new Rotation2d());
+        mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), new Rotation2d());
     }
 
     /**

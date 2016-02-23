@@ -4,11 +4,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.team254.lib.util.Pose2d;
+import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
-public class TestPose2d {
+public class TestRigidTransform2d {
     public static final double kTestEpsilon = 1E-9;
 
     @Test
@@ -184,51 +184,51 @@ public class TestPose2d {
     }
 
     @Test
-    public void testPose2d() {
+    public void testRigidTransform2d() {
         // Test constructors
-        Pose2d pose1 = new Pose2d();
+        RigidTransform2d pose1 = new RigidTransform2d();
         assertEquals(0, pose1.getTranslation().getX(), kTestEpsilon);
         assertEquals(0, pose1.getTranslation().getY(), kTestEpsilon);
         assertEquals(0, pose1.getRotation().getDegrees(), kTestEpsilon);
 
-        pose1 = new Pose2d(new Translation2d(3, 4), Rotation2d.fromDegrees(45));
+        pose1 = new RigidTransform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(45));
         assertEquals(3, pose1.getTranslation().getX(), kTestEpsilon);
         assertEquals(4, pose1.getTranslation().getY(), kTestEpsilon);
         assertEquals(45, pose1.getRotation().getDegrees(), kTestEpsilon);
 
         // Test transformation
-        pose1 = new Pose2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
-        Pose2d pose2 = new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0));
-        Pose2d pose3 = pose1.transformBy(pose2);
+        pose1 = new RigidTransform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
+        RigidTransform2d pose2 = new RigidTransform2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0));
+        RigidTransform2d pose3 = pose1.transformBy(pose2);
         assertEquals(3, pose3.getTranslation().getX(), kTestEpsilon);
         assertEquals(5, pose3.getTranslation().getY(), kTestEpsilon);
         assertEquals(90, pose3.getRotation().getDegrees(), kTestEpsilon);
 
-        pose1 = new Pose2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
-        pose2 = new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(-90));
+        pose1 = new RigidTransform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
+        pose2 = new RigidTransform2d(new Translation2d(1, 0), Rotation2d.fromDegrees(-90));
         pose3 = pose1.transformBy(pose2);
         assertEquals(3, pose3.getTranslation().getX(), kTestEpsilon);
         assertEquals(5, pose3.getTranslation().getY(), kTestEpsilon);
         assertEquals(0, pose3.getRotation().getDegrees(), kTestEpsilon);
 
         // A pose times its inverse should be the identity
-        Pose2d identity = new Pose2d();
-        pose1 = new Pose2d(new Translation2d(3.51512152, 4.23), Rotation2d.fromDegrees(91.6));
+        RigidTransform2d identity = new RigidTransform2d();
+        pose1 = new RigidTransform2d(new Translation2d(3.51512152, 4.23), Rotation2d.fromDegrees(91.6));
         pose2 = pose1.transformBy(pose1.inverse());
         assertEquals(identity.getTranslation().getX(), pose2.getTranslation().getX(), kTestEpsilon);
         assertEquals(identity.getTranslation().getY(), pose2.getTranslation().getY(), kTestEpsilon);
         assertEquals(identity.getRotation().getDegrees(), pose2.getRotation().getDegrees(), kTestEpsilon);
 
         // Test interpolation
-        pose1 = new Pose2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
-        pose2 = new Pose2d(new Translation2d(13, -6), Rotation2d.fromDegrees(-90));
+        pose1 = new RigidTransform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
+        pose2 = new RigidTransform2d(new Translation2d(13, -6), Rotation2d.fromDegrees(-90));
         pose3 = pose1.interpolate(pose2, .5);
         assertEquals(8, pose3.getTranslation().getX(), kTestEpsilon);
         assertEquals(-1, pose3.getTranslation().getY(), kTestEpsilon);
         assertEquals(0, pose3.getRotation().getDegrees(), kTestEpsilon);
 
-        pose1 = new Pose2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
-        pose2 = new Pose2d(new Translation2d(13, -6), Rotation2d.fromDegrees(-90));
+        pose1 = new RigidTransform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90));
+        pose2 = new RigidTransform2d(new Translation2d(13, -6), Rotation2d.fromDegrees(-90));
         pose3 = pose1.interpolate(pose2, .75);
         assertEquals(10.5, pose3.getTranslation().getX(), kTestEpsilon);
         assertEquals(-3.5, pose3.getTranslation().getY(), kTestEpsilon);
