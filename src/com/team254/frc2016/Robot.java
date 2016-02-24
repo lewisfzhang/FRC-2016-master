@@ -22,6 +22,7 @@ import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
@@ -44,6 +45,9 @@ public class Robot extends IterativeRobot {
     Looper mEnabledLooper = new Looper();
     // Disabled looper is called at 100Hz whenever the robot is disabled
     Looper mDisabledLooper = new Looper();
+    
+    //NetworkTables
+    public static NetworkTable shooterTable = NetworkTable.getTable("shooter");
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
