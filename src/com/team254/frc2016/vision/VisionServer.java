@@ -27,8 +27,9 @@ public class VisionServer implements Runnable {
         }
         return s_instance;
     }
-    
+
     private boolean mIsConnect = false;
+
     public boolean isConnected() {
         return mIsConnect;
     }

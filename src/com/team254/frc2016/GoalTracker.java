@@ -91,17 +91,24 @@ public class GoalTracker {
 
     public void update(double timestamp, List<Translation2d> odometric_to_goals) {
         // System.out.println("START GoalTracker::Update");
+        // System.out.println("Current number of tracks: " +
+        // mCurrentTracks.size());
         boolean hasUpdatedTrack = false;
         // Try to update existing tracks
         for (Translation2d target : odometric_to_goals) {
+            // System.out.println("Trying target " + target.toString());
             for (GoalTrack track : mCurrentTracks) {
+                // System.out.println("Trying track " + track.getId());
                 if (!hasUpdatedTrack) {
                     if (track.tryUpdate(timestamp, target)) {
                         hasUpdatedTrack = true;
-                        // System.out.println("UPDATED TRACK");
+                        System.out.println("UPDATED TRACK");
+                    } else {
+                        // System.out.println("COULD NOT UPDATE TRACK");
                     }
                 } else {
                     track.emptyUpdate();
+                    // System.out.println("SKIPPING TRACK");
                 }
             }
         }
@@ -110,13 +117,13 @@ public class GoalTracker {
             GoalTrack track = it.next();
             if (!track.isAlive()) {
                 it.remove();
-                // System.out.println("KILLED OLD TRACK");
+                System.out.println("KILLED OLD TRACK");
             }
         }
         // If all tracks are dead, start new tracks for any detections
         if (mCurrentTracks.isEmpty()) {
             for (Translation2d target : odometric_to_goals) {
-                // System.out.println("STARTING NEW TRACK");
+                System.out.println("STARTING NEW TRACK");
                 mCurrentTracks.add(GoalTrack.makeNewTrack(timestamp, target, mNextId));
                 ++mNextId;
             }

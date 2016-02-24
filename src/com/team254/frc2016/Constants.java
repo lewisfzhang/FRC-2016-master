@@ -52,7 +52,7 @@ public class Constants extends ConstantsBase {
     public static double kCameraFrameRate = 30.0;
     public static double kTrackReportComparatorStablityWeight = 1.0;
     public static double kTrackReportComparatorAgeWeight = 1.0;
-    public static double kTrackReportComparatorSwitchingWeight = 1.0;
+    public static double kTrackReportComparatorSwitchingWeight = 3.0;
 
     public static int kAndroidAppTcpPort = 8254;
 

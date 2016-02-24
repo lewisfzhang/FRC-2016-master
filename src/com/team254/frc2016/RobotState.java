@@ -142,21 +142,26 @@ public class RobotState {
         if (current_timestamp - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
             return rv;
         }
-        // turret_fixed -> vehicle (latest) -> odometric
-        RigidTransform2d turret_fixed_to_odometric = getLatestOdometricToVehicle().getValue()
-                .transformBy(kVehicleToTurretFixed).inverse();
         List<TrackReport> reports = goal_tracker_.getTracks();
         Collections.sort(reports, comparator);
+
+        // TODO: simplify this math
+        RigidTransform2d latest_turret_fixed_to_capture_time_turret_fixed = getLatestOdometricToVehicle().getValue()
+                .transformBy(kVehicleToTurretFixed).inverse()
+                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_)
+                        .transformBy(kVehicleToTurretFixed));
+
         for (TrackReport report : reports) {
-            // turret_fixed -> vehicle (latest) -> odometric -> goal
-            RigidTransform2d turret_fixed_to_goal = turret_fixed_to_odometric
+            RigidTransform2d latest_turret_fixed_to_goal = latest_turret_fixed_to_capture_time_turret_fixed
+                    .transformBy(kVehicleToTurretFixed.inverse())
+                    .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_).inverse())
                     .transformBy(RigidTransform2d.fromTranslation(report.odometric_to_goal));
 
             // We can actually disregard the angular portion of this pose. It is
             // the bearing that we care about!
-            rv.add(new Shooter.AimingParameters(turret_fixed_to_goal.getTranslation().norm(),
-                    new Rotation2d(turret_fixed_to_goal.getTranslation().getX(),
-                            turret_fixed_to_goal.getTranslation().getY(), true),
+            rv.add(new Shooter.AimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(),
+                    new Rotation2d(latest_turret_fixed_to_goal.getTranslation().getX(),
+                            latest_turret_fixed_to_goal.getTranslation().getY(), true),
                     report.id));
         }
         return rv;

@@ -45,9 +45,6 @@ public class Robot extends IterativeRobot {
     Looper mEnabledLooper = new Looper();
     // Disabled looper is called at 100Hz whenever the robot is disabled
     Looper mDisabledLooper = new Looper();
-    
-    //NetworkTables
-    public static NetworkTable shooterTable = NetworkTable.getTable("shooter");
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");

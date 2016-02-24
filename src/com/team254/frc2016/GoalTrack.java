@@ -13,13 +13,14 @@ public class GoalTrack {
     Translation2d mSmoothedPosition = null;
     int mId;
 
-    GoalTrack() {
+    private GoalTrack() {
     }
 
     public static GoalTrack makeNewTrack(double timestamp, Translation2d first_observation, int id) {
         GoalTrack rv = new GoalTrack();
         rv.mObservedPositions.put(timestamp, first_observation);
         rv.mSmoothedPosition = first_observation;
+        System.out.println("Set smoothed position to " + first_observation.toString());
         rv.mId = id;
         return rv;
     }
@@ -30,6 +31,9 @@ public class GoalTrack {
 
     // Returns true if the track was updated
     public boolean tryUpdate(double timestamp, Translation2d new_observation) {
+        if (!isAlive()) {
+            return false;
+        }
         double distance = mSmoothedPosition.inverse().translateBy(new_observation).norm();
         if (distance < Constants.kMaxTrackerDistance) {
             mObservedPositions.put(timestamp, new_observation);
@@ -55,6 +59,8 @@ public class GoalTrack {
         }
         if (mObservedPositions.isEmpty()) {
             mSmoothedPosition = null;
+        } else {
+            smooth();
         }
     }
 
@@ -81,8 +87,7 @@ public class GoalTrack {
     }
 
     public double getStability() {
-        return Math.min(1.0,
-                mObservedPositions.size() / (Constants.kCameraFrameRate * Constants.kMaxGoalTrackAge));
+        return Math.min(1.0, mObservedPositions.size() / (Constants.kCameraFrameRate * Constants.kMaxGoalTrackAge));
     }
 
     public int getId() {

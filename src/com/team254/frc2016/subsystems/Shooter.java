@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.GoalTracker;
-import com.team254.frc2016.Robot;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
 import com.team254.frc2016.vision.VisionServer;
@@ -14,6 +13,7 @@ import com.team254.lib.util.Rotation2d;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends Subsystem {
@@ -74,6 +74,9 @@ public class Shooter extends Subsystem {
     int mCurrentTrackId = -1;
     double mCurrentRange = 0;
     double mCurrentAngle = 0;
+
+    // NetworkTables
+    NetworkTable mShooterTable = NetworkTable.getTable("shooter");
 
     Loop mLoop = new Loop() {
         @Override
@@ -204,18 +207,18 @@ public class Shooter extends Subsystem {
                         mShooterSolenoid.set(false);
                     }
                 }
-                
-                //Update Network Tables
-                if (mOnTarget && mSeesGoal) 
-                    Robot.shooterTable.putString("state", "LOCKED");
-                else if (mSeesGoal)
-                    Robot.shooterTable.putString("state", "AIMING");
-                else if (mActualSubsystemState == SubsystemState.STOWED)
-                    Robot.shooterTable.putString("state", "CAM_STOWED");
-                else if (!VisionServer.getInstance().isConnected())
-                    Robot.shooterTable.putString("state", "NO_CAM");
-                else
-                    Robot.shooterTable.putString("state", "LOOKING_FOR_GOAL");
+
+                // Update Network Tables
+                /*
+                 * if (mOnTarget && mSeesGoal) {
+                 * mShooterTable.putString("state", "LOCKED"); } else if
+                 * (mSeesGoal) { mShooterTable.putString("state", "AIMING"); }
+                 * else if (mActualSubsystemState == SubsystemState.STOWED) {
+                 * mShooterTable.putString("state", "CAM_STOWED"); } else if
+                 * (!VisionServer.getInstance().isConnected()) {
+                 * mShooterTable.putString("state", "NO_CAM"); } else {
+                 * mShooterTable.putString("state", "LOOKING_FOR_GOAL"); }
+                 */
             }
         }
 
