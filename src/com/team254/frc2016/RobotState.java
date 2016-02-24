@@ -1,9 +1,12 @@
 package com.team254.frc2016;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import com.team254.frc2016.GoalTracker.TrackReport;
 import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.lib.util.InterpolatingDouble;
@@ -125,39 +128,37 @@ public class RobotState {
         return getOdometricToTurretRotated(timestamp).transformBy(kTurretRotatingToCamera);
     }
 
-    public synchronized boolean canSeeTarget() {
-        return latest_camera_to_goals_detected_timestamp_ > latest_camera_to_goals_undetected_timestamp_;
-    }
-
     public synchronized List<RigidTransform2d> getCaptureTimeOdometricToGoal() {
         List<RigidTransform2d> rv = new ArrayList<>();
-        Translation2d latest = goal_tracker_.getLatestSmoothedTrack();
-        if (latest != null) {
-            rv.add(RigidTransform2d.fromTranslation(latest));
+        for (TrackReport report : goal_tracker_.getTracks()) {
+            rv.add(RigidTransform2d.fromTranslation(report.odometric_to_goal));
         }
         return rv;
     }
 
-    public synchronized List<Shooter.AimingParameters> getAimingParameters(double current_timestamp) {
-        // TODO this no longer returns a list
+    public synchronized List<Shooter.AimingParameters> getAimingParameters(double current_timestamp,
+            Comparator<TrackReport> comparator) {
         List<Shooter.AimingParameters> rv = new ArrayList<>();
         if (current_timestamp - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
             return rv;
         }
-        Translation2d smoothed_odometric_to_goal = goal_tracker_.getLatestSmoothedTrack();
-        if (smoothed_odometric_to_goal == null) {
-            return rv;
+        // turret_fixed -> vehicle (latest) -> odometric
+        RigidTransform2d turret_fixed_to_odometric = getLatestOdometricToVehicle().getValue()
+                .transformBy(kVehicleToTurretFixed).inverse();
+        List<TrackReport> reports = goal_tracker_.getTracks();
+        Collections.sort(reports, comparator);
+        for (TrackReport report : reports) {
+            // turret_fixed -> vehicle (latest) -> odometric -> goal
+            RigidTransform2d turret_fixed_to_goal = turret_fixed_to_odometric
+                    .transformBy(RigidTransform2d.fromTranslation(report.odometric_to_goal));
+
+            // We can actually disregard the angular portion of this pose. It is
+            // the bearing that we care about!
+            rv.add(new Shooter.AimingParameters(turret_fixed_to_goal.getTranslation().norm(),
+                    new Rotation2d(turret_fixed_to_goal.getTranslation().getX(),
+                            turret_fixed_to_goal.getTranslation().getY(), true),
+                    report.id));
         }
-
-        // turret_fixed -> vehicle (latest) -> odometric -> goal
-        RigidTransform2d turret_fixed_to_goal = getLatestOdometricToVehicle().getValue()
-                .transformBy(kVehicleToTurretFixed).inverse()
-                .transformBy(RigidTransform2d.fromTranslation(smoothed_odometric_to_goal));
-
-        // We can actually disregard the angular portion of this pose. It is
-        // the bearing that we care about!
-        rv.add(new Shooter.AimingParameters(turret_fixed_to_goal.getTranslation().norm(), new Rotation2d(
-                turret_fixed_to_goal.getTranslation().getX(), turret_fixed_to_goal.getTranslation().getY(), true)));
         return rv;
     }
 
@@ -227,10 +228,11 @@ public class RobotState {
         SmartDashboard.putNumber("robot_pose_y", odometry.getTranslation().getY());
         SmartDashboard.putNumber("robot_pose_theta", odometry.getRotation().getDegrees());
         List<RigidTransform2d> poses = getCaptureTimeOdometricToGoal();
-        // TODO clean up
         for (RigidTransform2d pose : poses) {
+            // Only output first goal
             SmartDashboard.putNumber("goal_pose_x", pose.getTranslation().getX());
             SmartDashboard.putNumber("goal_pose_y", pose.getTranslation().getY());
+            break;
         }
     }
 }

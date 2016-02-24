@@ -1,9 +1,9 @@
 package com.team254.frc2016.subsystems;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.team254.frc2016.Constants;
+import com.team254.frc2016.GoalTracker;
 import com.team254.frc2016.Robot;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
@@ -20,45 +20,12 @@ public class Shooter extends Subsystem {
     public static class AimingParameters {
         double range;
         Rotation2d turret_angle;
+        int track_id;
 
-        public static class Comparator implements java.util.Comparator<AimingParameters> {
-            Rotation2d mCurrentAngleInverse;
-
-            public Comparator(Rotation2d current_turret_angle) {
-                mCurrentAngleInverse = current_turret_angle.inverse();
-            }
-
-            @Override
-            public int compare(AimingParameters o1, AimingParameters o2) {
-                // Sort by range and distance to current turret angle
-                if (o1.range < o2.range - Constants.kAutoAimRangeHysteresis) {
-                    return -1;
-                } else if (o1.range > o2.range + Constants.kAutoAimRangeHysteresis) {
-                    return 1;
-                } else {
-                    // Compare to current turret angle
-                    // It is theoretically possible that this computation will
-                    // assume rotation opposite the hard stops on the turret,
-                    // but this is basically guaranteed not to happen because of
-                    // the FOV of the camera relative to turret rotation.
-                    double relative_angle_o1 = Math
-                            .abs(mCurrentAngleInverse.rotateBy(o1.getTurretAngle()).getRadians());
-                    double relative_angle_o2 = Math
-                            .abs(mCurrentAngleInverse.rotateBy(o2.getTurretAngle()).getRadians());
-                    if (relative_angle_o1 < relative_angle_o2) {
-                        return -1;
-                    } else if (relative_angle_o1 > relative_angle_o2) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
-            }
-        }
-
-        public AimingParameters(double range, Rotation2d turret_angle) {
+        public AimingParameters(double range, Rotation2d turret_angle, int track_id) {
             this.range = range;
             this.turret_angle = turret_angle;
+            this.track_id = track_id;
         }
 
         public double getRange() {
@@ -67,6 +34,10 @@ public class Shooter extends Subsystem {
 
         public Rotation2d getTurretAngle() {
             return turret_angle;
+        }
+
+        public int getTrackid() {
+            return track_id;
         }
     }
 
@@ -100,6 +71,7 @@ public class Shooter extends Subsystem {
     InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodAutoAimMap = new InterpolatingTreeMap<>();
     double mHoodAutoAimBias = 0;
 
+    int mCurrentTrackId = -1;
     double mCurrentRange = 0;
     double mCurrentAngle = 0;
 
@@ -174,11 +146,14 @@ public class Shooter extends Subsystem {
                 if (mActualSubsystemState == SubsystemState.AUTOAIMING && mShootState != ShootState.SHOOTING) {
                     if (now - mHoodDeployTime < kFlywheelDelay) {
                         mRobotState.resetVision();
+                        mCurrentTrackId = -1;
                     } else {
-                        List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters(now);
+                        List<AimingParameters> aiming_parameters = mRobotState.getAimingParameters(now,
+                                new GoalTracker.TrackReportComparator(Constants.kTrackReportComparatorStablityWeight,
+                                        Constants.kTrackReportComparatorStablityWeight,
+                                        Constants.kTrackReportComparatorSwitchingWeight, mCurrentTrackId, now));
                         mSeesGoal = false;
                         if (aiming_parameters.size() > 0) {
-                            Collections.sort(aiming_parameters, new AimingParameters.Comparator(mTurret.getAngle()));
                             for (AimingParameters param : aiming_parameters) {
                                 // Deal with parameters outside of the shooter
                                 // range
@@ -194,6 +169,7 @@ public class Shooter extends Subsystem {
                                             .fromDegrees(getHoodAngleForRange(param.getRange()) + mHoodAutoAimBias));
                                     mTurret.setDesiredAngle(param.getTurretAngle());
                                     mSeesGoal = true;
+                                    mCurrentTrackId = param.getTrackid();
                                     break;
                                 }
                             }

@@ -49,6 +49,10 @@ public class Constants extends ConstantsBase {
     // Goal tracker constants
     public static double kMaxGoalTrackAge = 0.5;
     public static double kMaxTrackerDistance = 12.0;
+    public static double kCameraFrameRate = 30.0;
+    public static double kTrackReportComparatorStablityWeight = 1.0;
+    public static double kTrackReportComparatorAgeWeight = 1.0;
+    public static double kTrackReportComparatorSwitchingWeight = 1.0;
 
     public static int kAndroidAppTcpPort = 8254;
 

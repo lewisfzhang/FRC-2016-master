@@ -11,14 +11,16 @@ import edu.wpi.first.wpilibj.Timer;
 public class GoalTrack {
     Map<Double, Translation2d> mObservedPositions = new TreeMap<>();
     Translation2d mSmoothedPosition = null;
+    int mId;
 
     GoalTrack() {
     }
 
-    public static GoalTrack makeNewTrack(double timestamp, Translation2d first_observation) {
+    public static GoalTrack makeNewTrack(double timestamp, Translation2d first_observation, int id) {
         GoalTrack rv = new GoalTrack();
         rv.mObservedPositions.put(timestamp, first_observation);
         rv.mSmoothedPosition = first_observation;
+        rv.mId = id;
         return rv;
     }
 
@@ -76,5 +78,14 @@ public class GoalTrack {
 
     public double getLatestTimestamp() {
         return mObservedPositions.keySet().stream().max(Double::compareTo).orElse(0.0);
+    }
+
+    public double getStability() {
+        return Math.min(1.0,
+                mObservedPositions.size() / (Constants.kCameraFrameRate * Constants.kMaxGoalTrackAge));
+    }
+
+    public int getId() {
+        return mId;
     }
 }
