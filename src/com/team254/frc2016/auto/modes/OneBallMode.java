@@ -60,10 +60,12 @@ public class OneBallMode extends AutoModeBase {
 
     private final Action mAutoShootAction = new Action() {
 
+        private long mStartTime;
+
         @Override
         public void start() {
-            mShooter.wantAutoAim();
-            mShooter.setAutoShoot(true);
+            mShooter.setWantedState(Shooter.WantedState.WANT_TO_AIM);
+            mStartTime = System.currentTimeMillis();
         }
 
         @Override
@@ -73,12 +75,12 @@ public class OneBallMode extends AutoModeBase {
 
         @Override
         public boolean isFinished() {
-            return mShooter.isIdle();
+            return System.currentTimeMillis() - mStartTime > 2000;
         }
 
         @Override
         public void done() {
-            mShooter.wantStow();
+            mShooter.setWantedState(Shooter.WantedState.WANT_TO_STOW);
         }
     };
 }

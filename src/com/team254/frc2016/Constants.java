@@ -1,6 +1,8 @@
 package com.team254.frc2016;
 
 import com.team254.lib.util.ConstantsBase;
+import com.team254.lib.util.InterpolatingDouble;
+import com.team254.lib.util.InterpolatingTreeMap;
 
 public class Constants extends ConstantsBase {
     public static double kCenterOfTargetHeight = 89.0; // inches
@@ -146,6 +148,22 @@ public class Constants extends ConstantsBase {
     public String getFileLocation() {
         return "~/constants.txt";
     }
+
+    // Shooter Operational consts
+    public static final double kHoodUnstowToFlywheelSpinTime = 0.5;
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> HOOD_AUTO_AIM_MAP =
+            new InterpolatingTreeMap<>();
+    static {
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(70.0), new InterpolatingDouble(47.0));
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(75.0), new InterpolatingDouble(49.0));
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(82.0), new InterpolatingDouble(50.0));
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(90.0), new InterpolatingDouble(54.0));
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(98.0), new InterpolatingDouble(55.0));
+        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(113.0), new InterpolatingDouble(56.5));
+    }
+
 
     static {
         new Constants().loadFromFile();

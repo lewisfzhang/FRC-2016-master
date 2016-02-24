@@ -129,8 +129,8 @@ public class Robot extends IterativeRobot {
         mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
 
-        // Reset all state
-        zeroAllSensors();
+        // Reset drive sensors
+        mDrive.resetEncoders();
 
         // Configure loopers
         mDisabledLooper.stop();
@@ -187,27 +187,16 @@ public class Robot extends IterativeRobot {
         }
 
         if (mControls.getAutoAim()) {
-            mShooter.wantAutoAim();
+            mShooter.setWantedState(Shooter.WantedState.WANT_TO_AIM);
         } else if (mControls.getBatterShot()) {
-            mShooter.wantBatterMode();
+            mShooter.setWantedState(Shooter.WantedState.WANT_TO_BATTER);
         } else {
-            mShooter.wantStow();
+            mShooter.setWantedState(Shooter.WantedState.WANT_TO_STOW);
         }
 
-        mShooter.moveTurretManual(mControls.getTurretManual());
+        mShooter.setTurretManualScanOutput(mControls.getTurretManual());
 
-        if (mControls.getFireButton()) {
-            mShooter.wantShootNow();
-        }
-
-        // TODO: Remove these before competition
-        if (mControls.getButton5()) {
-            mShooter.setHoodBias(mShooter.getHoodBias() + .1);
-        } else if (mControls.getButton6()) {
-            mShooter.setHoodBias(mShooter.getHoodBias() - .1);
-        } else if (mControls.getButton4()) {
-            mShooter.setHoodBias(0);
-        }
+        mShooter.setWantsToShoot(mControls.getFireButton());
 
         outputAllToSmartDashboard();
     }

@@ -12,12 +12,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Hood extends Subsystem {
-    ContinuousRotationServo left_servo_;
-    ContinuousRotationServo right_servo_;
-    MA3Encoder encoder_;
-    Solenoid stow_solenoid_;
-    boolean has_homed_;
-    SynchronousPID pid_;
+    private ContinuousRotationServo left_servo_;
+    private ContinuousRotationServo right_servo_;
+    private MA3Encoder encoder_;
+    private Solenoid stow_solenoid_;
+    private boolean has_homed_;
+    private SynchronousPID pid_;
 
     enum ControlMode {
         HOMING, OPEN_LOOP, POSITION

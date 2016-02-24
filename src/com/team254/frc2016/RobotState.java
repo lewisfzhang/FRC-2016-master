@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.team254.frc2016.GoalTracker.TrackReport;
 import com.team254.frc2016.subsystems.Shooter;
+import com.team254.frc2016.subsystems.ShooterAimingParameters;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
@@ -136,9 +137,10 @@ public class RobotState {
         return rv;
     }
 
-    public synchronized List<Shooter.AimingParameters> getAimingParameters(double current_timestamp,
+    public synchronized List<ShooterAimingParameters> getAimingParameters(
+            double current_timestamp,
             Comparator<TrackReport> comparator) {
-        List<Shooter.AimingParameters> rv = new ArrayList<>();
+        List<ShooterAimingParameters> rv = new ArrayList<>();
         if (current_timestamp - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
             return rv;
         }
@@ -159,7 +161,7 @@ public class RobotState {
 
             // We can actually disregard the angular portion of this pose. It is
             // the bearing that we care about!
-            rv.add(new Shooter.AimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(),
+            rv.add(new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(),
                     new Rotation2d(latest_turret_fixed_to_goal.getTranslation().getX(),
                             latest_turret_fixed_to_goal.getTranslation().getY(), true),
                     report.id));
