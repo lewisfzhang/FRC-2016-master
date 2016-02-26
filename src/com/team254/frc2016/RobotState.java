@@ -145,16 +145,13 @@ public class RobotState {
         List<TrackReport> reports = goal_tracker_.getTracks();
         Collections.sort(reports, comparator);
 
-        // TODO: simplify this math
-        RigidTransform2d latest_turret_fixed_to_capture_time_turret_fixed = getLatestOdometricToVehicle().getValue()
-                .transformBy(kVehicleToTurretFixed).inverse()
-                .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_)
-                        .transformBy(kVehicleToTurretFixed));
+        // turret fixed (latest) -> vehicle (latest) -> odometric
+        RigidTransform2d latest_turret_fixed_to_odometric = getLatestOdometricToVehicle().getValue()
+                .transformBy(kVehicleToTurretFixed).inverse();
 
         for (TrackReport report : reports) {
-            RigidTransform2d latest_turret_fixed_to_goal = latest_turret_fixed_to_capture_time_turret_fixed
-                    .transformBy(kVehicleToTurretFixed.inverse())
-                    .transformBy(getOdometricToVehicle(latest_camera_to_goals_detected_timestamp_).inverse())
+            // turret fixed (latest) -> vehicle (latest) -> odometric -> goals
+            RigidTransform2d latest_turret_fixed_to_goal = latest_turret_fixed_to_odometric
                     .transformBy(RigidTransform2d.fromTranslation(report.odometric_to_goal));
 
             // We can actually disregard the angular portion of this pose. It is
