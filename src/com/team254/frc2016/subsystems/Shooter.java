@@ -26,24 +26,28 @@ public class Shooter extends Subsystem {
      * Drives actual state, all outputs should be dictated by this state
      */
     private enum SystemState {
-        STOWED_AND_HOMING_HOOD, //
-        STOWED_OR_STOWING, //
-        UNSTOWING_TO_AIM, //
-        UNSTOWING_TO_BATTER, //
-        SPINNING_AIM, //
-        SPINNING_BATTER, //
-        SHOOTING_AIM, //
-        SHOOTING_BATTER, //
-        UNSTOWED_RETURNING_TO_SAFE //
+        REENABLED, // The shooter has just been enabled (and may have previously
+                   // been disabled from any state)
+        STOWED_AND_HOMING_HOOD, // The shooter is stowed and the hood is homing
+        STOWED_OR_STOWING, // The shooter is stowed (or stowing)
+        UNSTOWING_TO_AIM, // The shooter is in the process of unstowing en route
+                          // to auto aiming
+        UNSTOWING_TO_BATTER, // The shooter is in the process of unstowing en
+                             // route to batter shooting
+        SPINNING_AIM, // The shooter is auto aiming
+        SPINNING_BATTER, // The shooter is in batter mode
+        FIRING_AIM, // The shooter is firing in auto aim mode
+        FIRING_BATTER, // The shooter is firing in batter mode
+        UNSTOWED_RETURNING_TO_SAFE // The shooter is preparing to stow
     }
 
     /**
      * Drives state changes. Outputs should not be decided based on this enum.
      */
     public enum WantedState {
-        WANT_TO_STOW, //
-        WANT_TO_AIM, //
-        WANT_TO_BATTER //
+        WANT_TO_STOW, // The user wants to stow the shooter
+        WANT_TO_AIM, // The user wants to auto aim
+        WANT_TO_BATTER // The user wants to use batter mode
     }
 
     /**
@@ -51,14 +55,17 @@ public class Shooter extends Subsystem {
      * Outputs should not be decided based on this enum.
      */
     public enum WantedFiringState {
-        WANT_TO_HOLD_FIRE, //
-        WANT_TO_FIRE_NOW, //
-        WANT_TO_FIRE_WHEN_READY //
+        WANT_TO_HOLD_FIRE, // The user does not wish to fire
+        WANT_TO_FIRE_NOW, // The user wants to fire now, regardless of readiness
+        WANT_TO_FIRE_WHEN_READY // The user wants to fire as soon as we achieve
+                                // readiness
     }
 
     private WantedState mWantedState = WantedState.WANT_TO_STOW;
     private WantedFiringState mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
 
+    // Every time we transition states, we update the current state start time
+    // and the state changed boolean (for one cycle)
     private double mCurrentStateStartTime;
     private boolean mStateChanged;
 
@@ -80,7 +87,7 @@ public class Shooter extends Subsystem {
 
     Loop mLoop = new Loop() {
 
-        private SystemState mSystemState = SystemState.STOWED_AND_HOMING_HOOD;
+        private SystemState mSystemState = SystemState.REENABLED;
 
         @Override
         public void onStart() {
@@ -89,6 +96,7 @@ public class Shooter extends Subsystem {
                 mWantedState = WantedState.WANT_TO_STOW;
                 mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
                 mCurrentStateStartTime = Timer.getFPGATimestamp();
+                mSystemState = SystemState.REENABLED;
                 mStateChanged = true;
             }
         }
@@ -100,6 +108,9 @@ public class Shooter extends Subsystem {
                 double now = Timer.getFPGATimestamp();
                 SystemState newState;
                 switch (mSystemState) {
+                case REENABLED:
+                    newState = handleReenabled();
+                    break;
                 case STOWED_AND_HOMING_HOOD:
                     newState = handleStowedAndHomingHood();
                     break;
@@ -116,8 +127,8 @@ public class Shooter extends Subsystem {
                 case SPINNING_BATTER:
                     newState = handleSpinningBatter(now);
                     break;
-                case SHOOTING_AIM: // fallthrough
-                case SHOOTING_BATTER:
+                case FIRING_AIM: // fallthrough
+                case FIRING_BATTER:
                     newState = handleShooting(mSystemState, now);
                     break;
                 case UNSTOWED_RETURNING_TO_SAFE:
@@ -242,6 +253,23 @@ public class Shooter extends Subsystem {
         return mHood;
     }
 
+    private synchronized SystemState handleReenabled() {
+        if (!mHood.hasHomed()) {
+            // We assume that this only happens when we are first enabled
+            return handleStowedAndHomingHood();
+        }
+        mTurret.setDesiredAngle(new Rotation2d());
+        mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
+        mFlywheel.stop();
+        setShooterSolenoidLift(false);
+
+        if (mTurret.isSafe() && mHood.isSafe()) {
+            return handleStowedOrStowing();
+        } else {
+            return handleReturningToSafe();
+        }
+    }
+
     private synchronized SystemState handleStowedAndHomingHood() {
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
@@ -310,8 +338,8 @@ public class Shooter extends Subsystem {
         case WANT_TO_AIM:
             if (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_NOW
                     || (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_WHEN_READY
-                            && readyToFire(SystemState.SHOOTING_AIM, now))) {
-                return SystemState.SHOOTING_AIM;
+                            && readyToFire(SystemState.FIRING_AIM, now))) {
+                return SystemState.FIRING_AIM;
             } else {
                 return SystemState.SPINNING_AIM;
             }
@@ -337,8 +365,8 @@ public class Shooter extends Subsystem {
         case WANT_TO_BATTER:
             if (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_NOW
                     || (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_WHEN_READY
-                            && readyToFire(SystemState.SHOOTING_AIM, now))) {
-                return SystemState.SHOOTING_BATTER;
+                            && readyToFire(SystemState.FIRING_AIM, now))) {
+                return SystemState.FIRING_BATTER;
             } else {
                 return SystemState.SPINNING_BATTER;
             }
@@ -349,7 +377,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleShooting(SystemState state, double now) {
-        if (state == SystemState.SHOOTING_AIM) {
+        if (state == SystemState.FIRING_AIM) {
             autoAim(now, false);
         }
 
@@ -363,7 +391,7 @@ public class Shooter extends Subsystem {
             case WANT_TO_AIM:
                 return SystemState.SPINNING_AIM;
             case WANT_TO_BATTER:
-                return SystemState.SHOOTING_BATTER;
+                return SystemState.FIRING_BATTER;
             case WANT_TO_STOW: // fallthrough
             default:
                 return SystemState.UNSTOWED_RETURNING_TO_SAFE;
@@ -373,7 +401,7 @@ public class Shooter extends Subsystem {
 
     private synchronized SystemState handleReturningToSafe() {
         mTurret.setDesiredAngle(new Rotation2d());
-        mFlywheel.setOpenLoop(0);
+        mFlywheel.stop();
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
         setShooterSolenoidLift(false);
@@ -384,7 +412,7 @@ public class Shooter extends Subsystem {
         case WANT_TO_BATTER:
             return SystemState.SPINNING_BATTER;
         default:
-            return mTurret.isOnTarget() && mHood.isOnTarget() ? SystemState.STOWED_OR_STOWING
+            return mTurret.isSafe() && mHood.isSafe() ? SystemState.STOWED_OR_STOWING
                     : SystemState.UNSTOWED_RETURNING_TO_SAFE;
         }
     }
@@ -435,6 +463,8 @@ public class Shooter extends Subsystem {
     }
 
     private boolean readyToFire(SystemState state, double now) {
+        // TODO: Consider applying time hysteresis (require being ready for > X
+        // ms consecutively)
         if (state == SystemState.SPINNING_AIM || state == SystemState.SPINNING_BATTER) {
             return mHood.isOnTarget() && mFlywheel.isOnTarget() && mTurret.isOnTarget();
         } else {

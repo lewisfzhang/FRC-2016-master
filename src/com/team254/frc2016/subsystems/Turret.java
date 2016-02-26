@@ -63,6 +63,11 @@ public class Turret extends Subsystem {
                 - talon_.getSetpoint() * Constants.kTurretGearReduction * 360.0) < Constants.kTurretOnTargetTolerance);
     }
 
+    public synchronized boolean isSafe() {
+        return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && talon_.getSetpoint() == 0 && Math.abs(
+                getAngle().getDegrees() * Constants.kTurretGearReduction * 360.0) < Constants.kTurretSafeTolerance);
+    }
+
     @Override
     public synchronized void stop() {
         setOpenLoop(0);

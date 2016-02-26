@@ -27,6 +27,7 @@ public class Constants extends ConstantsBase {
     public static double kMaxHoodAngle = 59.0; // TODO tune this
     public static double kBatterHoodAngle = 28.0;
     public static double kHoodNeutralAngle = 42.5;
+    public static double kHoodMaxSafeAngle = 45.0;
     public static double kHoodOnTargetTolerance = 0.5;
     public static double kHoodGearReduction = 12.0 / 708.0; // TODO check this
                                                             // with Colin
@@ -34,6 +35,7 @@ public class Constants extends ConstantsBase {
     // Turret constants
     public static double kMaxTurretAngle = 109.5;
     public static double kMinTurretAngle = -116.5;
+    public static double kTurretSafeTolerance = 2.0;
     public static double kTurretOnTargetTolerance = 1.0;
     public static double kTurretGearReduction = 14.0 / 50.0 * 14.0 / 322.0;
 

@@ -136,6 +136,11 @@ public class Hood extends Subsystem {
                 && Math.abs(pid_.getError()) < Constants.kHoodOnTargetTolerance);
     }
 
+    public synchronized boolean isSafe() {
+        return (control_mode_ == ControlMode.POSITION && getAngle().getDegrees() < Constants.kHoodMaxSafeAngle
+                && pid_.getSetpoint() < Constants.kHoodMaxSafeAngle);
+    }
+
     @Override
     public void outputToSmartDashboard() {
         SmartDashboard.putBoolean("has_hood_homed", has_homed_);
