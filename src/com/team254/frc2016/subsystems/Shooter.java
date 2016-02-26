@@ -206,11 +206,11 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized void resetTurretAtMax() {
-        mTurret.reset(Rotation2d.fromDegrees(Constants.kMaxTurretAngle));
+        mTurret.reset(Rotation2d.fromDegrees(Constants.kHardMaxTurretAngle));
     }
 
     public synchronized void resetTurretAtMin() {
-        mTurret.reset(Rotation2d.fromDegrees(Constants.kMinTurretAngle));
+        mTurret.reset(Rotation2d.fromDegrees(Constants.kHardTurretAngle));
     }
 
     public synchronized void zeroTurret() {
@@ -439,8 +439,8 @@ public class Shooter extends Subsystem {
             // Pick the target to aim at
             for (ShooterAimingParameters param : aimingParameters) {
                 double turret_angle_degrees = param.getTurretAngle().getDegrees();
-                if (turret_angle_degrees >= Constants.kMinTurretAngle
-                        && turret_angle_degrees <= Constants.kMaxTurretAngle
+                if (turret_angle_degrees >= Constants.kSoftMinTurretAngle
+                        && turret_angle_degrees <= Constants.kSoftMaxTurretAngle
                         && param.getRange() >= Constants.kAutoAimMinRange
                         && param.getRange() <= Constants.kAutoAimMaxRange
                         && (allow_changing_tracks || mCurrentTrackId == param.getTrackid())) {
