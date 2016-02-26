@@ -151,8 +151,8 @@ public class Constants extends ConstantsBase {
 
     // Shooter Operational consts
     public static final double kHoodUnstowToFlywheelSpinTime = 0.5;
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> HOOD_AUTO_AIM_MAP =
-            new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> HOOD_AUTO_AIM_MAP = new InterpolatingTreeMap<>();
+
     static {
         HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
         HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
@@ -163,7 +163,6 @@ public class Constants extends ConstantsBase {
         HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(98.0), new InterpolatingDouble(55.0));
         HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(113.0), new InterpolatingDouble(56.5));
     }
-
 
     static {
         new Constants().loadFromFile();

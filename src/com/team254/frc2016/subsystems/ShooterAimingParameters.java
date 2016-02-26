@@ -1,6 +1,5 @@
 package com.team254.frc2016.subsystems;
 
-import com.team254.frc2016.Constants;
 import com.team254.lib.util.Rotation2d;
 
 public class ShooterAimingParameters {

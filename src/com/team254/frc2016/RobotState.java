@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.team254.frc2016.GoalTracker.TrackReport;
-import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.subsystems.ShooterAimingParameters;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.lib.util.InterpolatingDouble;
@@ -77,7 +76,7 @@ public class RobotState {
             new Translation2d(Constants.kCameraXOffset, Constants.kCameraYOffset),
             Rotation2d.fromDegrees(Constants.kCameraAngleOffsetDegrees));
 
-    // FPGATimestamp -> Pose2d or Rotation2d
+    // FPGATimestamp -> RigidTransform2d or Rotation2d
     protected InterpolatingTreeMap<InterpolatingDouble, RigidTransform2d> odometric_to_vehicle_;
     protected InterpolatingTreeMap<InterpolatingDouble, Rotation2d> turret_rotation_;
     protected GoalTracker goal_tracker_;
@@ -137,8 +136,7 @@ public class RobotState {
         return rv;
     }
 
-    public synchronized List<ShooterAimingParameters> getAimingParameters(
-            double current_timestamp,
+    public synchronized List<ShooterAimingParameters> getAimingParameters(double current_timestamp,
             Comparator<TrackReport> comparator) {
         List<ShooterAimingParameters> rv = new ArrayList<>();
         if (current_timestamp - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
