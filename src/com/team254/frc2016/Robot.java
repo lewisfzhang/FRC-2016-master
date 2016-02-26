@@ -195,7 +195,12 @@ public class Robot extends IterativeRobot {
 
         mShooter.setTurretManualScanOutput(mControls.getTurretManual());
 
-        mShooter.setWantsToShoot(mControls.getFireButton());
+        if (mControls.getFireButton()) {
+            // TODO: Make this fire when ready once tuned
+            mShooter.setWantsToFireNow();
+        } else {
+            mShooter.setWantsToHoldFire();
+        }
 
         outputAllToSmartDashboard();
     }

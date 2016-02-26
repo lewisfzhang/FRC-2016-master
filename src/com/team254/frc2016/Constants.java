@@ -46,7 +46,8 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
-    public static double kShootActuationTime = 1.0;
+    public static double kShootActuationTime = 0.5;
+    public static double kHoodUnstowToFlywheelSpinTime = 0.5;
 
     // Goal tracker constants
     public static double kMaxGoalTrackAge = 0.5;
@@ -150,7 +151,6 @@ public class Constants extends ConstantsBase {
     }
 
     // Shooter Operational consts
-    public static final double kHoodUnstowToFlywheelSpinTime = 0.5;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> HOOD_AUTO_AIM_MAP = new InterpolatingTreeMap<>();
 
     static {
