@@ -35,6 +35,8 @@ public class Constants extends ConstantsBase {
     // Turret constants
     public static double kMaxTurretAngle = 109.5;
     public static double kMinTurretAngle = -116.5;
+    public static double kSoftMaxTurretAngle = 108.0;
+    public static double kSoftMinTurretAngle = -115.0;
     public static double kTurretSafeTolerance = 2.0;
     public static double kTurretOnTargetTolerance = 1.0;
     public static double kTurretGearReduction = 14.0 / 50.0 * 14.0 / 322.0;

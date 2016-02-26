@@ -13,6 +13,10 @@ public class Turret extends Subsystem {
     Turret() {
         talon_ = new CANTalon(Constants.kTurretTalonId);
         talon_.enableBrakeMode(true);
+        talon_.enableForwardSoftLimit(true);
+        talon_.enableReverseSoftLimit(true);
+        talon_.setForwardSoftLimit(Constants.kSoftMaxTurretAngle / (360.0 * Constants.kTurretGearReduction));
+        talon_.setReverseSoftLimit(Constants.kSoftMinTurretAngle / (360.0 * Constants.kTurretGearReduction));
         talon_.enableLimitSwitch(true, true);
         talon_.ConfigFwdLimitSwitchNormallyOpen(true);
         talon_.ConfigRevLimitSwitchNormallyOpen(true);
