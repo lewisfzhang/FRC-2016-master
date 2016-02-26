@@ -7,6 +7,7 @@ import com.team254.frc2016.GoalTracker;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.InterpolatingDouble;
+import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.Rotation2d;
 
 import edu.wpi.first.wpilibj.Solenoid;
@@ -78,6 +79,8 @@ public class Shooter extends Subsystem {
     Hood mHood = new Hood();
     Solenoid mShooterSolenoid = new Solenoid(Constants.kShooterSolenoidId / 8, Constants.kShooterSolenoidId % 8);
     RobotState mRobotState = RobotState.getInstance();
+
+    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap = Constants.kHoodAutoAimMapNewBalls;
 
     // NetworkTables
     NetworkTable mShooterTable = NetworkTable.getTable("shooter");
@@ -203,6 +206,14 @@ public class Shooter extends Subsystem {
         mFlywheel.zeroSensors();
         mHood.zeroSensors();
         mTurret.zeroSensors();
+    }
+
+    public synchronized void setNewBalls() {
+        mHoodMap = Constants.kHoodAutoAimMapNewBalls;
+    }
+
+    public synchronized void setWornBalls() {
+        mHoodMap = Constants.kHoodAutoAimMapWornBalls;
     }
 
     public synchronized void resetTurretAtMax() {
@@ -416,8 +427,8 @@ public class Shooter extends Subsystem {
         mShooterSolenoid.set(shouldLift);
     }
 
-    private static double getHoodAngleForRange(double range) {
-        return Constants.HOOD_AUTO_AIM_MAP.getInterpolated(new InterpolatingDouble(range)).value;
+    private double getHoodAngleForRange(double range) {
+        return mHoodMap.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
     private static double getRpmForRange(double range) {

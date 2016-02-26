@@ -155,17 +155,31 @@ public class Constants extends ConstantsBase {
     }
 
     // Shooter Operational consts
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> HOOD_AUTO_AIM_MAP = new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapWornBalls = new InterpolatingTreeMap<>();
 
     static {
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(70.0), new InterpolatingDouble(47.0));
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(75.0), new InterpolatingDouble(49.0));
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(82.0), new InterpolatingDouble(50.0));
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(90.0), new InterpolatingDouble(54.0));
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(98.0), new InterpolatingDouble(55.0));
-        HOOD_AUTO_AIM_MAP.put(new InterpolatingDouble(113.0), new InterpolatingDouble(56.5));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(70.0), new InterpolatingDouble(47.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(49.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(82.0), new InterpolatingDouble(50.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(54.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(98.0), new InterpolatingDouble(55.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(113.0), new InterpolatingDouble(56.5));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapNewBalls = new InterpolatingTreeMap<>();
+
+    static {
+        // TODO tune these
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(70.0), new InterpolatingDouble(47.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(49.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(82.0), new InterpolatingDouble(50.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(54.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(98.0), new InterpolatingDouble(55.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(113.0), new InterpolatingDouble(56.5));
     }
 
     static {
