@@ -30,10 +30,7 @@ public class Shooter extends Subsystem {
                    // been disabled from any state)
         STOWED_AND_HOMING_HOOD, // The shooter is stowed and the hood is homing
         STOWED_OR_STOWING, // The shooter is stowed (or stowing)
-        UNSTOWING_TO_AIM, // The shooter is in the process of unstowing en route
-                          // to auto aiming
-        UNSTOWING_TO_BATTER, // The shooter is in the process of unstowing en
-                             // route to batter shooting
+        UNSTOWING, // The shooter is in the process of unstowing
         SPINNING_AIM, // The shooter is auto aiming
         SPINNING_BATTER, // The shooter is in batter mode
         FIRING_AIM, // The shooter is firing in auto aim mode
@@ -117,8 +114,7 @@ public class Shooter extends Subsystem {
                 case STOWED_OR_STOWING:
                     newState = handleStowedOrStowing();
                     break;
-                case UNSTOWING_TO_AIM: // fall through
-                case UNSTOWING_TO_BATTER:
+                case UNSTOWING:
                     newState = handleUnstowing(now);
                     break;
                 case SPINNING_AIM:
@@ -287,10 +283,9 @@ public class Shooter extends Subsystem {
         setShooterSolenoidLift(false);
 
         switch (mWantedState) {
-        case WANT_TO_AIM:
-            return SystemState.UNSTOWING_TO_AIM;
+        case WANT_TO_AIM: // fallthrough
         case WANT_TO_BATTER:
-            return SystemState.UNSTOWING_TO_BATTER;
+            return SystemState.UNSTOWING;
         case WANT_TO_STOW: // fallthrough
         default:
             // Nothing to do, these outputs are redundant
@@ -311,12 +306,12 @@ public class Shooter extends Subsystem {
         case WANT_TO_BATTER:
             boolean isDoneUnstowing = now - mCurrentStateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
             if (!isDoneUnstowing) {
-                return mWantedState == WantedState.WANT_TO_AIM ? SystemState.UNSTOWING_TO_AIM
-                        : SystemState.UNSTOWING_TO_BATTER;
+                return SystemState.UNSTOWING;
+            } else {
+                mRobotState.resetVision();
+                mCurrentTrackId = -1;
+                return mWantedState == WantedState.WANT_TO_AIM ? SystemState.SPINNING_AIM : SystemState.SPINNING_BATTER;
             }
-            mRobotState.resetVision();
-            mCurrentTrackId = -1;
-            return mWantedState == WantedState.WANT_TO_AIM ? SystemState.SPINNING_AIM : SystemState.SPINNING_BATTER;
         case WANT_TO_STOW: // fallthrough
         default:
             return SystemState.STOWED_OR_STOWING;
