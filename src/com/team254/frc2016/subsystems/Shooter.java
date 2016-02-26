@@ -62,11 +62,6 @@ public class Shooter extends Subsystem {
     private WantedState mWantedState = WantedState.WANT_TO_STOW;
     private WantedFiringState mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
 
-    // Every time we transition states, we update the current state start time
-    // and the state changed boolean (for one cycle)
-    private double mCurrentStateStartTime;
-    private boolean mStateChanged;
-
     private double mCurrentRangeForLogging;
     private double mCurrentAngleForLogging;
     private SystemState mSystemStateForLogging;
@@ -88,6 +83,11 @@ public class Shooter extends Subsystem {
     Loop mLoop = new Loop() {
 
         private SystemState mSystemState = SystemState.REENABLED;
+
+        // Every time we transition states, we update the current state start time
+        // and the state changed boolean (for one cycle)
+        private double mCurrentStateStartTime;
+        private boolean mStateChanged;
 
         @Override
         public void onStart() {
@@ -118,17 +118,17 @@ public class Shooter extends Subsystem {
                     newState = handleStowedOrStowing();
                     break;
                 case UNSTOWING:
-                    newState = handleUnstowing(now);
+                    newState = handleUnstowing(now, mCurrentStateStartTime);
                     break;
                 case SPINNING_AIM:
-                    newState = handleSpinningAim(now);
+                    newState = handleSpinningAim(now, mStateChanged);
                     break;
                 case SPINNING_BATTER:
                     newState = handleSpinningBatter(now);
                     break;
                 case FIRING_AIM: // fallthrough
                 case FIRING_BATTER:
-                    newState = handleShooting(mSystemState, now);
+                    newState = handleShooting(mSystemState, now, mCurrentStateStartTime);
                     break;
                 case UNSTOWED_RETURNING_TO_SAFE:
                     newState = handleReturningToSafe();
@@ -304,7 +304,7 @@ public class Shooter extends Subsystem {
         }
     }
 
-    private synchronized SystemState handleUnstowing(double now) {
+  private synchronized SystemState handleUnstowing(double now, double stateStartTime) {
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.setOpenLoop(0);
         mHood.setStowed(false);
@@ -315,7 +315,7 @@ public class Shooter extends Subsystem {
         switch (mWantedState) {
         case WANT_TO_AIM: // fallthrough
         case WANT_TO_BATTER:
-            boolean isDoneUnstowing = now - mCurrentStateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
+            boolean isDoneUnstowing = now - stateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
             if (!isDoneUnstowing) {
                 return SystemState.UNSTOWING;
             } else {
@@ -329,8 +329,8 @@ public class Shooter extends Subsystem {
         }
     }
 
-    private synchronized SystemState handleSpinningAim(double now) {
-        if (mStateChanged) {
+    private synchronized SystemState handleSpinningAim(double now, boolean isFirstCycle) {
+        if (isFirstCycle) {
             // Start flywheel
             mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
         }
@@ -382,12 +382,12 @@ public class Shooter extends Subsystem {
         }
     }
 
-    private synchronized SystemState handleShooting(SystemState state, double now) {
+  private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
         if (state == SystemState.FIRING_AIM) {
             autoAim(now, false);
         }
 
-        if (Timer.getFPGATimestamp() - mCurrentStateStartTime < Constants.kShootActuationTime) {
+        if (now - stateStartTime < Constants.kShootActuationTime) {
             setShooterSolenoidLift(true);
             return state;
         } else {
