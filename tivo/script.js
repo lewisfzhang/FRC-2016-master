@@ -92,7 +92,6 @@ function initChart(chartName) {
 			gridThickness: 1,
 			gridColor: "#ddd",
 		}, 
-				if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
 		}
 	});
 
