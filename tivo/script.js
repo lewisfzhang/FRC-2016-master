@@ -3,6 +3,11 @@ var dataPoints = {};
 var dataBase = {};
 var paused = {};
 var displaying = {};
+var chartGet;
+var chartGetPlot;
+var chartGetX;
+var chartGetY;
+
 
 /**
 * Adds a point to a graph/plot.  Will automatically create new graph and/or plot if they do not exist
@@ -11,6 +16,20 @@ var displaying = {};
 * @params x The x coordinate of the point
 * @params y The y coordinate of the point
 */
+
+function addPointFunction(){
+    try{
+        chartGet = document.getElementById("chart-add").value;
+        chartGetPlot = document.getElementById("chart-add-plot").value;
+        chartGetX = document.getElementById("chart-add-x").value;
+        chartGetY = document.getElementById("chart-add-y").value;
+        addPoint(chartGet, chartGetPlot, chartGetX, chartGetY);
+    }
+    catch(e){
+        alert(e);
+    }
+}
+
 function addPoint(chart, plot, x, y) {
 	if(!dataBase[chart]) {
 		dataBase[chart] = {};
@@ -54,7 +73,15 @@ function initChart(chartName) {
                             fontSize: 14,
 			fontWeight: "light",
 			fontFamily: "Source Sans Pro",
-			fontColor: "dimGrey"
+			fontColor: "dimGrey",
+            cursor:"pointer",
+			itemclick : function(e) {
+				if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+					e.dataSeries.visible = false;
+				} else {
+					e.dataSeries.visible = true;
+				}
+				chart[chartName].render();
 		},
 		axisX: {
 			title: "Time",
@@ -65,16 +92,7 @@ function initChart(chartName) {
 			gridThickness: 1,
 			gridColor: "#ddd",
 		}, 
-		legend:{
-			cursor:"pointer",
-			itemclick : function(e) {
 				if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-					e.dataSeries.visible = false;
-				} else {
-					e.dataSeries.visible = true;
-				}
-				chart[chartName].render();
-			}
 		}
 	});
 
@@ -122,6 +140,10 @@ function showChart(chartName) {
 	if($("#minBar").html()=="") {
 		$("#minBar").css("background-color", "rgba(100,100,100,0)");
 	}
+}
+
+function newChart(){
+    initChart(document.getElementById("inputty").value);
 }
 
 function updateChart() {
@@ -185,3 +207,4 @@ function produce(chart, plot) {
 	time = dataBase[chart][plot][dataBase[chart][plot].length-1].x+1000/30;
 	addPoint(chart, plot, time, dataBase[chart][plot][dataBase[chart][plot].length-1].y+Math.random()*0.2-0.1);
 }
+
