@@ -71,6 +71,8 @@ public class Hood extends Subsystem {
         right_servo_ = new ContinuousRotationServo(Constants.kSensorSideServoPWM);
         encoder_ = new MA3Encoder(Constants.kHoodEncoderDIO);
         pid_ = new SynchronousPID(Constants.kHoodKp, Constants.kHoodKi, Constants.kHoodKd);
+        pid_.setDeadband(Constants.kHoodDeadband);
+        pid_.setInputRange(Constants.kMinHoodAngle, Constants.kMaxHoodAngle);
         stow_solenoid_ = new Solenoid(Constants.kHoodStowSolenoidId / 8, Constants.kHoodStowSolenoidId % 8);
 
         has_homed_ = false;
@@ -147,6 +149,7 @@ public class Hood extends Subsystem {
         SmartDashboard.putNumber("hood_angle", getAngle().getDegrees());
         SmartDashboard.putNumber("hood_setpoint", pid_.getSetpoint());
         SmartDashboard.putBoolean("hood_on_target", isOnTarget());
+        SmartDashboard.putNumber("hood_error", pid_.getSetpoint() - getAngle().getDegrees());
     }
 
     @Override

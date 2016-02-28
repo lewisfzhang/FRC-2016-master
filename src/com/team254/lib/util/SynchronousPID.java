@@ -28,6 +28,8 @@ public class SynchronousPID {
     private double m_error = 0.0;
     private double m_result = 0.0;
     private double m_last_input = Double.NaN;
+    private double m_deadband = 0.0; // If the absolute error is less than deadband
+                                     // then treat error for the proportional term as 0
 
     public SynchronousPID() {
     }
@@ -80,7 +82,10 @@ public class SynchronousPID {
             m_totalError = 0;
         }
 
-        m_result = (m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError));
+        // Don't blow away m_error so as to not break derivative
+        double proportionalError = Math.abs(m_error) < m_deadband ? 0 : m_error;
+
+        m_result = (m_P * proportionalError + m_I * m_totalError + m_D * (m_error - m_prevError));
         m_prevError = m_error;
 
         if (m_result > m_maximumOutput) {
@@ -156,6 +161,10 @@ public class SynchronousPID {
      */
     public void setContinuous(boolean continuous) {
         m_continuous = continuous;
+    }
+
+    public void setDeadband(double deadband) {
+        m_deadband = deadband;
     }
 
     /**

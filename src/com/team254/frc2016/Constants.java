@@ -13,9 +13,9 @@ public class Constants extends ConstantsBase {
     public static double kTurretAngleOffsetDegrees = 0.0;
 
     // Pose of the camera frame w.r.t. the turret frame
-    public static double kCameraXOffset = -5.535;
-    public static double kCameraYOffset = 2.034;
-    public static double kCameraZOffset = 20.765;
+    public static double kCameraXOffset = -5.736;
+    public static double kCameraYOffset = 0.0;
+    public static double kCameraZOffset = 20.784;
     public static double kCameraPitchAngleDegrees = 30.0;
     public static double kCameraAngleOffsetDegrees = 2.0;
 
@@ -24,7 +24,7 @@ public class Constants extends ConstantsBase {
 
     // Hood constants
     public static double kMinHoodAngle = 26.0; // TODO tune this
-    public static double kMaxHoodAngle = 59.0; // TODO tune this
+    public static double kMaxHoodAngle = 65.0;
     public static double kBatterHoodAngle = 28.0;
     public static double kHoodNeutralAngle = 42.5;
     public static double kHoodMaxSafeAngle = 45.0;
@@ -39,7 +39,7 @@ public class Constants extends ConstantsBase {
     public static double kSoftMinTurretAngle = -115.0;
     public static double kTurretSafeTolerance = 2.0;
     public static double kTurretOnTargetTolerance = 1.0;
-    public static double kTurretGearReduction = 14.0 / 50.0 * 14.0 / 322.0;
+    public static double kTurretRotationsPerTick = 14.0 / 50.0 * 14.0 / 322.0;
 
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 100.0;
@@ -68,9 +68,21 @@ public class Constants extends ConstantsBase {
     // PID gains for hood position loop
     // Units: error is degrees of hood rotation. Max output is +/- 1.0.
     // Loop runs at 100Hz
+    /**
+     * comp bot old server bot consts
+     */
+    // public static double kHoodKp = 0.05;
+    // public static double kHoodKi = 0.0001;
+    // public static double kHoodKd = 0.0;
+
+    /**
+     * Practice bot new servo consts
+     */
     public static double kHoodKp = 0.05;
-    public static double kHoodKi = 0.0001;
+    public static double kHoodKi = 0.0;
     public static double kHoodKd = 0.0;
+    public static double kHoodDeadband = 0.3; // degrees
+
 
     // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
