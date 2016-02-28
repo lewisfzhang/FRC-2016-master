@@ -13,10 +13,6 @@ public class Turret extends Subsystem {
     Turret() {
         talon_ = new CANTalon(Constants.kTurretTalonId);
         talon_.enableBrakeMode(true);
-        talon_.enableForwardSoftLimit(true);
-        talon_.enableReverseSoftLimit(true);
-        talon_.setForwardSoftLimit(Constants.kSoftMaxTurretAngle / (360.0 * Constants.kTurretGearReduction));
-        talon_.setReverseSoftLimit(Constants.kSoftMinTurretAngle / (360.0 * Constants.kTurretGearReduction));
         talon_.enableLimitSwitch(true, true);
         talon_.ConfigFwdLimitSwitchNormallyOpen(true);
         talon_.ConfigRevLimitSwitchNormallyOpen(true);
@@ -34,11 +30,16 @@ public class Turret extends Subsystem {
         talon_.setProfile(0);
         talon_.reverseSensor(true);
         talon_.reverseOutput(false);
+
+        talon_.enableForwardSoftLimit(true);
+        talon_.enableReverseSoftLimit(true);
+        talon_.setForwardSoftLimit(Constants.kSoftMaxTurretAngle / (360.0 * Constants.kTurretRotationsPerTick));
+        talon_.setReverseSoftLimit(Constants.kSoftMinTurretAngle / (360.0 * Constants.kTurretRotationsPerTick));
     }
 
     synchronized void setDesiredAngle(Rotation2d angle) {
         talon_.changeControlMode(CANTalon.TalonControlMode.Position);
-        talon_.set(angle.getRadians() / (2 * Math.PI * Constants.kTurretGearReduction));
+        talon_.set(angle.getRadians() / (2 * Math.PI * Constants.kTurretRotationsPerTick));
     }
 
     synchronized void setOpenLoop(double speed) {
@@ -47,11 +48,11 @@ public class Turret extends Subsystem {
     }
 
     synchronized void reset(Rotation2d actual_rotation) {
-        talon_.setPosition(actual_rotation.getRadians() / (2 * Math.PI * Constants.kTurretGearReduction));
+        talon_.setPosition(actual_rotation.getRadians() / (2 * Math.PI * Constants.kTurretRotationsPerTick));
     }
 
     public synchronized Rotation2d getAngle() {
-        return Rotation2d.fromRadians(Constants.kTurretGearReduction * talon_.getPosition() * 2 * Math.PI);
+        return Rotation2d.fromRadians(Constants.kTurretRotationsPerTick * talon_.getPosition() * 2 * Math.PI);
     }
 
     public synchronized boolean getForwardLimitSwitch() {
@@ -62,14 +63,17 @@ public class Turret extends Subsystem {
         return talon_.isRevLimitSwitchClosed();
     }
 
+    private synchronized double getError() {
+        return getAngle().getDegrees() - talon_.getSetpoint() * Constants.kTurretRotationsPerTick * 360.0;
+    }
+
     public synchronized boolean isOnTarget() {
-        return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && Math.abs(getAngle().getDegrees()
-                - talon_.getSetpoint() * Constants.kTurretGearReduction * 360.0) < Constants.kTurretOnTargetTolerance);
+        return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && Math.abs(getError()) < Constants.kTurretOnTargetTolerance);
     }
 
     public synchronized boolean isSafe() {
         return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && talon_.getSetpoint() == 0 && Math.abs(
-                getAngle().getDegrees() * Constants.kTurretGearReduction * 360.0) < Constants.kTurretSafeTolerance);
+                getAngle().getDegrees() * Constants.kTurretRotationsPerTick * 360.0) < Constants.kTurretSafeTolerance);
     }
 
     @Override
@@ -79,8 +83,9 @@ public class Turret extends Subsystem {
 
     @Override
     public void outputToSmartDashboard() {
+        SmartDashboard.putNumber("turret_error", getAngle().getDegrees());
         SmartDashboard.putNumber("turret_angle", getAngle().getDegrees());
-        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() / (360.0 * Constants.kTurretGearReduction));
+        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() * Constants.kTurretRotationsPerTick / 360.0);
         SmartDashboard.putBoolean("turret_fwd_limit", getForwardLimitSwitch());
         SmartDashboard.putBoolean("turret_rev_limit", getReverseLimitSwitch());
         SmartDashboard.putBoolean("turret_on_target", isOnTarget());
