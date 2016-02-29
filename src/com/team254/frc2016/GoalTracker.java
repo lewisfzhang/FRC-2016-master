@@ -102,7 +102,7 @@ public class GoalTracker {
                 if (!hasUpdatedTrack) {
                     if (track.tryUpdate(timestamp, target)) {
                         hasUpdatedTrack = true;
-                        System.out.println("UPDATED TRACK");
+                        // System.out.println("UPDATED TRACK");
                     } else {
                         // System.out.println("COULD NOT UPDATE TRACK");
                     }

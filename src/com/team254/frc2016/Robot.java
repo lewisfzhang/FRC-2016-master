@@ -197,7 +197,8 @@ public class Robot extends IterativeRobot {
 
         if (mControls.getFireButton()) {
             // TODO: Make this fire when ready once tuned
-            mShooter.setWantsToFireNow();
+            // mShooter.setWantsToFireNow();
+            mShooter.setWantsToFireWhenReady();
         } else {
             mShooter.setWantsToHoldFire();
         }

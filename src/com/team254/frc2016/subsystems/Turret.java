@@ -83,9 +83,9 @@ public class Turret extends Subsystem {
 
     @Override
     public void outputToSmartDashboard() {
-        SmartDashboard.putNumber("turret_error", getAngle().getDegrees());
+        SmartDashboard.putNumber("turret_error", getError());
         SmartDashboard.putNumber("turret_angle", getAngle().getDegrees());
-        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() * Constants.kTurretRotationsPerTick / 360.0);
+        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() * Constants.kTurretRotationsPerTick * 360.0);
         SmartDashboard.putBoolean("turret_fwd_limit", getForwardLimitSwitch());
         SmartDashboard.putBoolean("turret_rev_limit", getReverseLimitSwitch());
         SmartDashboard.putBoolean("turret_on_target", isOnTarget());

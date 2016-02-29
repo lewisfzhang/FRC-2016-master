@@ -344,7 +344,7 @@ public class Shooter extends Subsystem {
         case WANT_TO_AIM:
             if (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_NOW
                     || (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_WHEN_READY
-                            && readyToFire(SystemState.FIRING_AIM, now))) {
+                            && readyToFire(SystemState.SPINNING_AIM, now))) {
                 return SystemState.FIRING_AIM;
             } else {
                 return SystemState.SPINNING_AIM;
@@ -371,7 +371,7 @@ public class Shooter extends Subsystem {
         case WANT_TO_BATTER:
             if (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_NOW
                     || (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_WHEN_READY
-                            && readyToFire(SystemState.FIRING_AIM, now))) {
+                            && readyToFire(SystemState.SPINNING_BATTER, now))) {
                 return SystemState.FIRING_BATTER;
             } else {
                 return SystemState.SPINNING_BATTER;
@@ -395,7 +395,7 @@ public class Shooter extends Subsystem {
 
             switch (mWantedState) {
             case WANT_TO_AIM:
-                return SystemState.SPINNING_AIM;
+                return SystemState.FIRING_AIM;
             case WANT_TO_BATTER:
                 return SystemState.FIRING_BATTER;
             case WANT_TO_STOW: // fallthrough
@@ -446,7 +446,7 @@ public class Shooter extends Subsystem {
             mTurret.setOpenLoop(mTurretManualScanOutput);
             mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
         } else {
-            System.out.println("Picking a target");
+            // System.out.println("Picking a target");
             // Pick the target to aim at
             for (ShooterAimingParameters param : aimingParameters) {
                 double turret_angle_degrees = param.getTurretAngle().getDegrees();
