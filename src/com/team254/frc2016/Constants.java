@@ -23,8 +23,8 @@ public class Constants extends ConstantsBase {
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
 
     // Hood constants
-    public static double kMinHoodAngle = 26.0; // TODO tune this
-    public static double kMaxHoodAngle = 65.0;
+    public static double kMinHoodAngle = 39.0; // TODO tune this
+    public static double kMaxHoodAngle = 84.0;
     public static double kBatterHoodAngle = 28.0;
     public static double kHoodNeutralAngle = 42.5;
     public static double kHoodMaxSafeAngle = 45.0;
