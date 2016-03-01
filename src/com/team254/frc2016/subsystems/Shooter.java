@@ -1,5 +1,6 @@
 package com.team254.frc2016.subsystems;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.team254.frc2016.Constants;
@@ -68,6 +69,8 @@ public class Shooter extends Subsystem {
 
     private double mTurretManualScanOutput = 0;
     int mCurrentTrackId = -1;
+
+    private List<ShooterAimingParameters> mCachedAimingParams = new ArrayList<>();
 
     Turret mTurret = new Turret();
     Flywheel mFlywheel = new Flywheel();
@@ -435,11 +438,22 @@ public class Shooter extends Subsystem {
         return Constants.kFlywheelAutoAimNominalRpmSetpoint;
     }
 
-    private void autoAim(double now, boolean allow_changing_tracks) {
-        List<ShooterAimingParameters> aimingParameters = mRobotState.getAimingParameters(now,
+    private List<ShooterAimingParameters> getCurrentAimingParameters(double now) {
+        List<ShooterAimingParameters> params = mRobotState.getAimingParameters(now,
                 new GoalTracker.TrackReportComparator(Constants.kTrackReportComparatorStablityWeight,
                         Constants.kTrackReportComparatorAgeWeight, Constants.kTrackReportComparatorSwitchingWeight,
                         mCurrentTrackId, now));
+        mCachedAimingParams = params;
+        return params;
+
+    }
+
+    public List<ShooterAimingParameters> getCachedAimingParams() {
+        return mCachedAimingParams;
+    }
+
+    private void autoAim(double now, boolean allow_changing_tracks) {
+        List<ShooterAimingParameters> aimingParameters = getCurrentAimingParameters(now);
         if (aimingParameters.isEmpty()) {
             // Manual search
             System.out.println("No targets");

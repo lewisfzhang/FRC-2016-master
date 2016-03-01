@@ -39,8 +39,10 @@ public abstract class AutoModeBase {
         action.start();
         while (isActiveWithThrow() && !action.isFinished()) {
             action.update();
+            long waitTime = (long) (m_update_rate * 1000.0);
             try {
-                Thread.sleep((long) (m_update_rate * 1000.0));
+
+                Thread.sleep(waitTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

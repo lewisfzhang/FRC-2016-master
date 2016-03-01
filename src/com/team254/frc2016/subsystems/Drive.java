@@ -43,10 +43,12 @@ public class Drive extends Subsystem {
 
         @Override
         public void onLoop() {
-            // System.out.println(driveControlState_);
+            //System.out.println("State " + driveControlState_);
             switch (driveControlState_) {
             case OPEN_LOOP:
+                return;
             case BASE_LOCKED:
+                return;
             case VELOCITY_SETPOINT:
                 // Talons are updating the control loop state
                 return;
@@ -267,9 +269,14 @@ public class Drive extends Subsystem {
     }
 
     private synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-        System.out.println("left: " + left_inches_per_sec + " right: " + right_inches_per_sec);
-        leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
-        rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
+        if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL) {
+            leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
+            rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
+        } else {
+            System.out.println("Hit a bad velocity control state");
+            leftMaster_.set(0);
+            rightMaster_.set(0);
+        }
     }
 
     private void updateVelocityHeadingSetpoint() {

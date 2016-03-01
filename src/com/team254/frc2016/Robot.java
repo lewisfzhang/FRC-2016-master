@@ -131,6 +131,9 @@ public class Robot extends IterativeRobot {
         // Reset drive sensors
         mDrive.resetEncoders();
 
+        // Shift to low
+        mDrive.setHighGear(false);
+
         // Configure loopers
         mDisabledLooper.stop();
         mEnabledLooper.start();
