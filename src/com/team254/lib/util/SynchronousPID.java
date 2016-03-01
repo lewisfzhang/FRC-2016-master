@@ -28,8 +28,10 @@ public class SynchronousPID {
     private double m_error = 0.0;
     private double m_result = 0.0;
     private double m_last_input = Double.NaN;
-    private double m_deadband = 0.0; // If the absolute error is less than deadband
-                                     // then treat error for the proportional term as 0
+    private double m_deadband = 0.0; // If the absolute error is less than
+                                     // deadband
+                                     // then treat error for the proportional
+                                     // term as 0
 
     public SynchronousPID() {
     }

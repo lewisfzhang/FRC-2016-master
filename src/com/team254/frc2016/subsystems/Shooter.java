@@ -87,7 +87,8 @@ public class Shooter extends Subsystem {
 
         private SystemState mSystemState = SystemState.REENABLED;
 
-        // Every time we transition states, we update the current state start time
+        // Every time we transition states, we update the current state start
+        // time
         // and the state changed boolean (for one cycle)
         private double mCurrentStateStartTime;
         private boolean mStateChanged;
@@ -307,9 +308,9 @@ public class Shooter extends Subsystem {
         }
     }
 
-  private synchronized SystemState handleUnstowing(double now, double stateStartTime) {
+    private synchronized SystemState handleUnstowing(double now, double stateStartTime) {
         mTurret.setDesiredAngle(new Rotation2d());
-        mFlywheel.setOpenLoop(0);
+        mFlywheel.stop();
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
         setShooterSolenoidLift(false);
@@ -385,12 +386,13 @@ public class Shooter extends Subsystem {
         }
     }
 
-  private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
+    private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
         if (state == SystemState.FIRING_AIM) {
             autoAim(now, false);
         }
 
         if (now - stateStartTime < Constants.kShootActuationTime) {
+            // TODO set flywheel full speed open loop? We did this previously
             setShooterSolenoidLift(true);
             return state;
         } else {

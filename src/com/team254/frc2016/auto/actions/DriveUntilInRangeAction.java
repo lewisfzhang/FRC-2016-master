@@ -13,20 +13,21 @@ public class DriveUntilInRangeAction implements Action {
     private double mMinDistanceAway, mMaxDistanceToDrive, mVelocity;
     private double startingDistance;
     private Drive mDrive = Drive.getInstance();
-    private Shooter mShooter  = Shooter.getInstance();
+    private Shooter mShooter = Shooter.getInstance();
 
     public DriveUntilInRangeAction(double velocity, double minDistanceAway, double maxDistanceToDrive) {
         mMaxDistanceToDrive = maxDistanceToDrive;
         mMinDistanceAway = minDistanceAway;
         mVelocity = velocity;
     }
+
     @Override
     public boolean isFinished() {
         if (getCurrentDistance() - startingDistance >= mMaxDistanceToDrive) {
             return true;
         }
 
-        List<ShooterAimingParameters> params =  mShooter.getCachedAimingParams();
+        List<ShooterAimingParameters> params = mShooter.getCachedAimingParams();
         System.out.println("#l: " + params.size());
         if (params.isEmpty()) {
             return false;
@@ -57,7 +58,6 @@ public class DriveUntilInRangeAction implements Action {
         mDrive.setHighGear(false);
         mDrive.setVelocityHeadingSetpoint(mVelocity, Rotation2d.fromDegrees(0));
     }
-
 
     private double getCurrentDistance() {
         return (mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2;

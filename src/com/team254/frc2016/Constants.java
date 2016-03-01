@@ -83,7 +83,6 @@ public class Constants extends ConstantsBase {
     public static double kHoodKd = 0.0;
     public static double kHoodDeadband = 0.3; // degrees
 
-
     // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     public static double kDriveVelocityKp = 0.6;

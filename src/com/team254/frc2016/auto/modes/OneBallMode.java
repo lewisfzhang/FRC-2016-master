@@ -37,7 +37,8 @@ public class OneBallMode extends AutoModeBase {
 
         System.out.println("Finding targets");
         mShooter.setWantedState(Shooter.WantedState.WANT_TO_AIM);
-        runAction(new WaitAction(1.5)); // TODO: Make this better, sometimes it misses the target with a small delay
+        runAction(new WaitAction(1.5)); // TODO: Make this better, sometimes it
+                                        // misses the target with a small delay
 
         runAction(mPanForTargetAction);
 
@@ -78,7 +79,8 @@ public class OneBallMode extends AutoModeBase {
 
             double output = mSign ? .5 : -.5;
 
-            System.out.println("time: " + (Timer.getFPGATimestamp() - mStartTime) + " l: " + list.size() + " turret: " + mRobotState.getLatestTurretRotation().getValue().getDegrees() );
+            System.out.println("time: " + (Timer.getFPGATimestamp() - mStartTime) + " l: " + list.size() + " turret: "
+                    + mRobotState.getLatestTurretRotation().getValue().getDegrees());
             if (mSign && mRobotState.getLatestTurretRotation().getValue().getDegrees() > 45) {
                 mSign = false;
             }
