@@ -164,6 +164,12 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void disabledPeriodic() {
+        // Keep kicking the CAN driver even though we are disabled...
+        // See:
+        // https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%20Manual.pdf
+        // page 130
+        stopAll();
+
         outputAllToSmartDashboard();
 
         mHoodTuningMode = SmartDashboard.getBoolean("Hood Tuning Mode", false);
