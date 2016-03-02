@@ -43,21 +43,23 @@ public class Drive extends Subsystem {
 
         @Override
         public void onLoop() {
-            // System.out.println("State " + driveControlState_);
-            switch (driveControlState_) {
-            case OPEN_LOOP:
-                return;
-            case BASE_LOCKED:
-                return;
-            case VELOCITY_SETPOINT:
-                // Talons are updating the control loop state
-                return;
-            case VELOCITY_HEADING_CONTROL:
-                updateVelocityHeadingSetpoint();
-                return;
-            default:
-                System.out.println("WTF: unexpected drive control state: " + driveControlState_);
-                break;
+            synchronized (Drive.this) {
+                // System.out.println("State " + driveControlState_);
+                switch (driveControlState_) {
+                case OPEN_LOOP:
+                    return;
+                case BASE_LOCKED:
+                    return;
+                case VELOCITY_SETPOINT:
+                    // Talons are updating the control loop state
+                    return;
+                case VELOCITY_HEADING_CONTROL:
+                    updateVelocityHeadingSetpoint();
+                    return;
+                default:
+                    System.out.println("WTF: unexpected drive control state: " + driveControlState_);
+                    break;
+                }
             }
         }
 
@@ -144,39 +146,35 @@ public class Drive extends Subsystem {
     }
 
     public synchronized void setOpenLoop(DriveSignal signal) {
-        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.PercentVbus) {
+        if (driveControlState_ != DriveControlState.OPEN_LOOP) {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
             leftMaster_.enableBrakeMode(false);
             leftSlave_.enableBrakeMode(false);
-        }
-        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.PercentVbus) {
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
             rightMaster_.enableBrakeMode(false);
             rightSlave_.enableBrakeMode(false);
+            driveControlState_ = DriveControlState.OPEN_LOOP;
         }
         setLeftRightPower(signal.leftMotor, signal.rightMotor);
-        driveControlState_ = DriveControlState.OPEN_LOOP;
     }
 
     public synchronized void setBaseLockOn() {
-        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
+        if (driveControlState_ != DriveControlState.BASE_LOCKED) {
             leftMaster_.setProfile(kBaseLockControlSlot);
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             leftMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
             leftMaster_.enableBrakeMode(true);
             leftSlave_.enableBrakeMode(true);
             leftMaster_.set(leftMaster_.getPosition());
-        }
-        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Position) {
             rightMaster_.setProfile(kBaseLockControlSlot);
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             rightMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
             rightMaster_.enableBrakeMode(true);
             rightSlave_.enableBrakeMode(true);
             rightMaster_.set(rightMaster_.getPosition());
+            driveControlState_ = DriveControlState.BASE_LOCKED;
         }
         setHighGear(false);
-        driveControlState_ = DriveControlState.BASE_LOCKED;
     }
 
     public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
@@ -187,9 +185,8 @@ public class Drive extends Subsystem {
 
     public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_sec, Rotation2d headingSetpoint) {
         configureTalonsForSpeedControl();
-        setHighGear(false);
-        velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
         driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
+        velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
         velocityHeadingPid_.reset();
         updateVelocityHeadingSetpoint();
     }
@@ -250,21 +247,19 @@ public class Drive extends Subsystem {
     }
 
     private void configureTalonsForSpeedControl() {
-        if (leftMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
+        if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL && driveControlState_ != DriveControlState.VELOCITY_SETPOINT) {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             leftMaster_.setProfile(kVelocityControlSlot);
             leftMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
             leftMaster_.enableBrakeMode(true);
             leftSlave_.enableBrakeMode(true);
-            setHighGear(true);
-        }
-        if (rightMaster_.getControlMode() != CANTalon.TalonControlMode.Speed) {
+            setHighGear(false);
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             rightMaster_.setProfile(kVelocityControlSlot);
             rightMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
             rightMaster_.enableBrakeMode(true);
             rightSlave_.enableBrakeMode(true);
-            setHighGear(true);
+            setHighGear(false);
         }
     }
 

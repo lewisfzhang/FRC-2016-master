@@ -466,7 +466,7 @@ public class Shooter extends Subsystem {
 
     private void autoAim(double now, boolean allow_changing_tracks) {
         List<ShooterAimingParameters> aimingParameters = getCurrentAimingParameters(now);
-        if (aimingParameters.isEmpty()) {
+        if (aimingParameters.isEmpty() && allow_changing_tracks) {
             // Manual search
             System.out.println("No targets");
             mTurret.setOpenLoop(mTurretManualScanOutput);
