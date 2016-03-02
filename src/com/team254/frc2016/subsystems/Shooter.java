@@ -66,8 +66,10 @@ public class Shooter extends Subsystem {
     private double mCurrentRangeForLogging;
     private double mCurrentAngleForLogging;
     private SystemState mSystemStateForLogging;
+    private boolean mTuningMode = false;
 
     private double mTurretManualScanOutput = 0;
+    private double mHoodManualScanOutput = 0;
     int mCurrentTrackId = -1;
 
     private List<ShooterAimingParameters> mCachedAimingParams = new ArrayList<>();
@@ -240,6 +242,10 @@ public class Shooter extends Subsystem {
         mTurretManualScanOutput = output;
     }
 
+    public synchronized void setHoodManualScanOutput(double output) {
+        mHoodManualScanOutput = output;
+    }
+
     public synchronized void setWantsToFireNow() {
         mWantedFiringState = WantedFiringState.WANT_TO_FIRE_NOW;
     }
@@ -262,6 +268,10 @@ public class Shooter extends Subsystem {
 
     public Hood getHood() {
         return mHood;
+    }
+
+    public synchronized void setTuningMode(boolean tuning_on) {
+        mTuningMode = tuning_on;
     }
 
     private synchronized SystemState handleReenabled() {
@@ -400,9 +410,9 @@ public class Shooter extends Subsystem {
 
             switch (mWantedState) {
             case WANT_TO_AIM:
-                return SystemState.FIRING_AIM;
+                return SystemState.SPINNING_AIM;
             case WANT_TO_BATTER:
-                return SystemState.FIRING_BATTER;
+                return SystemState.SPINNING_BATTER;
             case WANT_TO_STOW: // fallthrough
             default:
                 return SystemState.UNSTOWED_RETURNING_TO_SAFE;
@@ -460,7 +470,11 @@ public class Shooter extends Subsystem {
             // Manual search
             System.out.println("No targets");
             mTurret.setOpenLoop(mTurretManualScanOutput);
-            mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
+            if (!mTuningMode) {
+                mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
+            } else {
+                mHood.setOpenLoop(mHoodManualScanOutput);
+            }
         } else {
             // System.out.println("Picking a target");
             // Pick the target to aim at
@@ -473,7 +487,11 @@ public class Shooter extends Subsystem {
                         && (allow_changing_tracks || mCurrentTrackId == param.getTrackid())) {
                     // This target works
                     mFlywheel.setRpm(getRpmForRange(param.getRange()));
-                    mHood.setDesiredAngle(Rotation2d.fromDegrees(getHoodAngleForRange(param.getRange())));
+                    if (!mTuningMode) {
+                        mHood.setDesiredAngle(Rotation2d.fromDegrees(getHoodAngleForRange(param.getRange())));
+                    } else {
+                        mHood.setOpenLoop(mHoodManualScanOutput);
+                    }
                     mTurret.setDesiredAngle(param.getTurretAngle());
                     mCurrentAngleForLogging = param.getTurretAngle().getDegrees();
                     mCurrentRangeForLogging = param.getRange();
@@ -488,7 +506,7 @@ public class Shooter extends Subsystem {
         // TODO: Consider applying time hysteresis (require being ready for > X
         // ms consecutively)
         if (state == SystemState.SPINNING_AIM || state == SystemState.SPINNING_BATTER) {
-            return mHood.isOnTarget() && mFlywheel.isOnTarget() && mTurret.isOnTarget();
+            return (mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget();
         } else {
             return false;
         }

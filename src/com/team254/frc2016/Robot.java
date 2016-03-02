@@ -45,6 +45,9 @@ public class Robot extends IterativeRobot {
     // Disabled looper is called at 100Hz whenever the robot is disabled
     Looper mDisabledLooper = new Looper();
 
+    boolean mLogToSmartdashboard = false;
+    boolean mHoodTuningMode = false;
+
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
     }
@@ -59,8 +62,10 @@ public class Robot extends IterativeRobot {
                 mCheesyLogger.sendTimePlotPoint("vision", "x", target.getX(), 1);
                 mCheesyLogger.sendTimePlotPoint("vision", "y", target.getY(), 1);
                 mCheesyLogger.sendTimePlotPoint("vision", "z", target.getZ(), 1);
-                SmartDashboard.putNumber("goal_centroid_x", target.getX());
-                SmartDashboard.putNumber("goal_centroid_y", target.getY());
+                if (mLogToSmartdashboard) {
+                    SmartDashboard.putNumber("goal_centroid_x", target.getX());
+                    SmartDashboard.putNumber("goal_centroid_y", target.getY());
+                }
             }
 
         }
@@ -73,11 +78,12 @@ public class Robot extends IterativeRobot {
     }
 
     public void outputAllToSmartDashboard() {
-        mDrive.outputToSmartDashboard();
-        mIntake.outputToSmartDashboard();
-        mShooter.outputToSmartDashboard();
-
-        mRobotState.outputToSmartDashboard();
+        if (mLogToSmartdashboard) {
+            mDrive.outputToSmartDashboard();
+            mIntake.outputToSmartDashboard();
+            mShooter.outputToSmartDashboard();
+            mRobotState.outputToSmartDashboard();
+        }
     }
 
     public void zeroAllSensors() {
@@ -128,8 +134,8 @@ public class Robot extends IterativeRobot {
         mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
 
-        // Reset drive sensors
-        mDrive.resetEncoders();
+        // Reset all sensors
+        zeroAllSensors();
 
         // Shift to low
         mDrive.setHighGear(false);
@@ -158,11 +164,10 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void disabledPeriodic() {
-        if (mControls.getQuickTurn()) {
-            mShooter.zeroTurret();
-        }
-
         outputAllToSmartDashboard();
+
+        mHoodTuningMode = SmartDashboard.getBoolean("Hood Tuning Mode", false);
+        mLogToSmartdashboard = SmartDashboard.getBoolean("Output To SmartDashboard", false);
     }
 
     @Override
@@ -204,6 +209,19 @@ public class Robot extends IterativeRobot {
             mShooter.setWantsToFireWhenReady();
         } else {
             mShooter.setWantsToHoldFire();
+        }
+
+        if (mHoodTuningMode) {
+            mShooter.setTuningMode(true);
+            if (mControls.getButton4()) {
+                mShooter.setHoodManualScanOutput(1.0);
+            } else if (mControls.getButton5()) {
+                mShooter.setHoodManualScanOutput(-1.0);
+            } else {
+                mShooter.setHoodManualScanOutput(0.0);
+            }
+        } else {
+            mShooter.setTuningMode(false);
         }
 
         outputAllToSmartDashboard();
