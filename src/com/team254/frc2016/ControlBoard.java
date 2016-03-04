@@ -32,7 +32,7 @@ public class ControlBoard {
         return mTurnStick.getRawButton(1);
     }
 
-    public boolean getBaseLock() {
+    public boolean getTractionControl() {
         return mTurnStick.getRawButton(2);
     }
 

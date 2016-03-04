@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 6. Goal frame: origin is the center of the goal (note that orientation in
  * this frame is arbitrary). Also note that there can be multiple goal frames.
  * 
- * As a simple kinematic chain with 5 frames, there are 4 transforms of
+ * As a simple kinematic chain with 6 frames, there are 5 transforms of
  * interest:
  * 
  * 1. Odometric-to-vehicle: This is tracked over time by integrating encoder and

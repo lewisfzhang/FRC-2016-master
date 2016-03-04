@@ -47,6 +47,7 @@ public class Robot extends IterativeRobot {
 
     boolean mLogToSmartdashboard = false;
     boolean mHoodTuningMode = false;
+    boolean mWornBalls = false;
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
@@ -112,6 +113,10 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.register(mDrive.getLoop());
         mDisabledLooper.register(new GyroCalibrator());
 
+        SmartDashboard.putBoolean("Hood Tuning Mode", false);
+        SmartDashboard.putBoolean("Output To SmartDashboard", false);
+        SmartDashboard.putBoolean("Balls Worn?", false);
+
         mCompressor.start();
     }
 
@@ -139,6 +144,7 @@ public class Robot extends IterativeRobot {
 
         // Shift to low
         mDrive.setHighGear(false);
+        mShooter.setTuningMode(false);
 
         // Configure loopers
         mDisabledLooper.stop();
@@ -174,14 +180,23 @@ public class Robot extends IterativeRobot {
 
         mHoodTuningMode = SmartDashboard.getBoolean("Hood Tuning Mode", false);
         mLogToSmartdashboard = SmartDashboard.getBoolean("Output To SmartDashboard", false);
+        mWornBalls = SmartDashboard.getBoolean("Balls Worn?", false);
     }
 
     @Override
     public void teleopPeriodic() {
+        mWornBalls = SmartDashboard.getBoolean("Balls Worn?", false);
         double throttle = mControls.getThrottle();
         double turn = mControls.getTurn();
-        if (mControls.getBaseLock()) {
-            mDrive.setBaseLockOn();
+        if (mControls.getTractionControl()) {
+            Rotation2d heading_setpoint = mDrive.getGyroAngle();
+            if (mDrive.getControlState() == Drive.DriveControlState.VELOCITY_HEADING_CONTROL) {
+                heading_setpoint = mDrive.getVelocityHeadingSetpoint().getHeading();
+            }
+            mDrive.setVelocityHeadingSetpoint(
+                    mCheesyDriveHelper.handleDeadband(throttle, CheesyDriveHelper.kThrottleDeadband)
+                            * Constants.kDriveLowGearMaxSpeedInchesPerSec,
+                    heading_setpoint);
         } else {
             mDrive.setHighGear(!mControls.getLowGear());
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
@@ -220,9 +235,9 @@ public class Robot extends IterativeRobot {
         if (mHoodTuningMode) {
             mShooter.setTuningMode(true);
             if (mControls.getButton4()) {
-                mShooter.setHoodManualScanOutput(1.0);
+                mShooter.setHoodManualScanOutput(0.25);
             } else if (mControls.getButton5()) {
-                mShooter.setHoodManualScanOutput(-1.0);
+                mShooter.setHoodManualScanOutput(-0.25);
             } else {
                 mShooter.setHoodManualScanOutput(0.0);
             }

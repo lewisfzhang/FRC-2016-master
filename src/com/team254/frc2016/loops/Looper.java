@@ -23,7 +23,8 @@ public class Looper {
                     for (Loop loop : loops_) {
                         loop.onLoop();
                     }
-                    // System.out.println("Looper took " + (Timer.getFPGATimestamp() - now) + " seconds");
+                    // System.out.println("Looper took " +
+                    // (Timer.getFPGATimestamp() - now) + " seconds");
                 }
             }
         }

@@ -23,7 +23,7 @@ public class Drive extends Subsystem {
         return instance_;
     }
 
-    private enum DriveControlState {
+    public enum DriveControlState {
         OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL
     }
 
@@ -224,6 +224,14 @@ public class Drive extends Subsystem {
         rightMaster_.setPosition(0);
     }
 
+    public synchronized DriveControlState getControlState() {
+        return driveControlState_;
+    }
+
+    public synchronized VelocityHeadingSetpoint getVelocityHeadingSetpoint() {
+        return velocityHeadingSetpoint_;
+    }
+
     @Override
     public synchronized void stop() {
         setOpenLoop(DriveSignal.NEUTRAL);
@@ -247,7 +255,8 @@ public class Drive extends Subsystem {
     }
 
     private void configureTalonsForSpeedControl() {
-        if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL && driveControlState_ != DriveControlState.VELOCITY_SETPOINT) {
+        if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL
+                && driveControlState_ != DriveControlState.VELOCITY_SETPOINT) {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             leftMaster_.setProfile(kVelocityControlSlot);
             leftMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
@@ -301,13 +310,21 @@ public class Drive extends Subsystem {
         return inchesToRotations(inches_per_second) * 60;
     }
 
-    private static class VelocityHeadingSetpoint {
+    public static class VelocityHeadingSetpoint {
         private final double forwardInchesPerSec_;
         private final Rotation2d headingSetpoint_;
 
         public VelocityHeadingSetpoint(double forwardInchesPerSec, Rotation2d headingSetpoint) {
             forwardInchesPerSec_ = forwardInchesPerSec;
             headingSetpoint_ = headingSetpoint;
+        }
+
+        public double getSpeed() {
+            return this.forwardInchesPerSec_;
+        }
+
+        public Rotation2d getHeading() {
+            return this.headingSetpoint_;
         }
     }
 }

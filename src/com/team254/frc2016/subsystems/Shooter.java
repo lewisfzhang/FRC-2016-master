@@ -78,6 +78,7 @@ public class Shooter extends Subsystem {
     Flywheel mFlywheel = new Flywheel();
     Hood mHood = new Hood();
     Solenoid mShooterSolenoid = new Solenoid(Constants.kShooterSolenoidId / 8, Constants.kShooterSolenoidId % 8);
+    Intake mIntake = Intake.getInstance();
     RobotState mRobotState = RobotState.getInstance();
 
     InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap = Constants.kHoodAutoAimMapNewBalls;
@@ -292,6 +293,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleStowedAndHomingHood() {
+        mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(true);
@@ -301,6 +303,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleStowedOrStowing() {
+        mIntake.overrideIntaking(false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(true);
@@ -319,6 +322,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleUnstowing(double now, double stateStartTime) {
+        mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(false);
@@ -344,6 +348,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleSpinningAim(double now, boolean isFirstCycle) {
+        mIntake.overrideIntaking(true);
         if (isFirstCycle) {
             // Start flywheel
             mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
@@ -372,6 +377,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleSpinningBatter(double now) {
+        mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.setRpm(Constants.kFlywheelBatterRpmSetpoint);
         mHood.setStowed(false);
@@ -397,12 +403,13 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
+        mIntake.overrideIntaking(true);
         if (state == SystemState.FIRING_AIM) {
             autoAim(now, false);
         }
 
         if (now - stateStartTime < Constants.kShootActuationTime) {
-            // TODO set flywheel full speed open loop? We did this previously
+            mFlywheel.setOpenLoop(1.0);
             setShooterSolenoidLift(true);
             return state;
         } else {
@@ -421,6 +428,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleReturningToSafe() {
+        mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(false);
@@ -478,6 +486,7 @@ public class Shooter extends Subsystem {
         } else {
             // System.out.println("Picking a target");
             // Pick the target to aim at
+            boolean has_target = false;
             for (ShooterAimingParameters param : aimingParameters) {
                 double turret_angle_degrees = param.getTurretAngle().getDegrees();
                 if (turret_angle_degrees >= Constants.kSoftMinTurretAngle
@@ -496,8 +505,12 @@ public class Shooter extends Subsystem {
                     mCurrentAngleForLogging = param.getTurretAngle().getDegrees();
                     mCurrentRangeForLogging = param.getRange();
                     mCurrentTrackId = param.getTrackid();
+                    has_target = true;
                     break;
                 }
+            }
+            if (!has_target) {
+                mCurrentTrackId = -1;
             }
         }
     }
@@ -505,7 +518,10 @@ public class Shooter extends Subsystem {
     private boolean readyToFire(SystemState state, double now) {
         // TODO: Consider applying time hysteresis (require being ready for > X
         // ms consecutively)
-        if (state == SystemState.SPINNING_AIM || state == SystemState.SPINNING_BATTER) {
+        if (state == SystemState.SPINNING_AIM) {
+            return (mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget()
+                    && (mCurrentTrackId != -1);
+        } else if (state == SystemState.SPINNING_BATTER) {
             return (mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget();
         } else {
             return false;

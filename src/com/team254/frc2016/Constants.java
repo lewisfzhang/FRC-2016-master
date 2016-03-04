@@ -22,6 +22,9 @@ public class Constants extends ConstantsBase {
     // Wheel diameter
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
 
+    // Drive constants
+    public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
+
     // Hood constants
     public static double kMinHoodAngle = 39.0; // TODO tune this
     public static double kMaxHoodAngle = 84.0;
@@ -42,7 +45,7 @@ public class Constants extends ConstantsBase {
     public static double kTurretRotationsPerTick = 14.0 / 50.0 * 14.0 / 322.0;
 
     // Flywheel constants
-    public static double kFlywheelOnTargetTolerance = 100.0;
+    public static double kFlywheelOnTargetTolerance = 150.0;
     public static double kFlywheelBatterRpmSetpoint = 6000.0;
     public static double kFlywheelAutoAimNominalRpmSetpoint = 6000.0;
 
@@ -51,7 +54,7 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
     public static double kShootActuationTime = 0.5;
-    public static double kHoodUnstowToFlywheelSpinTime = 0.5;
+    public static double kHoodUnstowToFlywheelSpinTime = 0.75;
 
     // Goal tracker constants
     public static double kMaxGoalTrackAge = 0.5;
@@ -60,6 +63,7 @@ public class Constants extends ConstantsBase {
     public static double kTrackReportComparatorStablityWeight = 1.0;
     public static double kTrackReportComparatorAgeWeight = 1.0;
     public static double kTrackReportComparatorSwitchingWeight = 3.0;
+    public static double kTrackReportComparatorDistanceWeight = 2.0; // TODO
 
     public static int kAndroidAppTcpPort = 8254;
 
@@ -90,7 +94,7 @@ public class Constants extends ConstantsBase {
     public static double kDriveVelocityKd = 6.0;
     public static double kDriveVelocityKf = 1.0;
     public static int kDriveVelocityIZone = 0;
-    public static double kDriveVelocityRampRate = 0;
+    public static double kDriveVelocityRampRate = 48.0;
     public static int kDriveVelocityAllowableError = 0;
 
     // PID gains for drive base lock loop
@@ -108,7 +112,7 @@ public class Constants extends ConstantsBase {
     // left/right.
     public static double kDriveHeadingVeloctyKp = 6.0;
     public static double kDriveHeadingVeloctyKi = 0.0;
-    public static double kDriveHeadingVeloctyKd = 0.0;
+    public static double kDriveHeadingVeloctyKd = 30.0;
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
@@ -169,6 +173,7 @@ public class Constants extends ConstantsBase {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapWornBalls = new InterpolatingTreeMap<>();
 
     static {
+        // Tuned on short BBD hood 2/?/2016
         kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
         kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
         kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(70.0), new InterpolatingDouble(47.0));
@@ -182,15 +187,17 @@ public class Constants extends ConstantsBase {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapNewBalls = new InterpolatingTreeMap<>();
 
     static {
-        // TODO tune these
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(56.0), new InterpolatingDouble(41.5));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(57.0), new InterpolatingDouble(42.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(70.0), new InterpolatingDouble(47.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(49.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(82.0), new InterpolatingDouble(50.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(54.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(98.0), new InterpolatingDouble(55.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(113.0), new InterpolatingDouble(56.5));
+        // Tuned on long, smooth metal hood 3/2/2016
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(63.0), new InterpolatingDouble(40.2));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(80.0), new InterpolatingDouble(49.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(83.0), new InterpolatingDouble(52.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(57.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(95.0), new InterpolatingDouble(59.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(102.0), new InterpolatingDouble(60.2));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(108.0), new InterpolatingDouble(63.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(117.0), new InterpolatingDouble(63.5));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(131.0), new InterpolatingDouble(65.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(141.0), new InterpolatingDouble(66.8));
     }
 
     static {
