@@ -28,7 +28,7 @@ public class OneBallMode extends AutoModeBase {
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        System.out.println("Starting");
+        System.out.println("Starting One Ball Mode");
         doOneBallRoutine();
         System.out.println("Ending");
     }

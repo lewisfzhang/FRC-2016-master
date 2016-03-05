@@ -1,6 +1,7 @@
 
 package com.team254.frc2016;
 
+import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeExecuter;
 import com.team254.frc2016.auto.modes.OneBallThenReturnMode;
 import com.team254.frc2016.loops.GyroCalibrator;
@@ -150,7 +151,7 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
 
-        mAutoModeExecuter.setAutoMode(new OneBallThenReturnMode(mDrive, mShooter));
+        mAutoModeExecuter.setAutoMode(mSmartDashboardInteractions.getSelectedAutonMode());
         mAutoModeExecuter.start();
     }
 

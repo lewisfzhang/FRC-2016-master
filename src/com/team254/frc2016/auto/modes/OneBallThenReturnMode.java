@@ -21,7 +21,7 @@ public class OneBallThenReturnMode extends AutoModeBase {
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        System.out.println("Starting");
+        System.out.println("Starting One Ball With Return Mode");
         mOneBallMode.doOneBallRoutine();
         runAction(new DriveStraightAction(
                 -(mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2.0 + 16.0,
