@@ -2,7 +2,7 @@
 package com.team254.frc2016;
 
 import com.team254.frc2016.auto.AutoModeExecuter;
-import com.team254.frc2016.auto.modes.OneBallMode;
+import com.team254.frc2016.auto.modes.OneBallThenReturnMode;
 import com.team254.frc2016.loops.GyroCalibrator;
 import com.team254.frc2016.loops.Looper;
 import com.team254.frc2016.loops.RobotStateEstimator;
@@ -150,7 +150,7 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
 
-        mAutoModeExecuter.setAutoMode(new OneBallMode(mDrive, mShooter));
+        mAutoModeExecuter.setAutoMode(new OneBallThenReturnMode(mDrive, mShooter));
         mAutoModeExecuter.start();
     }
 
