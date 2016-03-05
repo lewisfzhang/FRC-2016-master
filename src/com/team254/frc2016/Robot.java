@@ -1,9 +1,7 @@
 
 package com.team254.frc2016;
 
-import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeExecuter;
-import com.team254.frc2016.auto.modes.OneBallThenReturnMode;
 import com.team254.frc2016.loops.GyroCalibrator;
 import com.team254.frc2016.loops.Looper;
 import com.team254.frc2016.loops.RobotStateEstimator;
@@ -19,7 +17,6 @@ import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
-
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;

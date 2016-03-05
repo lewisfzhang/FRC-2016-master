@@ -3,6 +3,7 @@ package com.team254.frc2016;
 import com.team254.lib.util.ConstantsBase;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
+import edu.wpi.first.wpilibj.Solenoid;
 
 public class Constants extends ConstantsBase {
     public static double kCenterOfTargetHeight = 89.0; // inches
@@ -134,6 +135,13 @@ public class Constants extends ConstantsBase {
     public static double kFlywheelRampRate = 0;
     public static int kFlywheelAllowableError = 0;
 
+    // Utility arm time delays, all in seconds
+    // TODO: tune all these values
+    public static double kUtilityArmSizeBoxToPortcullisDelay = 5.0;
+    public static double kUtilityArmCdfToDrivingDelay = 5.0;
+    public static double kUtilityArmLiftForHangToOpenCdfDelay = 5.0;
+    public static double kUtilityArmOpenCdfToDeployHooksDelay = 5.0;
+
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
     // https://docs.google.com/spreadsheets/d/1O2Szvp3cC3gO2euKjqhdmpsyd54t6eB2t9jzo41G2H4
@@ -156,6 +164,21 @@ public class Constants extends ConstantsBase {
     public static final int kHoodStowSolenoidId = 1; // PCM 0, Solenoid 1
     public static final int kIntakeSolenoidId = 10; // PCM 1, Solenoid 2
     public static final int kShooterSolenoidId = 0; // PCM 0, Solenoid 0
+
+    // TODO: find the correct ID for the following solenoids
+    public static final int kArmLiftSolenoidId = 12;
+    public static final int kAdjustableHardStopSolenoidId = 13;
+    public static final int kCdfFlapSolenoidId = 14;
+    public static final int kHookReleaseSolenoidId = 15;
+    public static final int kGasSpringReleaseSolenoidId = 16;
+
+    /**
+     * Make an {@link Solenoid} instance for the single-number ID of the solenoid
+     * @param solenoidId One of the kXyzSolenoidId constants
+     */
+    public static Solenoid makeSolenoidForId(int solenoidId) {
+        return new Solenoid(solenoidId / 8, solenoidId % 8);
+    }
 
     // DIGITAL IO
     public static final int kHoodEncoderDIO = 9;

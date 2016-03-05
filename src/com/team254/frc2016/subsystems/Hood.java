@@ -73,7 +73,7 @@ public class Hood extends Subsystem {
         pid_ = new SynchronousPID(Constants.kHoodKp, Constants.kHoodKi, Constants.kHoodKd);
         pid_.setDeadband(Constants.kHoodDeadband);
         pid_.setInputRange(Constants.kMinHoodAngle, Constants.kMaxHoodAngle);
-        stow_solenoid_ = new Solenoid(Constants.kHoodStowSolenoidId / 8, Constants.kHoodStowSolenoidId % 8);
+        stow_solenoid_ = Constants.makeSolenoidForId(Constants.kHoodStowSolenoidId);
 
         has_homed_ = false;
         pid_.setSetpoint(Constants.kMinHoodAngle);

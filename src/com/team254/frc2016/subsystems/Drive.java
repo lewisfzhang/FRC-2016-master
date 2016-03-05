@@ -74,7 +74,7 @@ public class Drive extends Subsystem {
         leftSlave_ = new CANTalon(Constants.kLeftDriveSlaveId);
         rightMaster_ = new CANTalon(Constants.kRightDriveMasterId);
         rightSlave_ = new CANTalon(Constants.kRightDriveSlaveId);
-        shifter_ = new Solenoid(Constants.kShifterSolenoidId / 8, Constants.kShifterSolenoidId % 8);
+        shifter_ = Constants.makeSolenoidForId(Constants.kShifterSolenoidId);
         shifter_.set(false); // high gear
         gyro_ = new ADXRS453_Gyro();
 

@@ -77,11 +77,12 @@ public class Shooter extends Subsystem {
     Turret mTurret = new Turret();
     Flywheel mFlywheel = new Flywheel();
     Hood mHood = new Hood();
-    Solenoid mShooterSolenoid = new Solenoid(Constants.kShooterSolenoidId / 8, Constants.kShooterSolenoidId % 8);
+    Solenoid mShooterSolenoid = Constants.makeSolenoidForId(Constants.kShooterSolenoidId);
     Intake mIntake = Intake.getInstance();
     RobotState mRobotState = RobotState.getInstance();
 
-    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap = Constants.kHoodAutoAimMapNewBalls;
+    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap =
+            Constants.kHoodAutoAimMapNewBalls;
 
     // NetworkTables
     NetworkTable mShooterTable = NetworkTable.getTable("shooter");
@@ -90,9 +91,8 @@ public class Shooter extends Subsystem {
 
         private SystemState mSystemState = SystemState.REENABLED;
 
-        // Every time we transition states, we update the current state start
-        // time
-        // and the state changed boolean (for one cycle)
+        // Every time we transition states, we update the current state start time and the state
+        // changed boolean (for one cycle)
         private double mCurrentStateStartTime;
         private boolean mStateChanged;
 
