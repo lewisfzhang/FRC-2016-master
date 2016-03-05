@@ -45,6 +45,8 @@ public class Robot extends IterativeRobot {
     // Disabled looper is called at 100Hz whenever the robot is disabled
     Looper mDisabledLooper = new Looper();
 
+    SmartDashboardInteractions mSmartDashboardInteractions = new SmartDashboardInteractions();
+
     boolean mLogToSmartdashboard = false;
     boolean mHoodTuningMode = false;
     boolean mWornBalls = false;
@@ -113,9 +115,7 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.register(mDrive.getLoop());
         mDisabledLooper.register(new GyroCalibrator());
 
-        SmartDashboard.putBoolean("Hood Tuning Mode", false);
-        SmartDashboard.putBoolean("Output To SmartDashboard", false);
-        SmartDashboard.putBoolean("Balls Worn?", false);
+        mSmartDashboardInteractions.initWithDefaults();
 
         mCompressor.start();
     }
@@ -178,14 +178,15 @@ public class Robot extends IterativeRobot {
 
         outputAllToSmartDashboard();
 
-        mHoodTuningMode = SmartDashboard.getBoolean("Hood Tuning Mode", false);
-        mLogToSmartdashboard = SmartDashboard.getBoolean("Output To SmartDashboard", false);
-        mWornBalls = SmartDashboard.getBoolean("Balls Worn?", false);
+        mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
+        mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
+        mWornBalls = mSmartDashboardInteractions.areBallsWorn();
+
     }
 
     @Override
     public void teleopPeriodic() {
-        mWornBalls = SmartDashboard.getBoolean("Balls Worn?", false);
+        mWornBalls = mSmartDashboardInteractions.areBallsWorn();
         double throttle = mControls.getThrottle();
         double turn = mControls.getTurn();
         if (mControls.getTractionControl()) {
