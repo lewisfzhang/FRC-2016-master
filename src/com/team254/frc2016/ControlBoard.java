@@ -67,6 +67,10 @@ public class ControlBoard {
         }
     }
 
+    public boolean getBadBallOverride() {
+        return mButtonBoard.getRawButton(6);
+    }
+
     public boolean getAutoAim() {
         return mButtonBoard.getRawButton(10);
     }
@@ -85,10 +89,6 @@ public class ControlBoard {
 
     public boolean getButton5() {
         return mButtonBoard.getRawButton(5);
-    }
-
-    public boolean getButton6() {
-        return mButtonBoard.getRawButton(6);
     }
 
     public boolean getIntakeButton() {

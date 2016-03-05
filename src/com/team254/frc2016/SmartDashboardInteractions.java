@@ -9,8 +9,6 @@ import com.team254.frc2016.subsystems.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.util.concurrent.Callable;
-
 /**
  * Controls the interactive elements of smartdashboard.
  *
@@ -20,7 +18,7 @@ public class SmartDashboardInteractions {
 
     private static final String HOOD_TUNING_MODE = "Hood Tuning Mode";
     private static final String OUTPUT_TO_SMART_DASHBOARD = "Output To SmartDashboard";
-    private static final String BALLS_WORN = "Balls Worn?";
+    private static final String IS_AUTON_BALL_BAD = "Auton Ball Worn?";
     private static final String AUTON_MODE = "Auton Mode";
 
     private SendableChooser mAutonChooser;
@@ -28,7 +26,7 @@ public class SmartDashboardInteractions {
     public void initWithDefaults() {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
         SmartDashboard.putBoolean(OUTPUT_TO_SMART_DASHBOARD, false);
-        SmartDashboard.putBoolean(BALLS_WORN, false);
+        SmartDashboard.putBoolean(IS_AUTON_BALL_BAD, false);
 
         mAutonChooser = new SendableChooser();
         // first entry will become default
@@ -46,23 +44,9 @@ public class SmartDashboardInteractions {
         return SmartDashboard.getBoolean(OUTPUT_TO_SMART_DASHBOARD, false);
     }
 
-    public boolean areBallsWorn() {
-        return SmartDashboard.getBoolean(BALLS_WORN, false);
-    }
-
     public AutoModeBase getSelectedAutonMode() {
         AutonOption selected = (AutonOption) mAutonChooser.getSelected();
-        if (selected == null) {
-            System.out.println("WARNING: Got null auton mode");
-            selected = AutonOption.STAND_STILL;
-        }
-        try {
-            return selected.modeFactory.call();
-        } catch (Exception e) {
-            // Should never happen
-            e.printStackTrace();
-            return new StandStillMode();
-        }
+        return createAutoMode(selected);
     }
 
     /**
@@ -70,18 +54,34 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
-        ONE_BALL_MODE("One Ball", () -> new OneBallMode(Shooter.getInstance())),
-        ONE_BALL_MODE_WITH_RETURN(
-                "One Ball With Return",
-                () -> new OneBallThenReturnMode(Drive.getInstance(), Shooter.getInstance())),
-        STAND_STILL("Stand Still", StandStillMode::new);
+        ONE_BALL_MODE("One Ball"),
+        ONE_BALL_MODE_WITH_RETURN("One Ball With Return"),
+        STAND_STILL("Stand Still");
 
         public final String name;
-        public final Callable<AutoModeBase> modeFactory;
 
-        AutonOption(String name, Callable<AutoModeBase> modeFactory) {
+        AutonOption(String name) {
             this.name = name;
-            this.modeFactory = modeFactory;
         }
+    }
+
+    private AutoModeBase createAutoMode(AutonOption autonOption) {
+        switch (autonOption) {
+            case ONE_BALL_MODE:
+                return new OneBallMode(Shooter.getInstance(), isAutonBallBad());
+            case ONE_BALL_MODE_WITH_RETURN:
+                return new OneBallThenReturnMode(
+                        Drive.getInstance(),
+                        Shooter.getInstance(),
+                        isAutonBallBad());
+            case STAND_STILL: // fallthrough
+            default:
+                System.out.println("ERROR: unexpected auto mode: " + autonOption);
+                return new StandStillMode();
+        }
+    }
+
+    private boolean isAutonBallBad() {
+        return SmartDashboard.getBoolean(IS_AUTON_BALL_BAD, false);
     }
 }

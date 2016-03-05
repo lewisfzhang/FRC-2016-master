@@ -47,8 +47,8 @@ public class Constants extends ConstantsBase {
 
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 150.0;
-    public static double kFlywheelBatterRpmSetpoint = 6000.0;
-    public static double kFlywheelAutoAimNominalRpmSetpoint = 6000.0;
+    public static double kFlywheelGoodBallRpmSetpoint = 6000.0;
+    public static double kFlywheelBadBallRpmSetpoint = 7000.0; // TODO: tune this
 
     // Auto aiming/shooter constants
     public static double kAutoAimRangeHysteresis = 100.0;

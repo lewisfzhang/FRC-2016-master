@@ -14,9 +14,9 @@ public class OneBallThenReturnMode extends AutoModeBase {
     private final Drive mDrive;
     private final OneBallMode mOneBallMode;
 
-    public OneBallThenReturnMode(Drive drive, Shooter shooter) {
+    public OneBallThenReturnMode(Drive drive, Shooter shooter, boolean isBallBad) {
         mDrive = drive;
-        mOneBallMode = new OneBallMode(shooter);
+        mOneBallMode = new OneBallMode(shooter, isBallBad);
     }
 
     @Override

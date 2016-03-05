@@ -67,6 +67,7 @@ public class Shooter extends Subsystem {
     private double mCurrentAngleForLogging;
     private SystemState mSystemStateForLogging;
     private boolean mTuningMode = false;
+    private boolean mIsBadBall = false;
 
     private double mTurretManualScanOutput = 0;
     private double mHoodManualScanOutput = 0;
@@ -275,6 +276,10 @@ public class Shooter extends Subsystem {
         mTuningMode = tuning_on;
     }
 
+    public void setIsBadBall(boolean isBadBall) {
+        mIsBadBall = isBadBall;
+    }
+
     private synchronized SystemState handleReenabled() {
         if (!mHood.hasHomed()) {
             // We assume that this only happens when we are first enabled
@@ -351,7 +356,7 @@ public class Shooter extends Subsystem {
         mIntake.overrideIntaking(true);
         if (isFirstCycle) {
             // Start flywheel
-            mFlywheel.setRpm(Constants.kFlywheelAutoAimNominalRpmSetpoint);
+            mFlywheel.setRpm(getShootingSetpointRpm());
         }
 
         mHood.setStowed(false);
@@ -379,7 +384,7 @@ public class Shooter extends Subsystem {
     private synchronized SystemState handleSpinningBatter(double now) {
         mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
-        mFlywheel.setRpm(Constants.kFlywheelBatterRpmSetpoint);
+        mFlywheel.setRpm(getShootingSetpointRpm());
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
         setShooterSolenoidLift(false);
@@ -454,10 +459,6 @@ public class Shooter extends Subsystem {
         return mHoodMap.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
-    private static double getRpmForRange(double range) {
-        return Constants.kFlywheelAutoAimNominalRpmSetpoint;
-    }
-
     private List<ShooterAimingParameters> getCurrentAimingParameters(double now) {
         List<ShooterAimingParameters> params = mRobotState.getAimingParameters(now,
                 new GoalTracker.TrackReportComparator(Constants.kTrackReportComparatorStablityWeight,
@@ -495,7 +496,7 @@ public class Shooter extends Subsystem {
                         && param.getRange() <= Constants.kAutoAimMaxRange
                         && (allow_changing_tracks || mCurrentTrackId == param.getTrackid())) {
                     // This target works
-                    mFlywheel.setRpm(getRpmForRange(param.getRange()));
+                    mFlywheel.setRpm(getShootingSetpointRpm());
                     if (!mTuningMode) {
                         mHood.setDesiredAngle(Rotation2d.fromDegrees(getHoodAngleForRange(param.getRange())));
                     } else {
@@ -513,6 +514,12 @@ public class Shooter extends Subsystem {
                 mCurrentTrackId = -1;
             }
         }
+    }
+
+    private double getShootingSetpointRpm() {
+        return mIsBadBall
+                ? Constants.kFlywheelBadBallRpmSetpoint
+                : Constants.kFlywheelGoodBallRpmSetpoint;
     }
 
     private boolean readyToFire(SystemState state, double now) {

@@ -47,7 +47,6 @@ public class Robot extends IterativeRobot {
 
     boolean mLogToSmartdashboard = false;
     boolean mHoodTuningMode = false;
-    boolean mWornBalls = false;
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
@@ -178,13 +177,10 @@ public class Robot extends IterativeRobot {
 
         mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
         mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
-        mWornBalls = mSmartDashboardInteractions.areBallsWorn();
-
     }
 
     @Override
     public void teleopPeriodic() {
-        mWornBalls = mSmartDashboardInteractions.areBallsWorn();
         double throttle = mControls.getThrottle();
         double turn = mControls.getTurn();
         if (mControls.getTractionControl()) {
@@ -222,6 +218,8 @@ public class Robot extends IterativeRobot {
         }
 
         mShooter.setTurretManualScanOutput(mControls.getTurretManual());
+
+        mShooter.setIsBadBall(mControls.getBadBallOverride());
 
         if (mControls.getFireButton()) {
             // TODO: Make this fire when ready once tuned

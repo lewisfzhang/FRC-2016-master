@@ -12,12 +12,15 @@ import com.team254.frc2016.subsystems.Shooter;
 public class OneBallMode extends AutoModeBase {
 
     private final Shooter mShooter;
+    private final boolean mIsBadBall;
 
-    public OneBallMode(Shooter shooter) {
+    public OneBallMode(Shooter shooter, boolean isBadBall) {
         mShooter = shooter;
+        mIsBadBall = isBadBall;
     }
 
     public void doOneBallRoutine() throws AutoModeEndedException {
+        mShooter.setIsBadBall(mIsBadBall);
         runAction(new DriveThenAimAction(125, 100, 270, 45));
         runAction(new WaitAction(1));
         // TODO: should this be fireWhenReady()?
