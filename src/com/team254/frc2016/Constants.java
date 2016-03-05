@@ -142,6 +142,9 @@ public class Constants extends ConstantsBase {
     public static double kUtilityArmLiftForHangToOpenCdfDelay = 5.0;
     public static double kUtilityArmOpenCdfToDeployHooksDelay = 5.0;
 
+    // TODO: tune this value
+    public static double kIntakeDeploySettlingDelay = 5.0;
+
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
     // https://docs.google.com/spreadsheets/d/1O2Szvp3cC3gO2euKjqhdmpsyd54t6eB2t9jzo41G2H4

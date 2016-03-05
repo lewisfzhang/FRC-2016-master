@@ -202,15 +202,15 @@ public class Robot extends IterativeRobot {
         }
 
         if (mControls.getIntakeButton()) {
-            mIntake.deploy(true);
-            mIntake.set(1.0);
+            mIntake.tryToDeploy(true);
+            mIntake.setIntakeRoller(1.0);
         } else if (mControls.getStowIntakeButton()) {
-            mIntake.deploy(false);
-            mIntake.set(0.0);
+            mIntake.tryToDeploy(false);
+            mIntake.setIntakeRoller(0.0);
         } else if (mControls.getExhaustButton()) {
-            mIntake.set(-1.0);
+            mIntake.setIntakeRoller(-1.0);
         } else {
-            mIntake.set(0.0);
+            mIntake.setIntakeRoller(0.0);
         }
 
         if (mControls.getAutoAim()) {
