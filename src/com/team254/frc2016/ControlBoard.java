@@ -68,7 +68,7 @@ public class ControlBoard {
     }
 
     public boolean getBadBallOverride() {
-        return mButtonBoard.getRawButton(6);
+        return mButtonBoard.getRawButton(3);
     }
 
     public boolean getAutoAim() {
@@ -80,15 +80,15 @@ public class ControlBoard {
     }
 
     public boolean getBailButton() {
-        return mButtonBoard.getRawButton(3);
+        return mButtonBoard.getRawButton(5);
     }
 
-    public boolean getButton4() {
+    public boolean getPortcullisButton() {
         return mButtonBoard.getRawButton(4);
     }
 
-    public boolean getButton5() {
-        return mButtonBoard.getRawButton(5);
+    public boolean getCdfButton() {
+        return mButtonBoard.getRawButton(6);
     }
 
     public boolean getIntakeButton() {
@@ -101,5 +101,13 @@ public class ControlBoard {
 
     public boolean getExhaustButton() {
         return mButtonBoard.getRawAxis(0) < -0.1;
+    }
+
+    public boolean getHoodTuningPositiveButton() {
+        return mButtonBoard.getRawButton(1);
+    }
+
+    public boolean getHoodTuningNegativeButton() {
+        return mButtonBoard.getRawButton(2);
     }
 }

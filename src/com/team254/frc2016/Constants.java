@@ -141,6 +141,7 @@ public class Constants extends ConstantsBase {
     public static double kUtilityArmCdfToDrivingDelay = 5.0;
     public static double kUtilityArmLiftForHangToOpenCdfDelay = 5.0;
     public static double kUtilityArmOpenCdfToDeployHooksDelay = 5.0;
+    public static double kUtilityArmDriveToPortcullisDelay = 5.0;
 
     // TODO: tune this value
     public static double kIntakeDeploySettlingDelay = 5.0;
@@ -168,12 +169,11 @@ public class Constants extends ConstantsBase {
     public static final int kIntakeSolenoidId = 10; // PCM 1, Solenoid 2
     public static final int kShooterSolenoidId = 0; // PCM 0, Solenoid 0
 
-    // TODO: find the correct ID for the following solenoids
-    public static final int kArmLiftSolenoidId = 12;
-    public static final int kAdjustableHardStopSolenoidId = 13;
-    public static final int kCdfFlapSolenoidId = 14;
-    public static final int kHookReleaseSolenoidId = 15;
-    public static final int kGasSpringReleaseSolenoidId = 16;
+    public static final int kArmLiftSolenoidId = 9; // PCM 1, Solenoid 1
+    public static final int kAdjustableHardStopSolenoidId = 2; // PCM 0, Solenoid 2
+    public static final int kCdfFlapSolenoidId = 3; // PCM 0, Solenoid 3
+    public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct solenoid
+    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the correct solenoid
 
     /**
      * Make an {@link Solenoid} instance for the single-number ID of the solenoid

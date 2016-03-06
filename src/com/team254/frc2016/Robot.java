@@ -9,6 +9,7 @@ import com.team254.frc2016.loops.TurretResetter;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Intake;
 import com.team254.frc2016.subsystems.Shooter;
+import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
@@ -29,6 +30,7 @@ public class Robot extends IterativeRobot {
     Drive mDrive = Drive.getInstance();
     Intake mIntake = Intake.getInstance();
     Shooter mShooter = Shooter.getInstance();
+    UtilityArm mUtilityArm = UtilityArm.getInstance();
     Compressor mCompressor = new Compressor(1);
     AutoModeExecuter mAutoModeExecuter = new AutoModeExecuter();
 
@@ -67,7 +69,6 @@ public class Robot extends IterativeRobot {
                     SmartDashboard.putNumber("goal_centroid_y", target.getY());
                 }
             }
-
         }
     }
 
@@ -75,6 +76,7 @@ public class Robot extends IterativeRobot {
         mDrive.stop();
         mIntake.stop();
         mShooter.stop();
+        mUtilityArm.stop();
     }
 
     public void outputAllToSmartDashboard() {
@@ -83,6 +85,7 @@ public class Robot extends IterativeRobot {
             mIntake.outputToSmartDashboard();
             mShooter.outputToSmartDashboard();
             mRobotState.outputToSmartDashboard();
+            mUtilityArm.outputToSmartDashboard();
         }
     }
 
@@ -90,6 +93,7 @@ public class Robot extends IterativeRobot {
         mDrive.zeroSensors();
         mIntake.zeroSensors();
         mShooter.zeroSensors();
+        mUtilityArm.zeroSensors();
         mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), new Rotation2d());
     }
 
@@ -105,11 +109,15 @@ public class Robot extends IterativeRobot {
         // Reset all state
         zeroAllSensors();
 
+        // TODO: call this from auto init
+        mUtilityArm.setWantedState(UtilityArm.WantedState.STAY_IN_SIZE_BOX);
+
         // Configure loopers
         mEnabledLooper.register(new TurretResetter());
         mEnabledLooper.register(RobotStateEstimator.getInstance());
         mEnabledLooper.register(Shooter.getInstance().getLoop());
         mEnabledLooper.register(mDrive.getLoop());
+        mEnabledLooper.register(mUtilityArm.getLoop());
         mDisabledLooper.register(new GyroCalibrator());
 
         mSmartDashboardInteractions.initWithDefaults();
@@ -133,6 +141,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
+        // TODO: add option to force reset utility arm into starting box
         mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
 
@@ -153,6 +162,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopInit() {
+        // TODO: add option to force reset utility arm into starting box
         mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
 
@@ -222,18 +232,28 @@ public class Robot extends IterativeRobot {
         mShooter.setIsBadBall(mControls.getBadBallOverride());
 
         if (mControls.getFireButton()) {
-            // TODO: Make this fire when ready once tuned
-            // mShooter.setWantsToFireNow();
             mShooter.setWantsToFireWhenReady();
         } else {
             mShooter.setWantsToHoldFire();
         }
 
+        if (mControls.getPortcullisButton()) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
+        } else if (mControls.getCdfButton()) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.CDF);
+        } else if (mControls.getBailButton()) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
+        } else if (mControls.getDeployHanger()) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
+        } else if (mControls.getHang() && mUtilityArm.isAllowedToHang()) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
+        }
+
         if (mHoodTuningMode) {
             mShooter.setTuningMode(true);
-            if (mControls.getButton4()) {
+            if (mControls.getHoodTuningPositiveButton()) {
                 mShooter.setHoodManualScanOutput(0.25);
-            } else if (mControls.getButton5()) {
+            } else if (mControls.getHoodTuningNegativeButton()) {
                 mShooter.setHoodManualScanOutput(-0.25);
             } else {
                 mShooter.setHoodManualScanOutput(0.0);
