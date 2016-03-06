@@ -241,7 +241,12 @@ public class Robot extends IterativeRobot {
             mShooter.setWantsToHoldFire();
         }
 
-        if (mControls.getPortcullisButton()) {
+        if (mUtilityArm.isAllowedToHang()
+                && (mControls.getHang()
+                || (Timer.getMatchTime() >= Constants.kHangerAutoTriggerTime
+                && mControls.getAutoHangEnabled()))) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
+        } else if (mControls.getPortcullisButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
         } else if (mControls.getCdfButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.CDF);
@@ -249,8 +254,6 @@ public class Robot extends IterativeRobot {
             mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
         } else if (mControls.getDeployHanger()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
-        } else if (mControls.getHang() && mUtilityArm.isAllowedToHang()) {
-            mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
         }
 
         if (mHoodTuningMode) {

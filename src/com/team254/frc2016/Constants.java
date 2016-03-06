@@ -144,6 +144,10 @@ public class Constants extends ConstantsBase {
     public static double kUtilityArmDriveToPortcullisDelay = 0.4;
     public static double kIntakeDeploySettlingDelay = 0.2;
 
+    // Hanging Constants
+    // Warning, Timer.getMatchTime could be inaccurate
+    public static double kHangerAutoTriggerTime = 149.5; // TODO: tune this value
+
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
     // https://docs.google.com/spreadsheets/d/1O2Szvp3cC3gO2euKjqhdmpsyd54t6eB2t9jzo41G2H4
