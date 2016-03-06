@@ -79,6 +79,7 @@ public class UtilityArm extends Subsystem {
     // Transitioning to portcullis mode is the least likely to destroy the robot.
     private WantedState mWantedState = PANIC_WANTED_STATE;
     private boolean mIsAllowedToHang = false;
+    private boolean mIsSafeToDriveThroughPortcullis = false;
 
     private Solenoid mArmLiftSolenoid = Constants.makeSolenoidForId(Constants.kArmLiftSolenoidId);
     private Solenoid mAdjustableHardStopSolenoid =
@@ -106,6 +107,7 @@ public class UtilityArm extends Subsystem {
             mCurrentStateStartTime = Timer.getFPGATimestamp();
             mStateChanged = true;
             mIsAllowedToHang = false;
+            mIsSafeToDriveThroughPortcullis = false;
         }
 
         @Override
@@ -181,6 +183,10 @@ public class UtilityArm extends Subsystem {
 
     public synchronized boolean isAllowedToHang() {
         return mIsAllowedToHang;
+    }
+
+    public synchronized boolean isSafeToDriveThroughPortcullis() {
+        return mIsSafeToDriveThroughPortcullis;
     }
 
     /**
@@ -269,13 +275,16 @@ public class UtilityArm extends Subsystem {
     }
 
     private synchronized SystemState handlePortcullis() {
+        mIsSafeToDriveThroughPortcullis = true;
         switch (mWantedState) {
             case PORTCULLIS:
                 return SystemState.PORTCULLIS;
             case DRIVING: // fallthrough
             case CDF:
+                mIsSafeToDriveThroughPortcullis = false;
                 return SystemState.DRIVE;
             case PREPARE_FOR_HANG:
+                mIsSafeToDriveThroughPortcullis = false;
                 return SystemState.LIFTING_ARM_FOR_HANG;
             case STAY_IN_SIZE_BOX: // Fallthrough
             case PULL_UP_HANG: // Fallthrough
