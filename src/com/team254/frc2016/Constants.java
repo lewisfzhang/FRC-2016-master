@@ -136,15 +136,13 @@ public class Constants extends ConstantsBase {
     public static int kFlywheelAllowableError = 0;
 
     // Utility arm time delays, all in seconds
-    // TODO: tune all these values
-    public static double kUtilityArmSizeBoxToPortcullisDelay = 5.0;
-    public static double kUtilityArmCdfToDrivingDelay = 5.0;
-    public static double kUtilityArmLiftForHangToOpenCdfDelay = 5.0;
-    public static double kUtilityArmOpenCdfToDeployHooksDelay = 5.0;
-    public static double kUtilityArmDriveToPortcullisDelay = 5.0;
+    public static double kUtilityArmSizeBoxToPortcullisDelay = 1.5; // TODO: tune this value
+    public static double kUtilityArmLiftForHangToOpenCdfDelay = 2.0; // TODO: tune this value
 
-    // TODO: tune this value
-    public static double kIntakeDeploySettlingDelay = 5.0;
+    public static double kUtilityArmCdfToDrivingDelay = 0.2;
+    public static double kUtilityArmOpenCdfToDeployHooksDelay = 0.7;
+    public static double kUtilityArmDriveToPortcullisDelay = 0.4;
+    public static double kIntakeDeploySettlingDelay = 0.2;
 
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
