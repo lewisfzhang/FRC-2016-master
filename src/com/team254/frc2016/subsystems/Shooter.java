@@ -82,9 +82,6 @@ public class Shooter extends Subsystem {
     Intake mIntake = Intake.getInstance();
     RobotState mRobotState = RobotState.getInstance();
 
-    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap =
-            Constants.kHoodAutoAimMapNewBalls;
-
     // NetworkTables
     NetworkTable mShooterTable = NetworkTable.getTable("shooter");
 
@@ -214,14 +211,6 @@ public class Shooter extends Subsystem {
         mFlywheel.zeroSensors();
         mHood.zeroSensors();
         mTurret.zeroSensors();
-    }
-
-    public synchronized void setNewBalls() {
-        mHoodMap = Constants.kHoodAutoAimMapNewBalls;
-    }
-
-    public synchronized void setWornBalls() {
-        mHoodMap = Constants.kHoodAutoAimMapWornBalls;
     }
 
     public synchronized void resetTurretAtMax() {
@@ -456,7 +445,9 @@ public class Shooter extends Subsystem {
     }
 
     private double getHoodAngleForRange(double range) {
-        return mHoodMap.getInterpolated(new InterpolatingDouble(range)).value;
+        InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> hoodMap =
+                mIsBadBall ? Constants.kHoodAutoAimMapWornBalls : Constants.kHoodAutoAimMapNewBalls;
+        return hoodMap.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
     private List<ShooterAimingParameters> getCurrentAimingParameters(double now) {
