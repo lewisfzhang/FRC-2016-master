@@ -15,6 +15,7 @@ import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.DriveSignal;
+import com.team254.lib.util.RevRoboticsAirPressureSensor;
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.logger.CheesyLogger;
@@ -32,6 +33,7 @@ public class Robot extends IterativeRobot {
     Shooter mShooter = Shooter.getInstance();
     UtilityArm mUtilityArm = UtilityArm.getInstance();
     Compressor mCompressor = new Compressor(1);
+    RevRoboticsAirPressureSensor mAirPressureSensor = new RevRoboticsAirPressureSensor(3);
     AutoModeExecuter mAutoModeExecuter = new AutoModeExecuter();
 
     // Other parts of the robot
@@ -87,6 +89,8 @@ public class Robot extends IterativeRobot {
             mRobotState.outputToSmartDashboard();
             mUtilityArm.outputToSmartDashboard();
         }
+        // TODO: rate limit this
+        SmartDashboard.putNumber("Air Pressure psi", mAirPressureSensor.getAirPressurePsi());
     }
 
     public void zeroAllSensors() {
