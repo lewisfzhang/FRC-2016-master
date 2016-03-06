@@ -109,7 +109,6 @@ public class Robot extends IterativeRobot {
         // Reset all state
         zeroAllSensors();
 
-        // TODO: call this from auto init
         mUtilityArm.setWantedState(UtilityArm.WantedState.STAY_IN_SIZE_BOX);
 
         // Configure loopers
@@ -152,6 +151,8 @@ public class Robot extends IterativeRobot {
         mDrive.setHighGear(false);
         mShooter.setTuningMode(false);
 
+        maybeResetUtilityArmState();
+
         // Configure loopers
         mDisabledLooper.stop();
         mEnabledLooper.start();
@@ -159,6 +160,7 @@ public class Robot extends IterativeRobot {
         mAutoModeExecuter.setAutoMode(mSmartDashboardInteractions.getSelectedAutonMode());
         mAutoModeExecuter.start();
     }
+
 
     @Override
     public void teleopInit() {
@@ -168,6 +170,8 @@ public class Robot extends IterativeRobot {
 
         // Reset drive
         mDrive.resetEncoders();
+
+        maybeResetUtilityArmState();
 
         // Configure loopers
         mDisabledLooper.stop();
@@ -268,5 +272,12 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousPeriodic() {
         outputAllToSmartDashboard();
+    }
+
+    private void maybeResetUtilityArmState() {
+        if (mSmartDashboardInteractions.shouldResetUtilityArm()) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.STAY_IN_SIZE_BOX);
+        }
+        mSmartDashboardInteractions.clearUtilityArmResetState();
     }
 }

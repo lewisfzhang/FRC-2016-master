@@ -19,6 +19,7 @@ public class SmartDashboardInteractions {
     private static final String HOOD_TUNING_MODE = "Hood Tuning Mode";
     private static final String OUTPUT_TO_SMART_DASHBOARD = "Output To SmartDashboard";
     private static final String IS_AUTON_BALL_BAD = "Auton Ball Worn?";
+    private static final String SHOULD_RESET_UTILITY_ARM = "Robot in Start Position";
     private static final String AUTON_MODE = "Auton Mode";
 
     private SendableChooser mAutonChooser;
@@ -27,6 +28,7 @@ public class SmartDashboardInteractions {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
         SmartDashboard.putBoolean(OUTPUT_TO_SMART_DASHBOARD, false);
         SmartDashboard.putBoolean(IS_AUTON_BALL_BAD, false);
+        SmartDashboard.putBoolean(SHOULD_RESET_UTILITY_ARM, false);
 
         mAutonChooser = new SendableChooser();
         // first entry will become default
@@ -42,6 +44,14 @@ public class SmartDashboardInteractions {
 
     public boolean shouldLogToSmartDashboard() {
         return SmartDashboard.getBoolean(OUTPUT_TO_SMART_DASHBOARD, false);
+    }
+
+    public boolean shouldResetUtilityArm() {
+        return SmartDashboard.getBoolean(SHOULD_RESET_UTILITY_ARM, false);
+    }
+
+    public void clearUtilityArmResetState() {
+        SmartDashboard.putBoolean(SHOULD_RESET_UTILITY_ARM, false);
     }
 
     public AutoModeBase getSelectedAutonMode() {
