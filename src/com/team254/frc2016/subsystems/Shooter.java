@@ -534,6 +534,6 @@ public class Shooter extends Subsystem {
         } else {
             mConsecutiveCyclesOnTarget = 0;
         }
-        return mConsecutiveCyclesOnTarget > 5; // TODO make parameter
+        return mConsecutiveCyclesOnTarget > Constants.kAutoAimMinConsecutiveCyclesOnTarget;
     }
 }
