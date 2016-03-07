@@ -50,6 +50,7 @@ public class DriveThenAimAction implements Action {
     @Override
     public void done() {
         System.out.println("Drive done, Setting drive to neutral");
+        // mDrive.setOpenLoop(DriveSignal.NEUTRAL);
         mDrive.setVelocitySetpoint(0, 0);
     }
 

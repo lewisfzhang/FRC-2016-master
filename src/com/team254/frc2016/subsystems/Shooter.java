@@ -73,6 +73,7 @@ public class Shooter extends Subsystem {
     private double mHoodManualScanOutput = 0;
     int mCurrentTrackId = -1;
     int mConsecutiveCyclesOnTarget = 0;
+    int mNumShotsFired = 0;
 
     private List<ShooterAimingParameters> mCachedAimingParams = new ArrayList<>();
 
@@ -251,6 +252,10 @@ public class Shooter extends Subsystem {
         mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
     }
 
+    public synchronized int getNumShotsFired() {
+        return mNumShotsFired;
+    }
+
     public Turret getTurret() {
         return mTurret;
     }
@@ -411,7 +416,7 @@ public class Shooter extends Subsystem {
             return state;
         } else {
             setShooterSolenoidLift(false);
-
+            mNumShotsFired++;
             switch (mWantedState) {
             case WANT_TO_AIM:
                 return SystemState.SPINNING_AIM;
