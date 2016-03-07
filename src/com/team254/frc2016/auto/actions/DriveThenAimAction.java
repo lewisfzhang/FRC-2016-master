@@ -61,7 +61,7 @@ public class DriveThenAimAction implements Action {
     @Override
     public void done() {
         System.out.println("Drive done, stopping drive");
-        mDrive.setOpenLoop(DriveSignal.BREAK);
+        mDrive.setOpenLoop(DriveSignal.NEUTRAL);
     }
 
     private double getCurrentDistance() {

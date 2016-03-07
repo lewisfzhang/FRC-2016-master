@@ -62,8 +62,9 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
-        STAY_HIGH_ONE_BALL("Stay High Once Ball"),
-        GET_LOW_ONE_BALL("Get Low One Ball"),
+        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"),
+        STAY_HIGH_ONE_BALL("No Drop Stay"),
+        GET_LOW_ONE_BALL("Portcullis"),
         STAND_STILL("Stand Still");
 
         public final String name;
@@ -77,6 +78,8 @@ public class SmartDashboardInteractions {
         switch (autonOption) {
             case STAY_HIGH_ONE_BALL:
                 return new StayHighOneBall(isAutonBallBad(), false);
+            case STAY_HIGH_ONE_BALL_DRIVE_BACK:
+                return new StayHighOneBall(isAutonBallBad(), true);
             case GET_LOW_ONE_BALL:
                 return new GetLowOneBallMode(isAutonBallBad(), false);
             case STAND_STILL: // fallthrough

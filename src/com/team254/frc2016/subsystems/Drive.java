@@ -186,10 +186,12 @@ public class Drive extends Subsystem {
     }
 
     public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_sec, Rotation2d headingSetpoint) {
-        configureTalonsForSpeedControl();
-        driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
+        if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL) {
+            configureTalonsForSpeedControl();
+            driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
+            velocityHeadingPid_.reset();
+        }
         velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
-        velocityHeadingPid_.reset();
         updateVelocityHeadingSetpoint();
     }
 
