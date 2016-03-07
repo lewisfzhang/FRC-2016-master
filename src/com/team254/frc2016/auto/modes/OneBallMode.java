@@ -7,6 +7,7 @@ import com.team254.frc2016.auto.actions.ShootWhenReadyAction;
 import com.team254.frc2016.auto.actions.WaitAction;
 import com.team254.frc2016.subsystems.Shooter;
 
+// TODO: remove
 /**
  * The typical one ball auto mode.
  */

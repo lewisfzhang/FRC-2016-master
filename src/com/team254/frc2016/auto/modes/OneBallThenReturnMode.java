@@ -6,6 +6,7 @@ import com.team254.frc2016.auto.actions.DriveStraightAction;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Shooter;
 
+// TODO: remove
 /**
  * The typical one ball auto mode.
  */

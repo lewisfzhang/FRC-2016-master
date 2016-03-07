@@ -29,10 +29,10 @@ public class GetLowOneBallMode extends AutoModeBase {
         runAction(
                 new ParallelAction(
                         Arrays.<Action>asList(
-                                new DriveThenAimAction(125, 100, 270, 45),
+                                new DriveThenAimAction(125, 100, 210, 45),
                                 new GetLowAction())));
         runAction(new WaitAction(1));
-        mShooter.setWantsToFireNow();
+        runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(0.75));
 
         if (mShouldDriveBack) {

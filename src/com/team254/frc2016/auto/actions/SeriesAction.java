@@ -1,7 +1,6 @@
 package com.team254.frc2016.auto.actions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,7 +13,9 @@ public class SeriesAction implements Action {
 
     public SeriesAction(List<Action> actions) {
         mRemainingActions = new ArrayList<>(actions.size());
-        Collections.copy(mRemainingActions, actions);
+        for (Action action : actions) {
+            mRemainingActions.add(action);
+        }
         mCurAction = null;
     }
 

@@ -17,7 +17,11 @@ public class DriveThenAimAction implements Action {
     private Drive mDrive = Drive.getInstance();
     private Shooter mShooter = Shooter.getInstance();
 
-    public DriveThenAimAction(double distance_until_deploy, double min_range, double max_distance, double velocity) {
+    public DriveThenAimAction(
+            double distance_until_deploy,
+            double min_range,
+            double max_distance,
+            double velocity) {
         this.mDistanceUntilDeploy = distance_until_deploy;
         this.mMinRange = min_range;
         this.mMaxDistance = max_distance;

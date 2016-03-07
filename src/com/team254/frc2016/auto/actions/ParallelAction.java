@@ -1,7 +1,6 @@
 package com.team254.frc2016.auto.actions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,7 +13,9 @@ public class ParallelAction implements Action {
 
     public ParallelAction(List<Action> actions) {
         mActions = new ArrayList<>(actions.size());
-        Collections.copy(mActions, actions);
+        for (Action action : actions) {
+            mActions.add(action);
+        }
     }
 
     @Override
