@@ -17,6 +17,10 @@ public class DriveThenAimAction implements Action {
     private Drive mDrive = Drive.getInstance();
     private Shooter mShooter = Shooter.getInstance();
 
+    public static DriveThenAimAction makeForCommonConsts() {
+        return new DriveThenAimAction(140, 100, 210, 30);
+    }
+
     public DriveThenAimAction(
             double distance_until_deploy,
             double min_range,
@@ -46,16 +50,18 @@ public class DriveThenAimAction implements Action {
 
     @Override
     public boolean isFinished() {
+        if (getCurrentDistance() - mStartingDistance >= mMaxDistance) {
+            System.out.println("Stopping for distance");
+            return true;
+        }
         List<ShooterAimingParameters> params = mShooter.getCachedAimingParams();
-        return (getCurrentDistance() - mStartingDistance >= mMaxDistance)
-                || (params.size() > 0 && params.get(0).getRange() <= mMinRange);
+        return (params.size() > 0 && params.get(0).getRange() <= mMinRange);
     }
 
     @Override
     public void done() {
-        System.out.println("Drive done, Setting drive to neutral");
-        // mDrive.setOpenLoop(DriveSignal.NEUTRAL);
-        mDrive.setVelocitySetpoint(0, 0);
+        System.out.println("Drive done, stopping drive");
+        mDrive.setOpenLoop(DriveSignal.BREAK);
     }
 
     private double getCurrentDistance() {

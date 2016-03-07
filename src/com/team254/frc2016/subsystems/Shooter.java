@@ -214,6 +214,7 @@ public class Shooter extends Subsystem {
         mFlywheel.zeroSensors();
         mHood.zeroSensors();
         mTurret.zeroSensors();
+        mCachedAimingParams.clear();
     }
 
     public synchronized void resetTurretAtMax() {

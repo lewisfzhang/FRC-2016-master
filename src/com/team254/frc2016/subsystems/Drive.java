@@ -129,8 +129,10 @@ public class Drive extends Subsystem {
                 Constants.kDriveBaseLockKf, Constants.kDriveBaseLockIZone, Constants.kDriveBaseLockRampRate,
                 kBaseLockControlSlot);
 
-        velocityHeadingPid_ = new SynchronousPID(Constants.kDriveHeadingVelocityKp, Constants.kDriveHeadingVelocityKi,
-                Constants.kDriveHeadingVelocityKd);
+        velocityHeadingPid_ = new SynchronousPID(
+                Constants.kDriveHeadingVeloctyKp,
+                Constants.kDriveHeadingVeloctyKi,
+                Constants.kDriveHeadingVeloctyKd);
         velocityHeadingPid_.setOutputRange(-30, 30);
 
         setOpenLoop(DriveSignal.NEUTRAL);
@@ -148,11 +150,11 @@ public class Drive extends Subsystem {
     public synchronized void setOpenLoop(DriveSignal signal) {
         if (driveControlState_ != DriveControlState.OPEN_LOOP) {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-            leftMaster_.enableBrakeMode(false);
-            leftSlave_.enableBrakeMode(false);
+            leftMaster_.enableBrakeMode(signal.breakMode);
+            leftSlave_.enableBrakeMode(signal.breakMode);
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-            rightMaster_.enableBrakeMode(false);
-            rightSlave_.enableBrakeMode(false);
+            rightMaster_.enableBrakeMode(signal.breakMode);
+            rightSlave_.enableBrakeMode(signal.breakMode);
             driveControlState_ = DriveControlState.OPEN_LOOP;
         }
         setLeftRightPower(signal.leftMotor, signal.rightMotor);

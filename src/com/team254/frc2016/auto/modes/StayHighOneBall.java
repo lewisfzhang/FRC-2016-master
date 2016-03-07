@@ -9,16 +9,16 @@ import com.team254.frc2016.subsystems.Shooter;
 import java.util.Arrays;
 
 /**
- * Get's into portcullis/low bar position before driving through the defense.
+ * Go over the defenses in starting config
  */
-public class GetLowOneBallMode extends AutoModeBase {
+public class StayHighOneBall extends AutoModeBase {
 
+    private final Drive mDrive = Drive.getInstance();
+    private final Shooter mShooter = Shooter.getInstance();
     private final boolean mIsBadBall;
     private final boolean mShouldDriveBack;
-    private final Shooter mShooter = Shooter.getInstance();
-    private final Drive mDrive = Drive.getInstance();
 
-    public GetLowOneBallMode(boolean isBadBall, boolean shouldDriveBack) {
+    public StayHighOneBall(boolean isBadBall, boolean shouldDriveBack) {
         mIsBadBall = isBadBall;
         mShouldDriveBack = shouldDriveBack;
     }
@@ -27,14 +27,14 @@ public class GetLowOneBallMode extends AutoModeBase {
     protected void routine() throws AutoModeEndedException {
         mShooter.setIsBadBall(mIsBadBall);
         runAction(
-                new ParallelAction(
-                        Arrays.<Action>asList(
-                                DriveThenAimAction.makeForCommonConsts(),
-                                new GetLowAction())));
+                new ParallelAction(Arrays.asList(
+                        DriveThenAimAction.makeForCommonConsts(),
+                        new SeriesAction(Arrays.asList(
+                                new WaitForDistanceAction(125),
+                                new ArmToDriveModeAction())))));
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(0.75));
-
         if (mShouldDriveBack) {
             runAction(
                     new DriveStraightAction(

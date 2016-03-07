@@ -1,10 +1,7 @@
 package com.team254.frc2016;
 
 import com.team254.frc2016.auto.AutoModeBase;
-import com.team254.frc2016.auto.modes.GetLowOneBallMode;
-import com.team254.frc2016.auto.modes.OneBallMode;
-import com.team254.frc2016.auto.modes.OneBallThenReturnMode;
-import com.team254.frc2016.auto.modes.StandStillMode;
+import com.team254.frc2016.auto.modes.*;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -65,9 +62,8 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
+        STAY_HIGH_ONE_BALL("Stay High Once Ball"),
         GET_LOW_ONE_BALL("Get Low One Ball"),
-        ONE_BALL_MODE("One Ball"),
-        ONE_BALL_MODE_WITH_RETURN("One Ball With Return"),
         STAND_STILL("Stand Still");
 
         public final String name;
@@ -79,15 +75,10 @@ public class SmartDashboardInteractions {
 
     private AutoModeBase createAutoMode(AutonOption autonOption) {
         switch (autonOption) {
+            case STAY_HIGH_ONE_BALL:
+                return new StayHighOneBall(isAutonBallBad(), false);
             case GET_LOW_ONE_BALL:
                 return new GetLowOneBallMode(isAutonBallBad(), false);
-            case ONE_BALL_MODE:
-                return new OneBallMode(Shooter.getInstance(), isAutonBallBad());
-            case ONE_BALL_MODE_WITH_RETURN:
-                return new OneBallThenReturnMode(
-                        Drive.getInstance(),
-                        Shooter.getInstance(),
-                        isAutonBallBad());
             case STAND_STILL: // fallthrough
             default:
                 System.out.println("ERROR: unexpected auto mode: " + autonOption);
