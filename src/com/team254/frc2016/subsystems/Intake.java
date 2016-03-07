@@ -63,8 +63,7 @@ public class Intake extends Subsystem {
 
     public synchronized boolean isDeployedAndSettled() {
         return deploy_solenoid_.get()
-                && Timer.getFPGATimestamp() - deploy_state_started_time_
-                > Constants.kIntakeDeploySettlingDelay;
+                && Timer.getFPGATimestamp() - deploy_state_started_time_ > Constants.kIntakeDeploySettlingDelay;
     }
 
     @Override

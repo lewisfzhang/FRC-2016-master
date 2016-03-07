@@ -165,7 +165,6 @@ public class Robot extends IterativeRobot {
         mAutoModeExecuter.start();
     }
 
-
     @Override
     public void teleopInit() {
         // TODO: add option to force reset utility arm into starting box
@@ -245,10 +244,8 @@ public class Robot extends IterativeRobot {
             mShooter.setWantsToHoldFire();
         }
 
-        if (mUtilityArm.isAllowedToHang()
-                && (mControls.getHang()
-                || (Timer.getMatchTime() >= Constants.kHangerAutoTriggerTime
-                && mControls.getAutoHangEnabled()))) {
+        if (mUtilityArm.isAllowedToHang() && (mControls.getHang()
+                || (Timer.getMatchTime() >= Constants.kHangerAutoTriggerTime && mControls.getAutoHangEnabled()))) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
         } else if (mControls.getPortcullisButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);

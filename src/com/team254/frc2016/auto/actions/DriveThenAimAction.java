@@ -5,7 +5,6 @@ import java.util.List;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.subsystems.ShooterAimingParameters;
-import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Rotation2d;
 
 public class DriveThenAimAction implements Action {

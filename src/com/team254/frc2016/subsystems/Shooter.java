@@ -72,6 +72,7 @@ public class Shooter extends Subsystem {
     private double mTurretManualScanOutput = 0;
     private double mHoodManualScanOutput = 0;
     int mCurrentTrackId = -1;
+    int mConsecutiveCyclesOnTarget = 0;
 
     private List<ShooterAimingParameters> mCachedAimingParams = new ArrayList<>();
 
@@ -89,7 +90,8 @@ public class Shooter extends Subsystem {
 
         private SystemState mSystemState = SystemState.REENABLED;
 
-        // Every time we transition states, we update the current state start time and the state
+        // Every time we transition states, we update the current state start
+        // time and the state
         // changed boolean (for one cycle)
         private double mCurrentStateStartTime;
         private boolean mStateChanged;
@@ -218,7 +220,7 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized void resetTurretAtMin() {
-        mTurret.reset(Rotation2d.fromDegrees(Constants.kHardTurretAngle));
+        mTurret.reset(Rotation2d.fromDegrees(Constants.kHardMinTurretAngle));
     }
 
     public synchronized void zeroTurret() {
@@ -346,6 +348,7 @@ public class Shooter extends Subsystem {
         if (isFirstCycle) {
             // Start flywheel
             mFlywheel.setRpm(getShootingSetpointRpm());
+            mConsecutiveCyclesOnTarget = 0;
         }
 
         mHood.setStowed(false);
@@ -445,8 +448,8 @@ public class Shooter extends Subsystem {
     }
 
     private double getHoodAngleForRange(double range) {
-        InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> hoodMap =
-                mIsBadBall ? Constants.kHoodAutoAimMapWornBalls : Constants.kHoodAutoAimMapNewBalls;
+        InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> hoodMap = mIsBadBall
+                ? Constants.kHoodAutoAimMapWornBalls : Constants.kHoodAutoAimMapNewBalls;
         return hoodMap.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
@@ -494,6 +497,7 @@ public class Shooter extends Subsystem {
                         mHood.setOpenLoop(mHoodManualScanOutput);
                     }
                     mTurret.setDesiredAngle(param.getTurretAngle());
+                    // mTurret.setOpenLoop(mTurretManualScanOutput / 10.0);
                     mCurrentAngleForLogging = param.getTurretAngle().getDegrees();
                     mCurrentRangeForLogging = param.getRange();
                     mCurrentTrackId = param.getTrackid();
@@ -508,21 +512,28 @@ public class Shooter extends Subsystem {
     }
 
     private double getShootingSetpointRpm() {
-        return mIsBadBall
-                ? Constants.kFlywheelBadBallRpmSetpoint
-                : Constants.kFlywheelGoodBallRpmSetpoint;
+        return mIsBadBall ? Constants.kFlywheelBadBallRpmSetpoint : Constants.kFlywheelGoodBallRpmSetpoint;
     }
 
     private boolean readyToFire(SystemState state, double now) {
         // TODO: Consider applying time hysteresis (require being ready for > X
         // ms consecutively)
         if (state == SystemState.SPINNING_AIM) {
-            return (mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget()
-                    && (mCurrentTrackId != -1);
+            if ((mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget()
+                    && (mCurrentTrackId != -1)) {
+                mConsecutiveCyclesOnTarget++;
+            } else {
+                mConsecutiveCyclesOnTarget = 0;
+            }
         } else if (state == SystemState.SPINNING_BATTER) {
-            return (mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget();
+            if ((mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget()) {
+                mConsecutiveCyclesOnTarget++;
+            } else {
+                mConsecutiveCyclesOnTarget = 0;
+            }
         } else {
-            return false;
+            mConsecutiveCyclesOnTarget = 0;
         }
+        return mConsecutiveCyclesOnTarget > 5; // TODO make parameter
     }
 }

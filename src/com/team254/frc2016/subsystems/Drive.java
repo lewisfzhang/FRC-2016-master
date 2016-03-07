@@ -129,8 +129,8 @@ public class Drive extends Subsystem {
                 Constants.kDriveBaseLockKf, Constants.kDriveBaseLockIZone, Constants.kDriveBaseLockRampRate,
                 kBaseLockControlSlot);
 
-        velocityHeadingPid_ = new SynchronousPID(Constants.kDriveHeadingVeloctyKp, Constants.kDriveHeadingVeloctyKi,
-                Constants.kDriveHeadingVeloctyKd);
+        velocityHeadingPid_ = new SynchronousPID(Constants.kDriveHeadingVelocityKp, Constants.kDriveHeadingVelocityKi,
+                Constants.kDriveHeadingVelocityKd);
         velocityHeadingPid_.setOutputRange(-30, 30);
 
         setOpenLoop(DriveSignal.NEUTRAL);

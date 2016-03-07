@@ -14,11 +14,11 @@ public class Constants extends ConstantsBase {
     public static double kTurretAngleOffsetDegrees = 0.0;
 
     // Pose of the camera frame w.r.t. the turret frame
-    public static double kCameraXOffset = -5.736;
+    public static double kCameraXOffset = -5.81;
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 20.784;
     public static double kCameraPitchAngleDegrees = 30.0;
-    public static double kCameraAngleOffsetDegrees = 2.0;
+    public static double kCameraAngleOffsetDegrees = 0.0;
 
     // Wheel diameter
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
@@ -27,18 +27,17 @@ public class Constants extends ConstantsBase {
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
 
     // Hood constants
-    public static double kMinHoodAngle = 39.0; // TODO tune this
+    public static double kMinHoodAngle = 39.0;
     public static double kMaxHoodAngle = 84.0;
     public static double kBatterHoodAngle = 28.0;
     public static double kHoodNeutralAngle = 42.5;
     public static double kHoodMaxSafeAngle = 45.0;
     public static double kHoodOnTargetTolerance = 0.5;
-    public static double kHoodGearReduction = 12.0 / 708.0; // TODO check this
-                                                            // with Colin
+    public static double kHoodGearReduction = 12.0 / 708.0;
 
     // Turret constants
     public static double kHardMaxTurretAngle = 109.5;
-    public static double kHardTurretAngle = -116.5;
+    public static double kHardMinTurretAngle = -116.5;
     public static double kSoftMaxTurretAngle = 108.0;
     public static double kSoftMinTurretAngle = -115.0;
     public static double kTurretSafeTolerance = 2.0;
@@ -48,13 +47,15 @@ public class Constants extends ConstantsBase {
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 150.0;
     public static double kFlywheelGoodBallRpmSetpoint = 6000.0;
-    public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint; // TODO: tune this
+    public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint; // TODO:
+                                                                                     // tune
+                                                                                     // this
 
     // Auto aiming/shooter constants
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 200.0;
-    public static double kShootActuationTime = 0.5;
+    public static double kShootActuationTime = 0.75;
     public static double kHoodUnstowToFlywheelSpinTime = 0.75;
 
     // Goal tracker constants
@@ -111,19 +112,19 @@ public class Constants extends ConstantsBase {
     // PID gains for constant heading velocity control
     // Units: Error is degrees. Output is inches/second difference to
     // left/right.
-    public static double kDriveHeadingVeloctyKp = 6.0;
-    public static double kDriveHeadingVeloctyKi = 0.0;
-    public static double kDriveHeadingVeloctyKd = 30.0;
+    public static double kDriveHeadingVelocityKp = 6.0;
+    public static double kDriveHeadingVelocityKi = 0.0;
+    public static double kDriveHeadingVelocityKd = 30.0;
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kTurretKp = 0.5;
-    public static double kTurretKi = 0.005;
+    public static double kTurretKp = 0.7;
+    public static double kTurretKi = 0.0;// 0.02;
     public static double kTurretKd = 30.0;
     public static double kTurretKf = 0;
     public static int kTurretIZone = (int) (1023.0 / kTurretKp);
     public static double kTurretRampRate = 0;
-    public static int kTurretAllowableError = 0;
+    public static int kTurretAllowableError = 100;
 
     // PID gains for flywheel velocity loop
     // Units: error is (4096 counts/rev)/100ms. Max output is +/- 1023 units.
@@ -136,8 +137,13 @@ public class Constants extends ConstantsBase {
     public static int kFlywheelAllowableError = 0;
 
     // Utility arm time delays, all in seconds
-    public static double kUtilityArmSizeBoxToPortcullisDelay = 1.5; // TODO: tune this value
-    public static double kUtilityArmLiftForHangToOpenCdfDelay = 2.0; // TODO: tune this value
+    public static double kUtilityArmSizeBoxToPortcullisDelay = 1.5; // TODO:
+                                                                    // tune this
+                                                                    // value
+    public static double kUtilityArmLiftForHangToOpenCdfDelay = 2.0; // TODO:
+                                                                     // tune
+                                                                     // this
+                                                                     // value
 
     public static double kUtilityArmCdfToDrivingDelay = 0.2;
     public static double kUtilityArmOpenCdfToDeployHooksDelay = 0.7;
@@ -146,7 +152,8 @@ public class Constants extends ConstantsBase {
 
     // Hanging Constants
     // Warning, Timer.getMatchTime could be inaccurate
-    public static double kHangerAutoTriggerTime = 149.5; // TODO: tune this value
+    public static double kHangerAutoTriggerTime = 149.5; // TODO: tune this
+                                                         // value
 
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
@@ -172,14 +179,20 @@ public class Constants extends ConstantsBase {
     public static final int kShooterSolenoidId = 0; // PCM 0, Solenoid 0
 
     public static final int kArmLiftSolenoidId = 9; // PCM 1, Solenoid 1
-    public static final int kAdjustableHardStopSolenoidId = 2; // PCM 0, Solenoid 2
+    public static final int kAdjustableHardStopSolenoidId = 2; // PCM 0,
+                                                               // Solenoid 2
     public static final int kCdfFlapSolenoidId = 3; // PCM 0, Solenoid 3
-    public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct solenoid
-    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the correct solenoid
+    public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct
+                                                       // solenoid
+    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the
+                                                             // correct solenoid
 
     /**
-     * Make an {@link Solenoid} instance for the single-number ID of the solenoid
-     * @param solenoidId One of the kXyzSolenoidId constants
+     * Make an {@link Solenoid} instance for the single-number ID of the
+     * solenoid
+     * 
+     * @param solenoidId
+     *            One of the kXyzSolenoidId constants
      */
     public static Solenoid makeSolenoidForId(int solenoidId) {
         return new Solenoid(solenoidId / 8, solenoidId % 8);

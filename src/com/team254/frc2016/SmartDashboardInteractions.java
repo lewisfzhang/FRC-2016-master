@@ -64,9 +64,7 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
-        ONE_BALL_MODE("One Ball"),
-        ONE_BALL_MODE_WITH_RETURN("One Ball With Return"),
-        STAND_STILL("Stand Still");
+        ONE_BALL_MODE("One Ball"), ONE_BALL_MODE_WITH_RETURN("One Ball With Return"), STAND_STILL("Stand Still");
 
         public final String name;
 
@@ -77,17 +75,14 @@ public class SmartDashboardInteractions {
 
     private AutoModeBase createAutoMode(AutonOption autonOption) {
         switch (autonOption) {
-            case ONE_BALL_MODE:
-                return new OneBallMode(Shooter.getInstance(), isAutonBallBad());
-            case ONE_BALL_MODE_WITH_RETURN:
-                return new OneBallThenReturnMode(
-                        Drive.getInstance(),
-                        Shooter.getInstance(),
-                        isAutonBallBad());
-            case STAND_STILL: // fallthrough
-            default:
-                System.out.println("ERROR: unexpected auto mode: " + autonOption);
-                return new StandStillMode();
+        case ONE_BALL_MODE:
+            return new OneBallMode(Shooter.getInstance(), isAutonBallBad());
+        case ONE_BALL_MODE_WITH_RETURN:
+            return new OneBallThenReturnMode(Drive.getInstance(), Shooter.getInstance(), isAutonBallBad());
+        case STAND_STILL: // fallthrough
+        default:
+            System.out.println("ERROR: unexpected auto mode: " + autonOption);
+            return new StandStillMode();
         }
     }
 

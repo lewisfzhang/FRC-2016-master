@@ -24,8 +24,7 @@ public class OneBallThenReturnMode extends AutoModeBase {
         System.out.println("Starting One Ball With Return Mode");
         mOneBallMode.doOneBallRoutine();
         runAction(new DriveStraightAction(
-                -(mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2.0 + 16.0,
-                -45));
+                -(mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2.0 + 16.0, -45));
         System.out.println("Ending");
     }
 }
