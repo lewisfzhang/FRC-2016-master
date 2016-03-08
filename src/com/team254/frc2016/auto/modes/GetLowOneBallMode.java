@@ -26,21 +26,15 @@ public class GetLowOneBallMode extends AutoModeBase {
     @Override
     protected void routine() throws AutoModeEndedException {
         mShooter.setIsBadBall(mIsBadBall);
-        runAction(
-                new ParallelAction(
-                        Arrays.<Action>asList(
-                                DriveThenAimAction.makeForCommonConsts(),
-                                new GetLowAction())));
+        runAction(new ParallelAction(
+                Arrays.<Action> asList(DriveThenAimAction.makeForCommonConsts(), new GetLowAction())));
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(0.75));
 
         if (mShouldDriveBack) {
-            runAction(
-                    new DriveStraightAction(
-                            -(mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches())
-                                    / 2.0 + 16.0,
-                            -45));
+            runAction(new DriveStraightAction(
+                    -(mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2.0 + 16.0, -45));
         }
     }
 }

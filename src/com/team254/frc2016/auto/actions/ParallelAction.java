@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Composite action, running all sub-actions at the same time
- * All actions are updated until all report being done.
+ * Composite action, running all sub-actions at the same time All actions are
+ * updated until all report being done.
  */
 public class ParallelAction implements Action {
 

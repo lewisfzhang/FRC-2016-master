@@ -22,11 +22,7 @@ public class DriveThenAimAction implements Action {
         return new DriveThenAimAction(140, 100, 210, 30);
     }
 
-    public DriveThenAimAction(
-            double distance_until_deploy,
-            double min_range,
-            double max_distance,
-            double velocity) {
+    public DriveThenAimAction(double distance_until_deploy, double min_range, double max_distance, double velocity) {
         this.mDistanceUntilDeploy = distance_until_deploy;
         this.mMinRange = min_range;
         this.mMaxDistance = max_distance;

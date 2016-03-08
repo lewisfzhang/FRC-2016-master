@@ -139,7 +139,7 @@ public class Shooter extends Subsystem {
                     newState = handleShooting(mSystemState, now, mCurrentStateStartTime);
                     break;
                 case UNSTOWED_RETURNING_TO_SAFE:
-                    newState = handleReturningToSafe();
+                    newState = handleReturningToSafe(now, mCurrentStateStartTime);
                     break;
                 default:
                     System.out.println("Unexpected shooter state: " + mSystemState);
@@ -290,7 +290,8 @@ public class Shooter extends Subsystem {
         if (mTurret.isSafe() && mHood.isSafe()) {
             return handleStowedOrStowing();
         } else {
-            return handleReturningToSafe();
+            double now = Timer.getFPGATimestamp();
+            return handleReturningToSafe(now, now);
         }
     }
 
@@ -353,7 +354,7 @@ public class Shooter extends Subsystem {
         mIntake.overrideIntaking(true);
         if (isFirstCycle) {
             // Start flywheel
-            mFlywheel.setRpm(getShootingSetpointRpm());
+            mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
             mConsecutiveCyclesOnTarget = 0;
         }
 
@@ -382,7 +383,7 @@ public class Shooter extends Subsystem {
     private synchronized SystemState handleSpinningBatter(double now) {
         mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
-        mFlywheel.setRpm(getShootingSetpointRpm());
+        mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
         setShooterSolenoidLift(false);
@@ -430,7 +431,7 @@ public class Shooter extends Subsystem {
         }
     }
 
-    private synchronized SystemState handleReturningToSafe() {
+    private synchronized SystemState handleReturningToSafe(double now, double start_time) {
         mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
@@ -444,8 +445,11 @@ public class Shooter extends Subsystem {
         case WANT_TO_BATTER:
             return SystemState.SPINNING_BATTER;
         default:
-            return mTurret.isSafe() && mHood.isSafe() ? SystemState.STOWED_OR_STOWING
-                    : SystemState.UNSTOWED_RETURNING_TO_SAFE;
+            if ((mTurret.isSafe() && mHood.isSafe()) || (now - start_time > Constants.kStowingOverrideTime)) {
+                return SystemState.STOWED_OR_STOWING;
+            } else {
+                return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+            }
         }
     }
 
@@ -454,9 +458,11 @@ public class Shooter extends Subsystem {
     }
 
     private double getHoodAngleForRange(double range) {
-        InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> hoodMap = mIsBadBall
-                ? Constants.kHoodAutoAimMapWornBalls : Constants.kHoodAutoAimMapNewBalls;
-        return hoodMap.getInterpolated(new InterpolatingDouble(range)).value;
+        // InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>
+        // hoodMap = mIsBadBall
+        // ? Constants.kHoodAutoAimMapWornBalls :
+        // Constants.kHoodAutoAimMapNewBalls;
+        return Constants.kHoodAutoAimMapMixedBalls.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
     private List<ShooterAimingParameters> getCurrentAimingParameters(double now) {
@@ -496,7 +502,7 @@ public class Shooter extends Subsystem {
                         && param.getRange() <= Constants.kAutoAimMaxRange
                         && (allow_changing_tracks || mCurrentTrackId == param.getTrackid())) {
                     // This target works
-                    mFlywheel.setRpm(getShootingSetpointRpm());
+                    mFlywheel.setRpm(getShootingSetpointRpm(param.getRange()));
                     if (!mTuningMode) {
                         mHood.setDesiredAngle(Rotation2d.fromDegrees(getHoodAngleForRange(param.getRange())));
                     } else {
@@ -517,13 +523,13 @@ public class Shooter extends Subsystem {
         }
     }
 
-    private double getShootingSetpointRpm() {
-        return mIsBadBall ? Constants.kFlywheelBadBallRpmSetpoint : Constants.kFlywheelGoodBallRpmSetpoint;
+    private double getShootingSetpointRpm(double range) {
+        // return mIsBadBall ? Constants.kFlywheelBadBallRpmSetpoint :
+        // Constants.kFlywheelGoodBallRpmSetpoint;
+        return Constants.kFlywheelAutoAimMap.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
     private boolean readyToFire(SystemState state, double now) {
-        // TODO: Consider applying time hysteresis (require being ready for > X
-        // ms consecutively)
         if (state == SystemState.SPINNING_AIM) {
             if ((mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget()
                     && (mCurrentTrackId != -1)) {

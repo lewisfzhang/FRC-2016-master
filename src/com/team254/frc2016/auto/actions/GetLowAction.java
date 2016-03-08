@@ -20,8 +20,10 @@ public class GetLowAction implements Action {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
-    public void done() {}
+    public void done() {
+    }
 }

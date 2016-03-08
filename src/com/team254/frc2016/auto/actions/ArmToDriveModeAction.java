@@ -16,10 +16,12 @@ public class ArmToDriveModeAction implements Action {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
-    public void done() {}
+    public void done() {
+    }
 
     @Override
     public void start() {

@@ -2,8 +2,6 @@ package com.team254.frc2016;
 
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.modes.*;
-import com.team254.frc2016.subsystems.Drive;
-import com.team254.frc2016.subsystems.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -41,7 +39,7 @@ public class SmartDashboardInteractions {
     }
 
     public boolean shouldLogToSmartDashboard() {
-        return SmartDashboard.getBoolean(OUTPUT_TO_SMART_DASHBOARD, false);
+        return SmartDashboard.getBoolean(OUTPUT_TO_SMART_DASHBOARD, true);
     }
 
     public boolean shouldResetUtilityArm() {
@@ -62,10 +60,8 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
-        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"),
-        STAY_HIGH_ONE_BALL("No Drop Stay"),
-        GET_LOW_ONE_BALL("Portcullis"),
-        STAND_STILL("Stand Still");
+        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"), STAY_HIGH_ONE_BALL("No Drop Stay"), GET_LOW_ONE_BALL(
+                "Portcullis"), STAND_STILL("Stand Still");
 
         public final String name;
 
@@ -76,16 +72,16 @@ public class SmartDashboardInteractions {
 
     private AutoModeBase createAutoMode(AutonOption autonOption) {
         switch (autonOption) {
-            case STAY_HIGH_ONE_BALL:
-                return new StayHighOneBall(isAutonBallBad(), false);
-            case STAY_HIGH_ONE_BALL_DRIVE_BACK:
-                return new StayHighOneBall(isAutonBallBad(), true);
-            case GET_LOW_ONE_BALL:
-                return new GetLowOneBallMode(isAutonBallBad(), false);
-            case STAND_STILL: // fallthrough
-            default:
-                System.out.println("ERROR: unexpected auto mode: " + autonOption);
-                return new StandStillMode();
+        case STAY_HIGH_ONE_BALL:
+            return new StayHighOneBall(isAutonBallBad(), false);
+        case STAY_HIGH_ONE_BALL_DRIVE_BACK:
+            return new StayHighOneBall(isAutonBallBad(), true);
+        case GET_LOW_ONE_BALL:
+            return new GetLowOneBallMode(isAutonBallBad(), false);
+        case STAND_STILL: // fallthrough
+        default:
+            System.out.println("ERROR: unexpected auto mode: " + autonOption);
+            return new StandStillMode();
         }
     }
 

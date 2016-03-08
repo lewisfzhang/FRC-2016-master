@@ -27,12 +27,12 @@ public class Constants extends ConstantsBase {
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
 
     // Hood constants
-    public static double kMinHoodAngle = 39.0;
+    public static double kMinHoodAngle = 41.29;
     public static double kMaxHoodAngle = 84.0;
-    public static double kBatterHoodAngle = 28.0;
+    public static double kBatterHoodAngle = 41.29;
     public static double kHoodNeutralAngle = 42.5;
     public static double kHoodMaxSafeAngle = 45.0;
-    public static double kHoodOnTargetTolerance = 0.5;
+    public static double kHoodOnTargetTolerance = 0.4;
     public static double kHoodGearReduction = 12.0 / 708.0;
 
     // Turret constants
@@ -46,16 +46,17 @@ public class Constants extends ConstantsBase {
 
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 150.0;
-    public static double kFlywheelGoodBallRpmSetpoint = 6000.0;
+    public static double kFlywheelGoodBallRpmSetpoint = 5000.0;
     public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
-    public static double kAutoAimMaxRange = 140.0;
+    public static double kAutoAimMaxRange = 180.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 5;
     public static double kShootActuationTime = 0.75;
     public static double kHoodUnstowToFlywheelSpinTime = 0.75;
+    public static double kStowingOverrideTime = 2.0;
 
     // Goal tracker constants
     public static double kMaxGoalTrackAge = 0.5;
@@ -83,7 +84,7 @@ public class Constants extends ConstantsBase {
     /**
      * Practice bot new servo consts
      */
-    public static double kHoodKp = 0.05;
+    public static double kHoodKp = 0.1;
     public static double kHoodKi = 0.0;
     public static double kHoodKd = 0.0;
     public static double kHoodDeadband = 0.3; // degrees
@@ -240,6 +241,30 @@ public class Constants extends ConstantsBase {
         kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(120.0), new InterpolatingDouble(76.5));
         kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(132.0), new InterpolatingDouble(79.5));
         kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(137.0), new InterpolatingDouble(79.5));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapMixedBalls = new InterpolatingTreeMap<>();
+
+    static {
+        // Tuned on long, smooth metal hood with pinch standoff and 4 wheels 3/7
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(67.0), new InterpolatingDouble(41.29));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(76.0), new InterpolatingDouble(44.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(51.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(100.0), new InterpolatingDouble(52.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(55.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(120.0), new InterpolatingDouble(62.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(62.5));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();
+
+    static {
+        // Tuned on long, smooth metal hood with 4 wheels 3/7
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(65.0), new InterpolatingDouble(6000.0));
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(70.0), new InterpolatingDouble(5000.0));
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(5000.0));
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(120.0), new InterpolatingDouble(5500.0));
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(6000.0));
     }
 
     static {
