@@ -49,7 +49,7 @@ public class Robot extends IterativeRobot {
 
     SmartDashboardInteractions mSmartDashboardInteractions = new SmartDashboardInteractions();
 
-    boolean mLogToSmartdashboard = false;
+    boolean mLogToSmartdashboard = true;
     boolean mHoodTuningMode = false;
 
     public Robot() {
@@ -234,7 +234,7 @@ public class Robot extends IterativeRobot {
             mShooter.setWantedState(Shooter.WantedState.WANT_TO_STOW);
         }
 
-        mShooter.setTurretManualScanOutput(mControls.getTurretManual());
+        mShooter.setTurretManualScanOutput(mControls.getTurretManual() / 2);
 
         mShooter.setIsBadBall(mControls.getBadBallOverride());
 

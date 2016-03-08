@@ -47,14 +47,12 @@ public class Constants extends ConstantsBase {
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 150.0;
     public static double kFlywheelGoodBallRpmSetpoint = 6000.0;
-    public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint; // TODO:
-                                                                                     // tune
-                                                                                     // this
+    public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
-    public static double kAutoAimMaxRange = 200.0;
+    public static double kAutoAimMaxRange = 140.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 5;
     public static double kShootActuationTime = 0.75;
     public static double kHoodUnstowToFlywheelSpinTime = 0.75;
@@ -215,25 +213,33 @@ public class Constants extends ConstantsBase {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapWornBalls = new InterpolatingTreeMap<>();
 
     static {
-        // Tuned on long, smooth metal hood with 3 wheels 3/5/2016
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(62.0), new InterpolatingDouble(40.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(76.0), new InterpolatingDouble(44.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(95.0), new InterpolatingDouble(48.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(108.0), new InterpolatingDouble(56.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(121.0), new InterpolatingDouble(58.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(138.0), new InterpolatingDouble(57.0));
+        // Tuned on long, smooth metal hood with 4 wheels 3/7
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(62.0), new InterpolatingDouble(39.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(69.0), new InterpolatingDouble(40.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(44.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(85.0), new InterpolatingDouble(48.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(95.0), new InterpolatingDouble(53.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(102.0), new InterpolatingDouble(58.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(114.0), new InterpolatingDouble(62.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(122.0), new InterpolatingDouble(62.0));
+        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(137.0), new InterpolatingDouble(62.0));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapNewBalls = new InterpolatingTreeMap<>();
 
     static {
-        // Tuned on long, smooth metal hood with 3 wheels 3/5/2016
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(62.0), new InterpolatingDouble(40.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(80.0), new InterpolatingDouble(49.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(96.0), new InterpolatingDouble(59.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(114.0), new InterpolatingDouble(73.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(132.0), new InterpolatingDouble(75.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(150.0), new InterpolatingDouble(75.0));
+        // Tuned on long, smooth metal hood with 4 wheels 3/7
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(58.5), new InterpolatingDouble(40.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(64.3), new InterpolatingDouble(51.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(77.0), new InterpolatingDouble(58.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(88.0), new InterpolatingDouble(65.5));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(94.0), new InterpolatingDouble(67.5));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(99.0), new InterpolatingDouble(69.5));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(108.0), new InterpolatingDouble(73.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(114.0), new InterpolatingDouble(75.0));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(120.0), new InterpolatingDouble(76.5));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(132.0), new InterpolatingDouble(79.5));
+        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(137.0), new InterpolatingDouble(79.5));
     }
 
     static {
