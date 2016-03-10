@@ -73,8 +73,7 @@ public class RobotState {
             Rotation2d.fromDegrees(Constants.kTurretAngleOffsetDegrees));
 
     public static final RigidTransform2d kTurretRotatingToCamera = new RigidTransform2d(
-            new Translation2d(Constants.kCameraXOffset, Constants.kCameraYOffset),
-            Rotation2d.fromDegrees(Constants.kCameraAngleOffsetDegrees));
+            new Translation2d(Constants.kCameraXOffset, Constants.kCameraYOffset), new Rotation2d());
 
     // FPGATimestamp -> RigidTransform2d or Rotation2d
     protected InterpolatingTreeMap<InterpolatingDouble, RigidTransform2d> odometric_to_vehicle_;
@@ -83,6 +82,7 @@ public class RobotState {
     protected double latest_camera_to_goals_detected_timestamp_;
     protected double latest_camera_to_goals_undetected_timestamp_;
     protected Rotation2d camera_pitch_correction_;
+    protected Rotation2d camera_yaw_correction_;
     protected double differential_height_;
 
     protected RobotState() {
@@ -99,6 +99,7 @@ public class RobotState {
         latest_camera_to_goals_detected_timestamp_ = 0;
         latest_camera_to_goals_undetected_timestamp_ = start_time;
         camera_pitch_correction_ = Rotation2d.fromDegrees(-Constants.kCameraPitchAngleDegrees);
+        camera_yaw_correction_ = Rotation2d.fromDegrees(-Constants.kCameraYawAngleDegrees);
         differential_height_ = Constants.kCenterOfTargetHeight - Constants.kCameraZOffset;
     }
 
@@ -186,12 +187,19 @@ public class RobotState {
         } else {
             latest_camera_to_goals_detected_timestamp_ = timestamp;
             for (TargetInfo target : vision_update) {
+                double xdeadband = (target.getX() > -Constants.kCameraDeadband && target.getX() < Constants.kCameraDeadband) ? 0.0 : target.getX();
+                
+                // Compensate for camera yaw
+                double xyaw = xdeadband * camera_yaw_correction_.cos()
+                        + target.getY() * camera_yaw_correction_.sin();
+                double yyaw = target.getY() * camera_yaw_correction_.cos()
+                        - xdeadband * camera_yaw_correction_.sin();
+                double zyaw = target.getZ();
+
                 // Compensate for camera pitch
-                double xr = target.getZ() * camera_pitch_correction_.sin()
-                        + target.getX() * camera_pitch_correction_.cos();
-                double yr = target.getY();
-                double zr = target.getZ() * camera_pitch_correction_.cos()
-                        - target.getX() * camera_pitch_correction_.sin();
+                double xr = zyaw * camera_pitch_correction_.sin() + xyaw * camera_pitch_correction_.cos();
+                double yr = yyaw;
+                double zr = zyaw * camera_pitch_correction_.cos() - xyaw * camera_pitch_correction_.sin();
 
                 // find intersection with the goal
                 if (zr > 0) {

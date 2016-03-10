@@ -69,6 +69,7 @@ public class Robot extends IterativeRobot {
                 if (mLogToSmartdashboard) {
                     SmartDashboard.putNumber("goal_centroid_x", target.getX());
                     SmartDashboard.putNumber("goal_centroid_y", target.getY());
+                    SmartDashboard.putNumber("goal_centroid_z", target.getZ());
                 }
             }
         }

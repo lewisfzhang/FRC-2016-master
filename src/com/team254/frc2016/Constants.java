@@ -18,7 +18,8 @@ public class Constants extends ConstantsBase {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 20.784;
     public static double kCameraPitchAngleDegrees = 30.0;
-    public static double kCameraAngleOffsetDegrees = 0.0;
+    public static double kCameraYawAngleDegrees = 0.0;
+    public static double kCameraDeadband = 0.01;
 
     // Wheel diameter
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
@@ -260,7 +261,7 @@ public class Constants extends ConstantsBase {
 
     static {
         // Tuned on long, smooth metal hood with 4 wheels 3/7
-        kFlywheelAutoAimMap.put(new InterpolatingDouble(65.0), new InterpolatingDouble(6000.0));
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(65.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(70.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(120.0), new InterpolatingDouble(5500.0));
