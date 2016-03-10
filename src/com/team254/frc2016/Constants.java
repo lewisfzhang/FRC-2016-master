@@ -247,20 +247,23 @@ public class Constants extends ConstantsBase {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapMixedBalls = new InterpolatingTreeMap<>();
 
     static {
-        // Tuned on long, smooth metal hood with pinch standoff and 4 wheels 3/7
+        // Tuned on long, smooth metal hood with pinch standoff and 4 wheels, 3d
+        // printed camera mount 3/9
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(67.0), new InterpolatingDouble(41.29));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(76.0), new InterpolatingDouble(44.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(51.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(100.0), new InterpolatingDouble(52.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(55.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(120.0), new InterpolatingDouble(62.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(62.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(50.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(85.0), new InterpolatingDouble(52.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(92.0), new InterpolatingDouble(55.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(107.0), new InterpolatingDouble(57.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(115.0), new InterpolatingDouble(66.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(66.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(135.0), new InterpolatingDouble(70.5));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
-        // Tuned on long, smooth metal hood with 4 wheels 3/7
+        // Tuned on long, smooth metal hood with pinch standoff and 4 wheels, 3d
+        // printed camera mount 3/9
         kFlywheelAutoAimMap.put(new InterpolatingDouble(65.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(70.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(5000.0));

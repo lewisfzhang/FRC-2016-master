@@ -187,13 +187,12 @@ public class RobotState {
         } else {
             latest_camera_to_goals_detected_timestamp_ = timestamp;
             for (TargetInfo target : vision_update) {
-                double xdeadband = (target.getX() > -Constants.kCameraDeadband && target.getX() < Constants.kCameraDeadband) ? 0.0 : target.getX();
-                
+                double ydeadband = (target.getY() > -Constants.kCameraDeadband
+                        && target.getY() < Constants.kCameraDeadband) ? 0.0 : target.getY();
+
                 // Compensate for camera yaw
-                double xyaw = xdeadband * camera_yaw_correction_.cos()
-                        + target.getY() * camera_yaw_correction_.sin();
-                double yyaw = target.getY() * camera_yaw_correction_.cos()
-                        - xdeadband * camera_yaw_correction_.sin();
+                double xyaw = target.getX() * camera_yaw_correction_.cos() + ydeadband * camera_yaw_correction_.sin();
+                double yyaw = ydeadband * camera_yaw_correction_.cos() - target.getX() * camera_yaw_correction_.sin();
                 double zyaw = target.getZ();
 
                 // Compensate for camera pitch
