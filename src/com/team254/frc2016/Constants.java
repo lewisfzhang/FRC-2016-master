@@ -247,13 +247,13 @@ public class Constants extends ConstantsBase {
 
     static {
         // Tuned on long, smooth metal hood with pinch standoff and 4 wheels 3/7
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(67.0), new InterpolatingDouble(41.29));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(76.0), new InterpolatingDouble(44.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(51.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(100.0), new InterpolatingDouble(52.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(55.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(120.0), new InterpolatingDouble(62.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(62.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(67.0), new InterpolatingDouble(41.29));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(76.0), new InterpolatingDouble(44.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(51.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(100.0), new InterpolatingDouble(52.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(55.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(120.0), new InterpolatingDouble(62.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(62.5));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();

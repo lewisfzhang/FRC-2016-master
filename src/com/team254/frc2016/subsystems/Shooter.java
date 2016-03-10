@@ -462,7 +462,12 @@ public class Shooter extends Subsystem {
         // hoodMap = mIsBadBall
         // ? Constants.kHoodAutoAimMapWornBalls :
         // Constants.kHoodAutoAimMapNewBalls;
-        return Constants.kHoodAutoAimMapMixedBalls.getInterpolated(new InterpolatingDouble(range)).value;
+        InterpolatingDouble result = Constants.kHoodAutoAimMapMixedBalls.getInterpolated(new InterpolatingDouble(range));
+        if (result != null) {
+            return result.value;
+        } else {
+            return Constants.kHoodNeutralAngle;
+        }
     }
 
     private List<ShooterAimingParameters> getCurrentAimingParameters(double now) {
