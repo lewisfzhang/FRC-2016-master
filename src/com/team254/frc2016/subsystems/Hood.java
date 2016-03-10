@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Hood extends Subsystem {
     private ContinuousRotationServo left_servo_;
     private ContinuousRotationServo right_servo_;
+    private ContinuousRotationServo test_servo_;
     private MA3Encoder encoder_;
     private Solenoid stow_solenoid_;
     private boolean has_homed_;
@@ -69,6 +70,8 @@ public class Hood extends Subsystem {
     Hood() {
         left_servo_ = new ContinuousRotationServo(Constants.kOppositeSideServoPWM);
         right_servo_ = new ContinuousRotationServo(Constants.kSensorSideServoPWM);
+        test_servo_ = new ContinuousRotationServo(Constants.kTestServoPWM);
+        test_servo_.set(0.0);
         encoder_ = new MA3Encoder(Constants.kHoodEncoderDIO);
         pid_ = new SynchronousPID(Constants.kHoodKp, Constants.kHoodKi, Constants.kHoodKd);
         pid_.setDeadband(Constants.kHoodDeadband);
@@ -170,5 +173,9 @@ public class Hood extends Subsystem {
 
     void setStowed(boolean stow) {
         stow_solenoid_.set(!stow);
+    }
+
+    public void setTestServoSpeed(double speed) {
+        test_servo_.set(speed);
     }
 }

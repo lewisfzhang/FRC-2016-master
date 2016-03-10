@@ -241,6 +241,10 @@ public class Shooter extends Subsystem {
         mHoodManualScanOutput = output;
     }
 
+    public void setTestServoSpeed(double speed) {
+        mHood.setTestServoSpeed(speed);
+    }
+
     public synchronized void setWantsToFireNow() {
         mWantedFiringState = WantedFiringState.WANT_TO_FIRE_NOW;
     }
@@ -458,10 +462,6 @@ public class Shooter extends Subsystem {
     }
 
     private double getHoodAngleForRange(double range) {
-        // InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>
-        // hoodMap = mIsBadBall
-        // ? Constants.kHoodAutoAimMapWornBalls :
-        // Constants.kHoodAutoAimMapNewBalls;
         InterpolatingDouble result = Constants.kHoodAutoAimMapMixedBalls
                 .getInterpolated(new InterpolatingDouble(range));
         if (result != null) {

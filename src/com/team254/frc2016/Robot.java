@@ -262,14 +262,21 @@ public class Robot extends IterativeRobot {
         if (mHoodTuningMode) {
             mShooter.setTuningMode(true);
             if (mControls.getHoodTuningPositiveButton()) {
-                mShooter.setHoodManualScanOutput(0.25);
+                mShooter.setHoodManualScanOutput(0.1);
             } else if (mControls.getHoodTuningNegativeButton()) {
-                mShooter.setHoodManualScanOutput(-0.25);
+                mShooter.setHoodManualScanOutput(-0.1);
             } else {
                 mShooter.setHoodManualScanOutput(0.0);
             }
         } else {
             mShooter.setTuningMode(false);
+        }
+        if (mControls.getHoodTuningPositiveButton()) {
+            mShooter.setTestServoSpeed(1.0);
+        } else if (mControls.getHoodTuningNegativeButton()) {
+            mShooter.setTestServoSpeed(-1.0);
+        } else {
+            mShooter.setTestServoSpeed(0.0);
         }
 
         outputAllToSmartDashboard();

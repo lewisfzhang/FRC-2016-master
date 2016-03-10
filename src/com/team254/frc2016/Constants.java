@@ -205,6 +205,7 @@ public class Constants extends ConstantsBase {
     // PWM
     public static final int kSensorSideServoPWM = 0;
     public static final int kOppositeSideServoPWM = 1;
+    public static final int kTestServoPWM = 9;
 
     @Override
     public String getFileLocation() {
