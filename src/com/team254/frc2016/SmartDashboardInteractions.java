@@ -24,7 +24,7 @@ public class SmartDashboardInteractions {
 
     public void initWithDefaults() {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
-        SmartDashboard.putBoolean(OUTPUT_TO_SMART_DASHBOARD, false);
+        SmartDashboard.putBoolean(OUTPUT_TO_SMART_DASHBOARD, true);
         SmartDashboard.putBoolean(IS_AUTON_BALL_BAD, false);
         SmartDashboard.putBoolean(SHOULD_RESET_UTILITY_ARM, false);
 
@@ -84,7 +84,7 @@ public class SmartDashboardInteractions {
     enum AutonLane {
         // TODO: validate these distances
         LANE_1("Lane 1 (low bar)", 245),
-        LANE_2("Lane 2", 150),
+        LANE_2("Lane 2", 250),
         LANE_3("Lane 3", 205),
         LANE_4("Lane 4", 200),
         LANE_5("Lane 5", 245);
