@@ -2,6 +2,7 @@ package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.loops.Loop;
+import com.team254.lib.util.MA3AnalogEncoder;
 import com.team254.lib.util.MA3Encoder;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.SynchronousPID;
@@ -15,7 +16,7 @@ public class Hood extends Subsystem {
     private ContinuousRotationServo left_servo_;
     private ContinuousRotationServo right_servo_;
     private ContinuousRotationServo test_servo_;
-    private MA3Encoder encoder_;
+    private MA3AnalogEncoder encoder_;
     private Solenoid stow_solenoid_;
     private boolean has_homed_;
     private SynchronousPID pid_;
@@ -72,7 +73,7 @@ public class Hood extends Subsystem {
         right_servo_ = new ContinuousRotationServo(Constants.kSensorSideServoPWM);
         test_servo_ = new ContinuousRotationServo(Constants.kTestServoPWM);
         test_servo_.set(0.0);
-        encoder_ = new MA3Encoder(Constants.kHoodEncoderDIO);
+        encoder_ = new MA3AnalogEncoder(0); // TODO: constipate
         pid_ = new SynchronousPID(Constants.kHoodKp, Constants.kHoodKi, Constants.kHoodKd);
         pid_.setDeadband(Constants.kHoodDeadband);
         pid_.setInputRange(Constants.kMinHoodAngle, Constants.kMaxHoodAngle);
