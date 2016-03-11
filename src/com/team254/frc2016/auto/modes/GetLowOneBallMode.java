@@ -48,6 +48,7 @@ public class GetLowOneBallMode extends AutoModeBase {
 
         if (mShouldDriveBack) {
             runAction(AutoModeUtils.makeDriveBackAction(mDrive));
+            mDrive.setVelocitySetpoint(0, 0);
         }
     }
 }

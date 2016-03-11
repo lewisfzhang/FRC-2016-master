@@ -50,6 +50,7 @@ public class StayHighOneBall extends AutoModeBase {
 
         if (mShouldDriveBack) {
             runAction(AutoModeUtils.makeDriveBackAction(mDrive));
+            mDrive.setVelocitySetpoint(0, 0);
         }
     }
 }
