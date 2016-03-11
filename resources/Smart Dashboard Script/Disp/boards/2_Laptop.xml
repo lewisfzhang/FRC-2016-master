@@ -45,6 +45,9 @@
 	<widget field="Auton Mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
 		<location x="18" y="19"/>
 	</widget>
+    <widget field="Auton Lane" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="18" y="150"/>
+	</widget>
 	<widget field="flywheel_rpm" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="-33" y="659"/>
 	</widget>
