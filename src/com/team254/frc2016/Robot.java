@@ -246,18 +246,23 @@ public class Robot extends IterativeRobot {
             mShooter.setWantsToHoldFire();
         }
 
-        if (mUtilityArm.isAllowedToHang() && (mControls.getHang()
+        // TODO: re-enable when the hanger exists
+        /* if (mUtilityArm.isAllowedToHang() && (mControls.getHang()
                 || (Timer.getMatchTime() >= Constants.kHangerAutoTriggerTime && mControls.getAutoHangEnabled()))) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
-        } else if (mControls.getPortcullisButton()) {
+        } else */
+
+        if (mControls.getPortcullisButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
         } else if (mControls.getCdfButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.CDF);
         } else if (mControls.getBailButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
-        } else if (mControls.getDeployHanger()) {
-            mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
         }
+        // TODO: re-enable when the hanger exists
+        /* else if (mControls.getDeployHanger()) {
+            mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
+        } */
 
         if (mHoodTuningMode) {
             mShooter.setTuningMode(true);
