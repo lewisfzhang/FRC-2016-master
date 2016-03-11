@@ -18,30 +18,37 @@ public class StayHighOneBall extends AutoModeBase {
     private final Shooter mShooter = Shooter.getInstance();
     private final boolean mIsBadBall;
     private final boolean mShouldDriveBack;
+    private final double mDistanceToDrive;
 
-    public final double DISTANCE_TO_DROP_ARM = 35;
+    public static final double DISTANCE_TO_DROP_ARM = 35;
 
-    public StayHighOneBall(boolean isBadBall, boolean shouldDriveBack) {
+    public StayHighOneBall(boolean isBadBall, boolean shouldDriveBack, double distanceToDrive) {
         mIsBadBall = isBadBall;
         mShouldDriveBack = shouldDriveBack;
+        mDistanceToDrive = distanceToDrive;
     }
 
     @Override
     protected void routine() throws AutoModeEndedException {
         mShooter.setIsBadBall(mIsBadBall);
-        runAction(new ParallelAction(Arrays.asList(DriveThenAimAction.makeForCommonConsts(),
+
+        runAction(new ParallelAction(Arrays.asList(
+                new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
                 new SeriesAction(Arrays.asList(
                         new WaitForDistanceAction(DISTANCE_TO_DROP_ARM),
-                        new SetArmModeAction(UtilityArm.WantedState.PORTCULLIS)
+                        new SetArmModeAction(UtilityArm.WantedState.PORTCULLIS),
+                        new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
+                        new StartAutoAimingAction()
                 ))
         )));
+
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(0.75));
-        runAction(new ArmToDriveModeAction());
+        runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));
+
         if (mShouldDriveBack) {
-            runAction(new DriveStraightAction(
-                    -(mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2.0 + 16.0, -45));
+            runAction(AutoModeUtils.makeDriveBackAction(mDrive));
         }
     }
 }

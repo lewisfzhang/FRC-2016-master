@@ -5,6 +5,7 @@ import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Shooter;
+import com.team254.frc2016.subsystems.UtilityArm;
 
 import java.util.Arrays;
 
@@ -15,27 +16,38 @@ public class GetLowOneBallMode extends AutoModeBase {
 
     private final boolean mIsBadBall;
     private final boolean mShouldDriveBack;
+    private final double mDistanceToDrive;
     private final Shooter mShooter = Shooter.getInstance();
     private final Drive mDrive = Drive.getInstance();
 
-    public GetLowOneBallMode(boolean isBadBall, boolean shouldDriveBack) {
+    public GetLowOneBallMode(boolean isBadBall, boolean shouldDriveBack, double distanceToDrive) {
         mIsBadBall = isBadBall;
         mShouldDriveBack = shouldDriveBack;
+        mDistanceToDrive = distanceToDrive;
     }
 
     @Override
     protected void routine() throws AutoModeEndedException {
         mShooter.setIsBadBall(mIsBadBall);
+
         runAction(new GetLowAction());
         runAction(new WaitAction(3.5));
-        runAction(DriveThenAimAction.makeForCommonConsts());
+
+        runAction(new ParallelAction(Arrays.asList(
+                new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
+                new SeriesAction(Arrays.asList(
+                        new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
+                        new StartAutoAimingAction()
+                ))
+        )));
+
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(0.75));
+        runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));
 
         if (mShouldDriveBack) {
-            runAction(new DriveStraightAction(
-                    -(mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2.0 + 16.0, -45));
+            runAction(AutoModeUtils.makeDriveBackAction(mDrive));
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.team254.frc2016.auto.actions;
 
 import com.team254.frc2016.subsystems.Drive;
+import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Rotation2d;
 
 public class DriveStraightAction implements Action {
@@ -44,7 +45,7 @@ public class DriveStraightAction implements Action {
     @Override
     public void done() {
         System.out.println("Drive done, Setting drive to neutral");
-        mDrive.setVelocitySetpoint(0, 0);
+        mDrive.setOpenLoop(DriveSignal.NEUTRAL);
     }
 
     private double getCurrentDistance() {
