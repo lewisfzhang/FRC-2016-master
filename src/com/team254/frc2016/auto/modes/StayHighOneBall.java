@@ -20,7 +20,8 @@ public class StayHighOneBall extends AutoModeBase {
     private final boolean mShouldDriveBack;
     private final double mDistanceToDrive;
 
-    public static final double DISTANCE_TO_DROP_ARM = 35;
+    // TODO: validate this distance
+    public static final double DISTANCE_TO_DROP_ARM = 85;
 
     public StayHighOneBall(boolean isBadBall, boolean shouldDriveBack, double distanceToDrive) {
         mIsBadBall = isBadBall;
