@@ -12,7 +12,7 @@ public class AutoModeUtils {
     public static Action makeDriveBackAction(Drive drive) {
         double driveBackDistance =
                 -(drive.getLeftDistanceInches() + drive.getRightDistanceInches()) / 2.0
-                        + 16.0;
+                        + 28.0;
         return new DriveStraightAction(driveBackDistance, -45);
     }
 }

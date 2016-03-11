@@ -83,11 +83,11 @@ public class SmartDashboardInteractions {
 
     enum AutonLane {
         // TODO: validate these distances
-        LANE_1("Lane 1 (low bar)", 245),
-        LANE_2("Lane 2", 250),
-        LANE_3("Lane 3", 205),
-        LANE_4("Lane 4", 200),
-        LANE_5("Lane 5", 245);
+        LANE_1("Lane 1 (low bar)", 240),
+        LANE_2("Lane 2", 245),
+        LANE_3("Lane 3", 200),
+        LANE_4("Lane 4", 195),
+        LANE_5("Lane 5", 240);
 
         public final String name;
         public final double distanceToDrive;
