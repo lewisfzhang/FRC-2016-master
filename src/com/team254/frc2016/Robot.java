@@ -217,10 +217,10 @@ public class Robot extends IterativeRobot {
         }
 
         if (mControls.getIntakeButton()) {
-            mIntake.tryToDeploy(true);
+            mIntake.setDeploy(true);
             mIntake.setIntakeRoller(1.0);
         } else if (mControls.getStowIntakeButton()) {
-            mIntake.tryToDeploy(false);
+            mIntake.setDeploy(false);
             mIntake.setIntakeRoller(0.0);
         } else if (mControls.getExhaustButton()) {
             mIntake.setIntakeRoller(-1.0);
@@ -246,23 +246,14 @@ public class Robot extends IterativeRobot {
             mShooter.setWantsToHoldFire();
         }
 
-        // TODO: re-enable when the hanger exists
-        /* if (mUtilityArm.isAllowedToHang() && (mControls.getHang()
-                || (Timer.getMatchTime() >= Constants.kHangerAutoTriggerTime && mControls.getAutoHangEnabled()))) {
-            mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
-        } else */
-
         if (mControls.getPortcullisButton()) {
+            mIntake.setDeploy(true);
             mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
         } else if (mControls.getCdfButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.CDF);
         } else if (mControls.getBailButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
         }
-        // TODO: re-enable when the hanger exists
-        /* else if (mControls.getDeployHanger()) {
-            mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
-        } */
 
         if (mHoodTuningMode) {
             mShooter.setTuningMode(true);
@@ -276,6 +267,7 @@ public class Robot extends IterativeRobot {
         } else {
             mShooter.setTuningMode(false);
         }
+
         if (mControls.getHoodTuningPositiveButton()) {
             mShooter.setTestServoSpeed(1.0);
         } else if (mControls.getHoodTuningNegativeButton()) {

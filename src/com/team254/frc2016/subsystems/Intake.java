@@ -19,9 +19,6 @@ public class Intake extends Subsystem {
     private Solenoid deploy_solenoid_;
     private boolean overridden_intake_ = false;
 
-    private boolean deploy_safety_requirement_ = false;
-    private double deploy_state_started_time_ = Timer.getFPGATimestamp();
-
     private Intake() {
         intake_talon_ = new CANTalon(Constants.kIntakeTalonId);
         intake_talon_.changeControlMode(TalonControlMode.PercentVbus);
@@ -47,29 +44,14 @@ public class Intake extends Subsystem {
         }
     }
 
-    public synchronized void setDeploySafetyRequirement(boolean mustBeDeployed) {
-        deploy_safety_requirement_ = mustBeDeployed;
-        tryToDeploy(deploy_solenoid_.get());
-    }
-
-    public synchronized void tryToDeploy(boolean deploy) {
-        deploy = deploy_safety_requirement_ || deploy;
-        if (deploy == deploy_solenoid_.get()) {
-            return;
-        }
+    public synchronized void setDeploy(boolean deploy) {
         deploy_solenoid_.set(deploy);
-        deploy_state_started_time_ = Timer.getFPGATimestamp();
-    }
-
-    public synchronized boolean isDeployedAndSettled() {
-        return deploy_solenoid_.get()
-                && Timer.getFPGATimestamp() - deploy_state_started_time_ > Constants.kIntakeDeploySettlingDelay;
     }
 
     @Override
     public synchronized void stop() {
         setIntakeRoller(0);
-        tryToDeploy(false);
+        setDeploy(false);
     }
 
     @Override

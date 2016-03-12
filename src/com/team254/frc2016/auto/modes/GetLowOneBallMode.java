@@ -20,6 +20,8 @@ public class GetLowOneBallMode extends AutoModeBase {
     private final Shooter mShooter = Shooter.getInstance();
     private final Drive mDrive = Drive.getInstance();
 
+    private static final double DISTANCE_TO_DROP_INTAKE = 12;
+
     public GetLowOneBallMode(boolean isBadBall, boolean shouldDriveBack, double distanceToDrive) {
         mIsBadBall = isBadBall;
         mShouldDriveBack = shouldDriveBack;
@@ -30,11 +32,15 @@ public class GetLowOneBallMode extends AutoModeBase {
     protected void routine() throws AutoModeEndedException {
         mShooter.setIsBadBall(mIsBadBall);
 
-        runAction(new GetLowAction());
-        runAction(new WaitAction(3.5));
+        // Get low and wait a minimum of 3.5 seconds
+        runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(3.5))));
 
         runAction(new ParallelAction(Arrays.asList(
                 new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
+                new SeriesAction(Arrays.asList(
+                        new WaitForDistanceAction(DISTANCE_TO_DROP_INTAKE),
+                        new DeployIntakeAction()
+                )),
                 new SeriesAction(Arrays.asList(
                         new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
                         new StartAutoAimingAction()

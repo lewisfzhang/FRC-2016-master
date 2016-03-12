@@ -35,14 +35,8 @@ public class UtilityArm extends Subsystem {
         /** Start of match state */
         SIZE_BOX,
 
-        /** Lower intake to protect it from upcoming portcullis mode */
-        SIZE_BOX_PROTECT_INTAKE,
-
         /** Dropping the arm past the adj hardstops */
         SIZE_BOX_TO_PORTCULLIS,
-
-        /** Lower intake to protect it from upcoming portcullis mode */
-        DRIVE_PROTECT_INTAKE,
 
         /** Lower intake to prevent porcullis mode from damaging it */
         DRIVE_TO_PORTCULLIS,
@@ -92,7 +86,6 @@ public class UtilityArm extends Subsystem {
     private Solenoid mCdfFlapSolenoid = Constants.makeSolenoidForId(Constants.kCdfFlapSolenoidId);
     private Solenoid mHookReleaseSolenoid = Constants.makeSolenoidForId(Constants.kHookReleaseSolenoidId);
     private Solenoid mGasSpringReleaseSolenoid = Constants.makeSolenoidForId(Constants.kGasSpringReleaseSolenoidId);
-    private Intake mIntake = Intake.getInstance();
 
     Loop mLoop = new Loop() {
 
@@ -138,12 +131,8 @@ public class UtilityArm extends Subsystem {
             switch (mSystemState) {
             case SIZE_BOX:
                 return handleSizeBox();
-            case SIZE_BOX_PROTECT_INTAKE:
-                return handleSizeBoxProtectIntake();
             case SIZE_BOX_TO_PORTCULLIS:
                 return handleSizeBoxToPortcullis(timeSinceStateStart);
-            case DRIVE_PROTECT_INTAKE:
-                return handleDrivingProtectIntake();
             case DRIVE_TO_PORTCULLIS:
                 return handleDrivingToPortcullus(timeSinceStateStart);
             case PORTCULLIS:
@@ -226,15 +215,7 @@ public class UtilityArm extends Subsystem {
 
     private synchronized SystemState handleSizeBox() {
         return mWantedState == WantedState.STAY_IN_SIZE_BOX ? SystemState.SIZE_BOX
-                : SystemState.SIZE_BOX_PROTECT_INTAKE;
-    }
-
-    private synchronized SystemState handleSizeBoxProtectIntake() {
-        if (mWantedState == WantedState.STAY_IN_SIZE_BOX) {
-            logIllegalWantedState(SystemState.SIZE_BOX_PROTECT_INTAKE, mWantedState);
-        }
-        return mIntake.isDeployedAndSettled() ? SystemState.SIZE_BOX_TO_PORTCULLIS
-                : SystemState.SIZE_BOX_PROTECT_INTAKE;
+                : SystemState.SIZE_BOX_TO_PORTCULLIS;
     }
 
     private synchronized SystemState handleSizeBoxToPortcullis(double timeSinceStateStart) {
@@ -245,27 +226,12 @@ public class UtilityArm extends Subsystem {
                 : SystemState.SIZE_BOX_TO_PORTCULLIS;
     }
 
-    private synchronized SystemState handleDrivingProtectIntake() {
-        switch (mWantedState) {
-        case PREPARE_FOR_HANG: // fallthrough
-        case PORTCULLIS:
-            return mIntake.isDeployedAndSettled() ? SystemState.DRIVE_TO_PORTCULLIS : SystemState.DRIVE_PROTECT_INTAKE;
-        case DRIVING: // fallthrough
-        case CDF:
-            return SystemState.DRIVE;
-        case PULL_UP_HANG: // fallthrough
-        case STAY_IN_SIZE_BOX: // fallthrough
-        default:
-            logIllegalWantedState(SystemState.DRIVE_PROTECT_INTAKE, mWantedState);
-            return SystemState.DRIVE_PROTECT_INTAKE;
-        }
-    }
-
     private synchronized SystemState handleDrivingToPortcullus(double timeSinceStateStart) {
         switch (mWantedState) {
         case PREPARE_FOR_HANG: // fallthrough
         case PORTCULLIS:
-            return timeSinceStateStart >= Constants.kUtilityArmDriveToPortcullisDelay ? SystemState.PORTCULLIS
+            return timeSinceStateStart >= Constants.kUtilityArmDriveToPortcullisDelay
+                    ? SystemState.PORTCULLIS
                     : SystemState.DRIVE_TO_PORTCULLIS;
         case DRIVING: // fallthrough
         case CDF:
@@ -302,7 +268,7 @@ public class UtilityArm extends Subsystem {
         switch (mWantedState) {
         case PORTCULLIS: // fallthrough
         case PREPARE_FOR_HANG:
-            return SystemState.DRIVE_PROTECT_INTAKE;
+            return SystemState.DRIVE_TO_PORTCULLIS;
         case DRIVING:
             return SystemState.DRIVE;
         case CDF:
@@ -389,52 +355,67 @@ public class UtilityArm extends Subsystem {
 
     private void setOutputsForState(SystemState systemState) {
         switch (systemState) {
-        case SIZE_BOX_PROTECT_INTAKE: // fallthrough
-        case DRIVE_PROTECT_INTAKE:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED,
-                    IntakeDeployRequirements.FORCE_DEPLOYED);
-            break;
         case SIZE_BOX_TO_PORTCULLIS: // fallthrough
         case DRIVE_TO_PORTCULLIS: // fallthrough
         case PORTCULLIS:
-            setOutputs(ArmOutput.ARM_DOWN, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED,
-                    IntakeDeployRequirements.FORCE_DEPLOYED);
+            setOutputs(
+                    ArmOutput.ARM_DOWN,
+                    AdjustableHardstopOutput.PREVENT_HANG,
+                    CdfFlapOutput.STOWED,
+                    HookReleaseOutput.HOOKS_HELD_IN,
+                    GasSpringReleaseOutput.STOWED);
             break;
         case SIZE_BOX: // fallthrough
         case CDF_TO_DRIVING: // fallthrough
         case DRIVE:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED, IntakeDeployRequirements.FREE);
+            setOutputs(
+                    ArmOutput.ARM_UP,
+                    AdjustableHardstopOutput.PREVENT_HANG,
+                    CdfFlapOutput.STOWED,
+                    HookReleaseOutput.HOOKS_HELD_IN,
+                    GasSpringReleaseOutput.STOWED);
             break;
         case CDF:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED, IntakeDeployRequirements.FREE);
+            setOutputs(
+                    ArmOutput.ARM_UP,
+                    AdjustableHardstopOutput.PREVENT_HANG,
+                    CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_HELD_IN,
+                    GasSpringReleaseOutput.STOWED);
             break;
         case LIFTING_ARM_FOR_HANG:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED, IntakeDeployRequirements.FREE);
+            setOutputs(
+                    ArmOutput.ARM_UP,
+                    AdjustableHardstopOutput.ALLOW_HANG,
+                    CdfFlapOutput.STOWED,
+                    HookReleaseOutput.HOOKS_HELD_IN,
+                    GasSpringReleaseOutput.STOWED);
             break;
         case OPENING_CDF_FOR_HANG:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED, IntakeDeployRequirements.FREE);
+            setOutputs(
+                    ArmOutput.ARM_UP,
+                    AdjustableHardstopOutput.ALLOW_HANG,
+                    CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_HELD_IN,
+                    GasSpringReleaseOutput.STOWED);
             break;
         case DEPLOY_HOOKS:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_RELEASED, GasSpringReleaseOutput.STOWED, IntakeDeployRequirements.FREE); // TODO:
-                                                                                                                     // add
-                                                                                                                     // an
-                                                                                                                     // intake
-                                                                                                                     // up
-                                                                                                                     // control
-                                                                                                                     // here?
+            // TODO: add an intake up control here?
+            setOutputs(
+                    ArmOutput.ARM_UP,
+                    AdjustableHardstopOutput.ALLOW_HANG,
+                    CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_RELEASED,
+                    GasSpringReleaseOutput.STOWED);
             break;
         case HANG:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_RELEASED, GasSpringReleaseOutput.LIFTING_ROBOT,
-                    IntakeDeployRequirements.FREE); // TODO: add an intake up
-                                                    // control here?
+            // TODO: add an intake up control here?
+            setOutputs(
+                    ArmOutput.ARM_UP,
+                    AdjustableHardstopOutput.ALLOW_HANG,
+                    CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_RELEASED,
+                    GasSpringReleaseOutput.LIFTING_ROBOT);
             break;
         default:
             System.out.println("Utility arm unknown state for output: " + systemState);
@@ -446,22 +427,23 @@ public class UtilityArm extends Subsystem {
      * solenoid outputs (which lose state on disable) and this state machine
      * (which keeps state through disable).
      */
-    private void setOutputs(ArmOutput armOutput, AdjustableHardstopOutput adjustableHardstopOutput,
-            CdfFlapOutput cdfFlapOutput, HookReleaseOutput hookReleaseOutput,
-            GasSpringReleaseOutput gasSpringReleaseOutput, IntakeDeployRequirements intakeDeployRequirements) {
+    private void setOutputs(
+            ArmOutput armOutput,
+            AdjustableHardstopOutput adjustableHardstopOutput,
+            CdfFlapOutput cdfFlapOutput,
+            HookReleaseOutput hookReleaseOutput,
+            GasSpringReleaseOutput gasSpringReleaseOutput) {
         mArmLiftSolenoid.set(armOutput.value);
         mAdjustableHardStopSolenoid.set(adjustableHardstopOutput.value);
         mCdfFlapSolenoid.set(cdfFlapOutput.value);
         mHookReleaseSolenoid.set(hookReleaseOutput.value);
         mGasSpringReleaseSolenoid.set(gasSpringReleaseOutput.value);
-
-        mIntake.setDeploySafetyRequirement(intakeDeployRequirements == IntakeDeployRequirements.FORCE_DEPLOYED);
     }
 
     // These enums strongly type solenoid outputs to their respective solenoid
     // directions
     private enum ArmOutput {
-        ARM_UP(false), // TODO: verify this value
+        ARM_UP(false),
         ARM_DOWN(!ARM_UP.value);
 
         final boolean value;
@@ -472,7 +454,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum AdjustableHardstopOutput {
-        PREVENT_HANG(false), // TODO: verify this value
+        PREVENT_HANG(false),
         ALLOW_HANG(!PREVENT_HANG.value);
 
         final boolean value;
@@ -483,7 +465,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum CdfFlapOutput {
-        STOWED(false), // TODO: verify this value
+        STOWED(false),
         OPEN(!STOWED.value);
 
         final boolean value;
@@ -494,7 +476,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum HookReleaseOutput {
-        HOOKS_HELD_IN(false), // TODO: verify this value
+        HOOKS_HELD_IN(false),
         HOOKS_RELEASED(!HOOKS_HELD_IN.value);
 
         final boolean value;
@@ -505,7 +487,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum GasSpringReleaseOutput {
-        STOWED(false), // TODO: verify this value
+        STOWED(false),
         LIFTING_ROBOT(!STOWED.value);
 
         final boolean value;
@@ -513,9 +495,5 @@ public class UtilityArm extends Subsystem {
         GasSpringReleaseOutput(boolean value) {
             this.value = value;
         }
-    }
-
-    private enum IntakeDeployRequirements {
-        FREE, FORCE_DEPLOYED
     }
 }
