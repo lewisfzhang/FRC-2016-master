@@ -46,6 +46,8 @@ public class Flywheel extends Subsystem {
     }
 
     synchronized void setRpm(double rpm) {
+        master_talon_.enableBrakeMode(false);
+        slave_talon_.enableBrakeMode(false);
         master_talon_.changeControlMode(CANTalon.TalonControlMode.Speed);
         master_talon_.set(rpm);
     }
@@ -63,6 +65,8 @@ public class Flywheel extends Subsystem {
     @Override
     public synchronized void stop() {
         setOpenLoop(0);
+        master_talon_.enableBrakeMode(true);
+        slave_talon_.enableBrakeMode(true);
     }
 
     @Override
