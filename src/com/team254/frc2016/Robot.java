@@ -253,6 +253,9 @@ public class Robot extends IterativeRobot {
             mUtilityArm.setWantedState(UtilityArm.WantedState.CDF);
         } else if (mControls.getBailButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
+        } else if (mControls.getBatterChallengeButton()) {
+            mIntake.setDeploy(false);
+            mUtilityArm.setWantedState(UtilityArm.WantedState.BATTER_CHALLENGE);
         }
 
         if (mHoodTuningMode) {

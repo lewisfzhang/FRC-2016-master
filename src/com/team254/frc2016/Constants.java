@@ -150,6 +150,7 @@ public class Constants extends ConstantsBase {
     public static double kUtilityArmOpenCdfToDeployHooksDelay = 0.7;
     public static double kUtilityArmDriveToPortcullisDelay = 0.4;
     public static double kIntakeDeploySettlingDelay = 0.2;
+    public static double kUtilityArmHardStopsMoveForRaiseArmDelay = 0.5;
 
     // Hanging Constants
     // Warning, Timer.getMatchTime could be inaccurate
