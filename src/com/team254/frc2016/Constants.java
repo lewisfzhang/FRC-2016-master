@@ -251,6 +251,10 @@ public class Constants extends ConstantsBase {
         // Tuned on long, smooth metal hood with pinch standoff and 4 wheels, 3d
         // printed camera mount 3/9
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(67.0), new InterpolatingDouble(41.29));
+
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(71.0), new InterpolatingDouble(47.0));
+
+
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(50.0));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(85.0), new InterpolatingDouble(52.5));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(92.0), new InterpolatingDouble(55.5));
