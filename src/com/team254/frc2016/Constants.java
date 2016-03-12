@@ -255,12 +255,16 @@ public class Constants extends ConstantsBase {
 
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(71.0), new InterpolatingDouble(47.0));
 
-
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(50.0));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(85.0), new InterpolatingDouble(52.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(92.0), new InterpolatingDouble(55.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(107.0), new InterpolatingDouble(57.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(115.0), new InterpolatingDouble(66.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(92.0), new InterpolatingDouble(53.5));
+
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(94.0), new InterpolatingDouble(53.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(53.5));
+
+
+        // maybe invalid old points?
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(115.0), new InterpolatingDouble(60.0));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(66.5));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(135.0), new InterpolatingDouble(70.5));
     }
