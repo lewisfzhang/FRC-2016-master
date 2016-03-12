@@ -82,7 +82,6 @@ public class SmartDashboardInteractions {
     }
 
     enum AutonLane {
-        // TODO: validate these distances
         LANE_1("Lane 1 (low bar)", 240),
         LANE_2("Lane 2", 245),
         LANE_3("Lane 3", 200),
