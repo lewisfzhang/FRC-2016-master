@@ -63,7 +63,7 @@ public class Intake extends Subsystem {
     public void outputToSmartDashboard() {
         double voltage = have_ball_sensor_.getAverageVoltage();
         // TODO: tune this threshold
-        SmartDashboard.putBoolean("have_ball", voltage > 2.0);
+        SmartDashboard.putBoolean("have_ball", voltage > 1.5);
         SmartDashboard.putNumber("have_ball_voltage", voltage);
     }
 
