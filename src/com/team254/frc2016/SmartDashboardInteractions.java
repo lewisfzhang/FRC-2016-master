@@ -86,7 +86,7 @@ public class SmartDashboardInteractions {
         LANE_2("Lane 2", 245),
         LANE_3("Lane 3", 200),
         LANE_4("Lane 4", 195),
-        LANE_5("Lane 5", 240);
+        LANE_5("Lane 5", 230);
 
         public final String name;
         public final double distanceToDrive;
