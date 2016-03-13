@@ -2,10 +2,13 @@ package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
 
+import com.team254.lib.util.ConstantsBase;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake extends Subsystem {
     static Intake instance_ = new Intake();
@@ -18,6 +21,7 @@ public class Intake extends Subsystem {
     private CANTalon fixed_talon_;
     private Solenoid deploy_solenoid_;
     private boolean overridden_intake_ = false;
+    private AnalogInput have_ball_sensor_;
 
     private Intake() {
         intake_talon_ = new CANTalon(Constants.kIntakeTalonId);
@@ -27,6 +31,7 @@ public class Intake extends Subsystem {
         fixed_talon_.changeControlMode(TalonControlMode.PercentVbus);
         fixed_talon_.enableBrakeMode(false);
         deploy_solenoid_ = Constants.makeSolenoidForId(Constants.kIntakeSolenoidId);
+        have_ball_sensor_ = new AnalogInput(Constants.kHaveBallSensorAnalogId);
     }
 
     synchronized void overrideIntaking(boolean overriding) {
@@ -56,7 +61,9 @@ public class Intake extends Subsystem {
 
     @Override
     public void outputToSmartDashboard() {
-        // no-op
+        // TODO: tune this threshold
+        SmartDashboard.putBoolean("have_ball", have_ball_sensor_.getVoltage() > 2.0);
+        SmartDashboard.putNumber("have_ball_voltage", have_ball_sensor_.getVoltage());
     }
 
     @Override

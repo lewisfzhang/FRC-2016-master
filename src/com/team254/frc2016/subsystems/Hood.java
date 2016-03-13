@@ -73,7 +73,7 @@ public class Hood extends Subsystem {
         right_servo_ = new ContinuousRotationServo(Constants.kSensorSideServoPWM);
         test_servo_ = new ContinuousRotationServo(Constants.kTestServoPWM);
         test_servo_.set(0.0);
-        encoder_ = new MA3AnalogEncoder(0); // TODO: constipate
+        encoder_ = new MA3AnalogEncoder(Constants.kHoodEncoderAnalogId);
         pid_ = new SynchronousPID(Constants.kHoodKp, Constants.kHoodKi, Constants.kHoodKd);
         pid_.setDeadband(Constants.kHoodDeadband);
         pid_.setInputRange(Constants.kMinHoodAngle, Constants.kMaxHoodAngle);
