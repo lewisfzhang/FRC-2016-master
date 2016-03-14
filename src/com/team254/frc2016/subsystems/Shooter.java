@@ -350,6 +350,7 @@ public class Shooter extends Subsystem {
             }
         case WANT_TO_STOW: // fallthrough
         default:
+            mHood.startHoming();
             return SystemState.STOWED_OR_STOWING;
         }
     }
@@ -450,6 +451,7 @@ public class Shooter extends Subsystem {
             return SystemState.SPINNING_BATTER;
         default:
             if ((mTurret.isSafe() && mHood.isSafe()) || (now - start_time > Constants.kStowingOverrideTime)) {
+                mHood.startHoming();
                 return SystemState.STOWED_OR_STOWING;
             } else {
                 return SystemState.UNSTOWED_RETURNING_TO_SAFE;
