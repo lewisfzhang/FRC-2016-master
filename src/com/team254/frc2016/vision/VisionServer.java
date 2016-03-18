@@ -2,10 +2,14 @@ package com.team254.frc2016.vision;
 
 import com.team254.frc2016.Constants;
 
+import com.team254.frc2016.vision.messages.HeartbeatMessage;
+import com.team254.frc2016.vision.messages.OffWireMessage;
+import com.team254.frc2016.vision.messages.VisionMessage;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +45,33 @@ public class VisionServer implements Runnable {
             m_socket = socket;
         }
 
+        private void send(VisionMessage message) {
+            String toSend = message.toJson() + "\n";
+            if (m_socket != null && m_socket.isConnected()) {
+                try {
+                    OutputStream os = m_socket.getOutputStream();
+                    os.write(toSend.getBytes());
+                } catch (IOException e) {
+                    System.err.println("VisionServer: Could not send data to socket");
+                }
+            }
+        }
+
+        public void handleMessage(VisionMessage message, double timestamp) {
+            if ("targets".equals(message.getType())) {
+                VisionUpdate update = VisionUpdate.generateFromJsonString(timestamp, message.getMessage());
+                receivers.removeAll(Collections.singleton(null));
+                if (update.isValid()) {
+                    for (VisionUpdateReceiver receiver : receivers) {
+                        receiver.gotUpdate(update);
+                    }
+                }
+            }
+            if ("heartbeat".equals(message.getType())) {
+                send(HeartbeatMessage.getInstance());
+            }
+        }
+
         @Override
         public void run() {
             if (m_socket == null) {
@@ -56,20 +87,13 @@ public class VisionServer implements Runnable {
                     String messageRaw = new String(buffer, 0, read);
                     String[] messages = messageRaw.split("\n");
                     for (String message : messages) {
-                        if ("PING".equals(message)) {
-                            m_socket.getOutputStream().write("PONG".getBytes());
-                            continue;
-                        }
-                        VisionUpdate update = VisionUpdate.generateFromJsonString(timestamp, message);
-                        receivers.removeAll(Collections.singleton(null));
-                        if (update.isValid()) {
-                            for (VisionUpdateReceiver receiver : receivers) {
-                                receiver.gotUpdate(update);
-                            }
+                        OffWireMessage parsedMessage = new OffWireMessage(message);
+                        if (parsedMessage.isValid()) {
+                            handleMessage(parsedMessage, timestamp);
                         }
                     }
                 }
-                System.out.print("Socket disconnected");
+                System.out.println("Socket disconnected");
             } catch (IOException e) {
                 System.err.println("Could not talk to socket");
             }
