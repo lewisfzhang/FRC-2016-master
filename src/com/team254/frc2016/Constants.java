@@ -189,7 +189,6 @@ public class Constants extends ConstantsBase {
     public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the correct solenoid
 
     // Analog Inputs
-    public static int kHoodEncoderAnalogId = 0;
     public static int kHaveBallSensorAnalogId = 1;
 
     /**
