@@ -418,7 +418,6 @@ public class Shooter extends Subsystem {
         }
 
         if (now - stateStartTime < Constants.kShootActuationTime) {
-            mFlywheel.setOpenLoop(1.0);
             setShooterSolenoidLift(true);
             return state;
         } else {
