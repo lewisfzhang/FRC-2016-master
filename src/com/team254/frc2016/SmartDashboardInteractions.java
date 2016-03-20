@@ -73,6 +73,7 @@ public class SmartDashboardInteractions {
         STAY_HIGH_ONE_BALL("No Drop Stay"),
         GET_LOW_ONE_BALL("Portcullis"),
         CDF_ONE_BALL("CDF"),
+        TWO_BALL("Two Ball"),
         STAND_STILL("Stand Still");
 
         public final String name;
@@ -107,6 +108,8 @@ public class SmartDashboardInteractions {
             return new GetLowOneBallMode(isAutonBallBad(), false, autonLane.distanceToDrive);
         case CDF_ONE_BALL:
             return new ShovelTheFriesMode(autonLane.distanceToDrive);
+        case TWO_BALL:
+            return new TwoBallMode();
         case STAND_STILL: // fallthrough
         default:
             System.out.println("ERROR: unexpected auto mode: " + autonOption);
