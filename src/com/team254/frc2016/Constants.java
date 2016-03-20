@@ -204,6 +204,7 @@ public class Constants extends ConstantsBase {
 
     // DIGITAL IO
     public static final int kHoodEncoderDIO = 9;
+    public static final int kLineSensorDIO = 0;
 
     // PWM
     public static final int kSensorSideServoPWM = 0;

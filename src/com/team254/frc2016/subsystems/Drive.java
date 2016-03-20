@@ -8,6 +8,7 @@ import com.team254.lib.util.Rotation2d;
 
 import com.team254.lib.util.SynchronousPID;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,6 +31,7 @@ public class Drive extends Subsystem {
     private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
     private final Solenoid shifter_;
     private final ADXRS453_Gyro gyro_;
+    private DigitalInput lineSensor_;
 
     private DriveControlState driveControlState_;
     private VelocityHeadingSetpoint velocityHeadingSetpoint_;
@@ -77,6 +79,7 @@ public class Drive extends Subsystem {
         shifter_ = Constants.makeSolenoidForId(Constants.kShifterSolenoidId);
         shifter_.set(false); // high gear
         gyro_ = new ADXRS453_Gyro();
+        lineSensor_ = new DigitalInput(Constants.kLineSensorDIO);
 
         // Get status at 100Hz
         leftMaster_.setStatusFrameRateMs(CANTalon.StatusFrameRate.Feedback, 10);
