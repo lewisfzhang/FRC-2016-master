@@ -242,6 +242,14 @@ public class Drive extends Subsystem {
         setOpenLoop(DriveSignal.NEUTRAL);
     }
 
+    public boolean getLineSensorTriggered() {
+        return lineSensor_.get();
+    }
+
+    public DigitalInput getLineSensor() {
+        return lineSensor_;
+    }
+
     @Override
     public void outputToSmartDashboard() {
         SmartDashboard.putNumber("left_distance", getLeftDistanceInches());
@@ -251,6 +259,7 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("gyro_angle", getGyro().getAngle());
         SmartDashboard.putNumber("gyro_center", getGyro().getCenter());
         SmartDashboard.putNumber("heading_error", mLastHeadingErrorDegrees);
+        SmartDashboard.putBoolean("line_sensor", getLineSensorTriggered());
     }
 
     @Override
