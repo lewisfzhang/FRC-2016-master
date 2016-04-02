@@ -3,7 +3,7 @@ package com.team254.lib.util;
 import edu.wpi.first.wpilibj.*;
 
 /**
- * A 12-bit PWM MA3 absolute encoder.
+ * A 10-bit analog MA3 absolute encoder.
  * http://cdn.usdigital.com/assets/datasheets/MA3_datasheet.pdf
  * 
  * @author jarussell
