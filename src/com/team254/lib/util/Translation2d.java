@@ -65,6 +65,10 @@ public class Translation2d implements Interpolable<Translation2d> {
         } else if (x >= 1) {
             return new Translation2d(other);
         }
+        return extrapolate(other, x);
+    }
+
+    public Translation2d extrapolate(Translation2d other, double x) {
         return new Translation2d(x * (other.x_ - x_) + x_, x * (other.y_ - y_) + y_);
     }
 
