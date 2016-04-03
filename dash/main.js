@@ -2,7 +2,10 @@ var webSocket = null;
 
 var model = {
   tables: {},
+  charts: [],
 };
+
+var MIN_PLOT_UPDATE_TIME_MILLIS = 50;
 
 $(document).ready(function() {
   kickWebSocket();
@@ -33,6 +36,7 @@ function handlePayloadFromWebSocket(payloadString) {
 function addOrUpdateValue(tableName, key, value) {
   var table = getOrCreateTable(tableName);
   setOrCreateElement(table, key, value);
+  maybeUpdateChart(tableName, key, value);
 }
 
 function getOrCreateTable(tableName) {
@@ -43,7 +47,7 @@ function getOrCreateTable(tableName) {
   // Make a new container
   var container = $("<div/>");
   container.append($("<div> Table: " + tableName + "</div>"));
-  $("body").append(container);
+  $("#rawValuesContainer").append(container);
   var pane = $("<div/>");
   container.append(pane);
   
@@ -51,6 +55,7 @@ function getOrCreateTable(tableName) {
   table = {
     elements: [],
     pane: pane,
+    name: tableName,
   };
   model.tables[tableName] = table;
   return table;
@@ -68,9 +73,14 @@ function setOrCreateElement(table, key, value) {
   if (element == null) {
     // Make a new container
     var field = $("<input type='text'></input>");
+    var button = $("<button type='button'>Chart</button>");
+    button.click(function() {
+      startChartingKey(table.name, key);
+    });
     var container = $("<div/>")
         .append("<span style='display: inline-block; width: 200px;'>" + key + ":</span>")
-        .append(field);
+        .append(field)
+        .append(button);
     // Make a new model
     element = {
       key: key,
@@ -98,4 +108,77 @@ function insertElementToTable(table, element) {
   }
   table.pane.append(element.container);
   table.elements.push(element);
+}
+
+function startChartingKey(tableName, key) {
+  // See if this chart already exists
+  if (findChartModelOrNull(tableName, key) != null) {
+    // This chart already exists
+    return;
+  }
+  // create the new UI
+  var container = $("<div><h3>" + key + "<h3></div>");
+  $("#chartsContainer").append(container);
+
+  var removeButton = $("<button type='button'>Remove</button>");
+  removeButton.click(function() {
+    stopChartingKey(tableName, key);
+  });
+  container.append(removeButton);
+  
+  var dataContainer = $("<div/>");
+  container.append(dataContainer);
+  
+  // Update the model
+  var newChart = {
+    tableName: tableName,
+    key: key,
+    points: [],
+    container: container,
+    dataContainer: dataContainer,
+  };
+  model.charts.push(newChart);
+}
+
+function stopChartingKey(tableName, key) {
+  var chart = findChartModelOrNull(tableName, key);
+  if (chart == null) {
+    console.error("WTF: Trying to remove unknown chart  " + tableName + ", " + key);
+    return;
+  }
+  // Update the model
+  model.charts.splice(model.charts.indexOf(chart), 1);
+  // Update the UI
+  chart.container.remove();
+}
+
+function maybeUpdateChart(tableName, key, value) {
+  // Look in the model to see if the chart exists
+  var chart = findChartModelOrNull(tableName, key);
+  if (chart == null) {
+    // not charting this key
+    return;
+  }
+  var now = Date.now();
+  if (chart.points.length > 0
+      && now - chart.points[chart.points.length - 1].time < MIN_PLOT_UPDATE_TIME_MILLIS) {
+    // sampling policy ignores this point
+    return;
+  }
+  var newPoint = {
+    time: now,
+    val: value,
+  };
+  chart.points.push(newPoint);
+  chart.dataContainer.append(" " + JSON.stringify(newPoint) + ",");
+}
+
+function findChartModelOrNull(tableName, key) {
+  for (var i = 0; i < model.charts.length; i++) {
+    var curChart = model.charts[i];
+    if (curChart.tableName == tableName && curChart.key == key) {
+      return curChart;
+    }
+  }
+  return null;
 }
