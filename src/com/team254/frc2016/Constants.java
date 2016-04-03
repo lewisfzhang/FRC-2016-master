@@ -18,7 +18,7 @@ public class Constants extends ConstantsBase {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 19.75;
     public static double kCameraPitchAngleDegrees = 33.67;
-    public static double kCameraYawAngleDegrees = 0.0;
+    public static double kCameraYawAngleDegrees = -0.25;
     public static double kCameraDeadband = 0.01;
 
     // Wheel diameter
@@ -47,7 +47,7 @@ public class Constants extends ConstantsBase {
 
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 150.0;
-    public static double kFlywheelGoodBallRpmSetpoint = 6000.0;
+    public static double kFlywheelGoodBallRpmSetpoint = 5800.0;
     public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
@@ -56,7 +56,7 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimMaxRange = 220.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 5;
     public static double kShootActuationTime = 0.75;
-    public static double kHoodUnstowToFlywheelSpinTime = 0.25;
+    public static double kHoodUnstowToFlywheelSpinTime = 0.75;
     public static double kLoadingTime = 0.5;
     public static double kStowingOverrideTime = 2.0;
 
@@ -288,11 +288,13 @@ public class Constants extends ConstantsBase {
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(140.0), new InterpolatingDouble(54.0));
         */
 
+        // 6000 rpm angles
+        /*
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(62.0), new InterpolatingDouble(42.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(69.0), new InterpolatingDouble(44.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(46.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(83.0), new InterpolatingDouble(48.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(50.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(69.0), new InterpolatingDouble(45.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(46.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(83.0), new InterpolatingDouble(49.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(90.0), new InterpolatingDouble(50.5));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(96.0), new InterpolatingDouble(51.5));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(54.0));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(115.0), new InterpolatingDouble(55.5));
@@ -300,6 +302,18 @@ public class Constants extends ConstantsBase {
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(140.0), new InterpolatingDouble(58.5));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(162.0), new InterpolatingDouble(60.5));
         kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(170.0), new InterpolatingDouble(61.0));
+        */
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(62.0), new InterpolatingDouble(42.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(67.0), new InterpolatingDouble(42.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(77.0), new InterpolatingDouble(44.8));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(85.0), new InterpolatingDouble(48.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(92.0), new InterpolatingDouble(50.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(100.0), new InterpolatingDouble(51.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(53.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(54.5));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(140.0), new InterpolatingDouble(56.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(155.0), new InterpolatingDouble(57.0));
+        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(168.0), new InterpolatingDouble(57.5));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();

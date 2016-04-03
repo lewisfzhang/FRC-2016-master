@@ -373,7 +373,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleLoading(double now, double stateStartTime) {
-        mIntake.overrideIntaking(true);
+        mIntake.setIntakeRoller(1.0);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         mHood.setStowed(false);
@@ -386,6 +386,7 @@ public class Shooter extends Subsystem {
         case WANT_TO_IDLE:
             boolean isDoneLoading = now - stateStartTime > Constants.kLoadingTime;
             if (isDoneLoading) {
+                mIntake.setIntakeRoller(0.0);
                 mRobotState.resetVision();
                 mCurrentTrackId = -1;
                 if (mWantedState == WantedState.WANT_TO_AIM) {
@@ -400,6 +401,7 @@ public class Shooter extends Subsystem {
             }
         case WANT_TO_STOW:
         default:
+            mIntake.setIntakeRoller(0.0);
             return SystemState.UNSTOWED_RETURNING_TO_SAFE;
         }
     }
