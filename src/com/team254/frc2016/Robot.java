@@ -245,6 +245,8 @@ public class Robot extends IterativeRobot {
 
         if (mControls.getFireButton()) {
             mShooter.setWantsToFireWhenReady();
+        } else if (mControls.getExhaustButton()) {
+            mShooter.setWantsToExhaust();
         } else {
             mShooter.setWantsToHoldFire();
         }

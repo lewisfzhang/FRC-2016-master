@@ -115,7 +115,6 @@ public class Shooter extends Subsystem {
         public void onLoop() {
             synchronized (Shooter.this) {
                 mHood.getLoop().onLoop();
-                mHoodRoller.getLoop().onLoop();
                 double now = Timer.getFPGATimestamp();
                 SystemState newState;
                 switch (mSystemState) {
@@ -164,6 +163,7 @@ public class Shooter extends Subsystem {
                     mStateChanged = false;
                 }
                 mSystemStateForLogging = mSystemState;
+                mHoodRoller.getLoop().onLoop();
 
                 // Update Network Tables
                 /*
@@ -328,7 +328,11 @@ public class Shooter extends Subsystem {
         mFlywheel.stop();
         mHood.setStowed(true);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        mHoodRoller.stop();
+        if (mWantedFiringState == WantedFiringState.WANT_TO_EXHAUST) {
+            mHoodRoller.reverse();
+        } else {
+            mHoodRoller.stop();
+        }
 
         switch (mWantedState) {
         case WANT_TO_AIM: // fallthrough
@@ -371,7 +375,7 @@ public class Shooter extends Subsystem {
     private synchronized SystemState handleLoading(double now, double stateStartTime) {
         mIntake.overrideIntaking(true);
         mTurret.setDesiredAngle(new Rotation2d());
-        mFlywheel.stop();
+        mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
         mHoodRoller.intake();
@@ -492,7 +496,11 @@ public class Shooter extends Subsystem {
         mFlywheel.stop();
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        mHoodRoller.stop();
+        if (mWantedFiringState == WantedFiringState.WANT_TO_EXHAUST) {
+            mHoodRoller.reverse();
+        } else {
+            mHoodRoller.stop();
+        }
 
         switch (mWantedState) {
         case WANT_TO_AIM: // fallthrough
