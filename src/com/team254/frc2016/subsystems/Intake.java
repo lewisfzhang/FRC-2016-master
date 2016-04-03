@@ -38,8 +38,13 @@ public class Intake extends Subsystem {
 
     // Positive intakes balls, negative exhausts
     public synchronized void setIntakeRoller(double power) {
+        boolean has_ball = hasBall();
         if (!overridden_intake_) {
-            intake_talon_.set(-power);
+            if (has_ball) {
+                intake_talon_.set(Math.max(-power, 0));
+            } else {
+                intake_talon_.set(-power);
+            }
             fixed_talon_.set(-power);
         } else {
             intake_talon_.set(Math.max(-power, 0));
@@ -51,6 +56,10 @@ public class Intake extends Subsystem {
         deploy_solenoid_.set(deploy);
     }
 
+    public synchronized boolean hasBall() {
+        return have_ball_sensor_.getAverageVoltage() > 1.5;
+    }
+
     @Override
     public synchronized void stop() {
         setIntakeRoller(0);
@@ -60,8 +69,7 @@ public class Intake extends Subsystem {
     @Override
     public void outputToSmartDashboard() {
         double voltage = have_ball_sensor_.getAverageVoltage();
-        // TODO: tune this threshold
-        SmartDashboard.putBoolean("have_ball", voltage > 1.5);
+        SmartDashboard.putBoolean("have_ball", hasBall());
         SmartDashboard.putNumber("have_ball_voltage", voltage);
     }
 

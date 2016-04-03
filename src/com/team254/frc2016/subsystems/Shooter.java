@@ -610,12 +610,14 @@ public class Shooter extends Subsystem {
     }
 
     private double getShootingSetpointRpm(double range) {
-        // return mIsBadBall ? Constants.kFlywheelBadBallRpmSetpoint :
-        // Constants.kFlywheelGoodBallRpmSetpoint;
         return Constants.kFlywheelAutoAimMap.getInterpolated(new InterpolatingDouble(range)).value;
     }
 
     private boolean readyToFire(SystemState state, double now) {
+        Drive drive = Drive.getInstance(); // TODO: hold onto a permanent
+                                           // reference to this
+        boolean is_stopped = Math.abs(drive.getLeftVelocityInchesPerSec()) < Constants.kAutoShootMaxDriveSpeed
+                && Math.abs(drive.getRightVelocityInchesPerSec()) < Constants.kAutoShootMaxDriveSpeed;
         if (state == SystemState.SPINNING_AIM) {
             if ((mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget()
                     && (mCurrentTrackId != -1)) {
@@ -632,6 +634,6 @@ public class Shooter extends Subsystem {
         } else {
             mConsecutiveCyclesOnTarget = 0;
         }
-        return mConsecutiveCyclesOnTarget > Constants.kAutoAimMinConsecutiveCyclesOnTarget;
+        return mConsecutiveCyclesOnTarget > Constants.kAutoAimMinConsecutiveCyclesOnTarget && is_stopped;
     }
 }
