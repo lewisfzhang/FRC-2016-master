@@ -25,6 +25,9 @@ public class VisionServer implements Runnable {
     double lastMessageReceivedTime = 0;
     private boolean m_use_java_time = false;
 
+    private ArrayList<ServerThread> serverThreads = new ArrayList<>();
+
+
     public static VisionServer getInstance() {
         if (s_instance == null) {
             s_instance = new VisionServer(Constants.kAndroidAppTcpPort);
@@ -45,7 +48,7 @@ public class VisionServer implements Runnable {
             m_socket = socket;
         }
 
-        private void send(VisionMessage message) {
+        public void send(VisionMessage message) {
             String toSend = message.toJson() + "\n";
             if (m_socket != null && m_socket.isConnected()) {
                 try {
@@ -70,6 +73,10 @@ public class VisionServer implements Runnable {
             if ("heartbeat".equals(message.getType())) {
                 send(HeartbeatMessage.getInstance());
             }
+        }
+
+        public boolean isAlive() {
+            return m_socket != null && m_socket.isConnected() && !m_socket.isClosed();
         }
 
         @Override
@@ -144,12 +151,22 @@ public class VisionServer implements Runnable {
         }
     }
 
+    public void sendMessage(VisionMessage message) {
+        for (ServerThread s : serverThreads) {
+            if (s.isAlive()) {
+                s.send(message);
+            }
+        }
+    }
+
     @Override
     public void run() {
         while (m_running) {
             try {
                 Socket p = m_server_socket.accept();
-                new Thread(new ServerThread(p)).start();
+                ServerThread s = new ServerThread(p);
+                new Thread(s).start();
+                serverThreads.add(s);
             } catch (IOException e) {
                 System.err.println("Issue accepting socket connection!");
             }
