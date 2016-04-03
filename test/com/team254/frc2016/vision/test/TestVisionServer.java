@@ -30,13 +30,19 @@ public class TestVisionServer {
         while (true) {
             try {
                 Thread.sleep(1000);
-                VisionMessage message = (i % 20) < 10 ? SetCameraModeMessage.getVisionModeMessage() : SetCameraModeMessage.getIntakeModeMessage();
-                server.sendMessage(message);
-                System.out.println("Sending " + message.getMessage());
+                if (i == 0) {
+                    server.setUseVisionMode();
+                } else if (i == 10) {
+                    server.setUseIntakeMode();
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            System.out.println(i);
             i++;
+            if (i > 19) {
+                i = 0;
+            }
         }
 
     }

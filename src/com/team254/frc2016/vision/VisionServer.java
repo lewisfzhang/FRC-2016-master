@@ -4,6 +4,7 @@ import com.team254.frc2016.Constants;
 
 import com.team254.frc2016.vision.messages.HeartbeatMessage;
 import com.team254.frc2016.vision.messages.OffWireMessage;
+import com.team254.frc2016.vision.messages.SetCameraModeMessage;
 import com.team254.frc2016.vision.messages.VisionMessage;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -24,6 +25,7 @@ public class VisionServer implements Runnable {
     AdbBridge adb = new AdbBridge();
     double lastMessageReceivedTime = 0;
     private boolean m_use_java_time = false;
+    private boolean mUseVisionMode = true;
 
     private ArrayList<ServerThread> serverThreads = new ArrayList<>();
 
@@ -132,6 +134,7 @@ public class VisionServer implements Runnable {
         }
         new Thread(this).start();
         new Thread(new ForcePortForwardingThread()).start();
+        new Thread(new SendCameraModeThread()).start();
     }
 
     public void restartAdb() {
@@ -170,6 +173,36 @@ public class VisionServer implements Runnable {
             } catch (IOException e) {
                 System.err.println("Issue accepting socket connection!");
             }
+        }
+    }
+
+    public void setUseVisionMode() {
+        sendMessage(SetCameraModeMessage.getVisionModeMessage());
+        mUseVisionMode = true;
+    }
+
+    public void setUseIntakeMode() {
+        sendMessage(SetCameraModeMessage.getIntakeModeMessage());
+        mUseVisionMode = false;
+    }
+
+
+    private class SendCameraModeThread implements Runnable {
+
+        private SetCameraModeMessage mSetVision = SetCameraModeMessage.getVisionModeMessage();
+        private SetCameraModeMessage mSetIntake = SetCameraModeMessage.getIntakeModeMessage();
+
+        @Override
+        public void run() {
+            while (m_running) {
+                sendMessage(mUseVisionMode ? mSetVision : mSetIntake);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
 
