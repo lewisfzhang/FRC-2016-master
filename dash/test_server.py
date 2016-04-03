@@ -10,9 +10,12 @@ NetworkTable.initialize()
 
 table = NetworkTable.getTable("SmartDashboard")
 
+def valueChanged(table, key, value, isNew):
+    print("Value Changed", table.path, key, value)
+table.addTableListener(valueChanged)
+
 i = 0
 while True:
     table.putNumber("server_count", i)
-    print("looping %s" % i)
     i += 1
     time.sleep(1)
