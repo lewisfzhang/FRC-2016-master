@@ -3,7 +3,6 @@ package com.team254.frc2016.vision.messages;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 public class OffWireMessage extends VisionMessage {
 

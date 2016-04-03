@@ -4,7 +4,6 @@ import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
 import com.team254.frc2016.subsystems.Drive;
-import com.team254.frc2016.subsystems.Shooter;
 import com.team254.frc2016.subsystems.UtilityArm;
 
 import java.util.Arrays;

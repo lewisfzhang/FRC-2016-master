@@ -8,11 +8,8 @@ import com.team254.frc2016.GoalTracker;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.InterpolatingDouble;
-import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.Rotation2d;
 
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +36,7 @@ public class Shooter extends Subsystem {
         SPINNING_BATTER, // The shooter is in batter mode
         FIRING_AIM, // The shooter is firing in auto aim mode
         FIRING_BATTER, // The shooter is firing in batter mode
-        IDLE, // THe shooter is deployed but idle
+        IDLE, // The shooter is deployed but idle
         UNSTOWED_RETURNING_TO_SAFE // The shooter is preparing to stow
     }
 

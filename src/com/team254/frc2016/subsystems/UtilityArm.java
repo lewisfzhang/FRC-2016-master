@@ -103,14 +103,12 @@ public class UtilityArm extends Subsystem {
         // time and the state
         // changed boolean (for one cycle)
         private double mCurrentStateStartTime;
-        private boolean mStateChanged;
 
         @Override
         public void onStart() {
             // Leave the wanted state as it was set before enabling
             mSystemState = stateForOnStart();
             mCurrentStateStartTime = Timer.getFPGATimestamp();
-            mStateChanged = true;
             mIsAllowedToHang = false;
             mIsSafeToDriveThroughPortcullis = false;
         }
@@ -123,9 +121,6 @@ public class UtilityArm extends Subsystem {
                 System.out.println("Utility Arm state " + mSystemState + " to " + newState);
                 mSystemState = newState;
                 mCurrentStateStartTime = now;
-                mStateChanged = true;
-            } else {
-                mStateChanged = false;
             }
             setOutputsForState(mSystemState);
         }

@@ -2,7 +2,6 @@ package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.loops.Loop;
-import com.team254.lib.util.MA3AnalogEncoder;
 import com.team254.lib.util.MA3Encoder;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.SynchronousPID;

@@ -2,7 +2,6 @@ package com.team254.frc2016.auto.actions;
 
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.lib.util.Rotation2d;
-import edu.wpi.first.wpilibj.InterruptHandlerFunction;
 
 public class DriveUntilLineAction implements Action {
 
@@ -29,9 +28,5 @@ public class DriveUntilLineAction implements Action {
     public void start() {
         mDrive.setHighGear(false);
         mDrive.setVelocityHeadingSetpoint(mVelocity, Rotation2d.fromDegrees(mHeading));
-    }
-
-    private double getCurrentDistance() {
-        return (mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2;
     }
 }

@@ -5,7 +5,6 @@ import com.team254.frc2016.loops.Loop;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class HoodRoller extends Subsystem {
