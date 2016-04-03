@@ -1,5 +1,9 @@
 var webSocket = null;
 
+var model = {
+  tables: {},
+};
+
 $(document).ready(function() {
   kickWebSocket();
   setInterval(kickWebSocket, 1000);
@@ -27,33 +31,71 @@ function handlePayloadFromWebSocket(payloadString) {
 }
 
 function addOrUpdateValue(tableName, key, value) {
-  var pane = getOrCreateDashboardPane(tableName);
-  var textField = getOrCreateTextField(pane, key);
-  textField.val(value);
+  var table = getOrCreateTable(tableName);
+  setOrCreateElement(table, key, value);
 }
 
-var tablePanes = {};
-function getOrCreateDashboardPane(tableName) {
-  var pane = tablePanes[tableName];
-  if (pane != null) {
-    return pane;
+function getOrCreateTable(tableName) {
+  var table = model.tables[tableName];
+  if (table != null) {
+    return table;
   }
-  pane = $("<div/>");
-  pane.append($("<div> Table: " + tableName + "</div>"));
-  $("body").append(pane);
-  tablePanes[tableName] = pane;
-  return pane;
+  // Make a new container
+  var container = $("<div/>");
+  container.append($("<div> Table: " + tableName + "</div>"));
+  $("body").append(container);
+  var pane = $("<div/>");
+  container.append(pane);
+  
+  // make a new model entry
+  table = {
+    elements: [],
+    pane: pane,
+  };
+  model.tables[tableName] = table;
+  return table;
 }
 
-function getOrCreateTextField(pane, key) {
-  var className = "key_class_" + key;
-  var field = pane.find("." + className);
-  if (field.length > 0) {
-    return field;
+function setOrCreateElement(table, key, value) {
+  var element = null;
+  for (var i = 0; i < table.elements.length; i++) {
+    if (table.elements[i].key == key) {
+      element = table.elements[i];
+      break;
+    }
   }
-  field = $("<input type='text' class='" + className + "'></input>");
-  var container = $("<div/>").append(key + ":").append(field);
-  pane.append(container);
-  return field;
+  
+  if (element == null) {
+    // Make a new container
+    var field = $("<input type='text'></input>");
+    var container = $("<div/>")
+        .append("<span style='display: inline-block; width: 200px;'>" + key + ":</span>")
+        .append(field);
+    // Make a new model
+    element = {
+      key: key,
+      value: value,
+      field: field,
+      container: container,
+    };
+    // Insert the element alphabetically
+    insertElementToTable(table, element);
+  }
+
+  element.value = value;
+  element.field.val(value);
 }
 
+function insertElementToTable(table, element) {
+  var newKey = element.key;
+  for (var i = 0; i < table.elements.length; i++) {
+    if (newKey > table.elements[i].key) {
+      continue;
+    }
+    element.container.insertBefore(table.elements[i].container);
+    table.elements.splice(i, 0, element);
+    return;
+  }
+  table.pane.append(element.container);
+  table.elements.push(element);
+}
