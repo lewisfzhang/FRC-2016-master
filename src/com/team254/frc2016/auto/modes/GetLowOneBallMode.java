@@ -14,24 +14,19 @@ import java.util.Arrays;
  */
 public class GetLowOneBallMode extends AutoModeBase {
 
-    private final boolean mIsBadBall;
     private final boolean mShouldDriveBack;
     private final double mDistanceToDrive;
-    private final Shooter mShooter = Shooter.getInstance();
     private final Drive mDrive = Drive.getInstance();
 
     private static final double DISTANCE_TO_DROP_INTAKE = 12;
 
-    public GetLowOneBallMode(boolean isBadBall, boolean shouldDriveBack, double distanceToDrive) {
-        mIsBadBall = isBadBall;
+    public GetLowOneBallMode(boolean shouldDriveBack, double distanceToDrive) {
         mShouldDriveBack = shouldDriveBack;
         mDistanceToDrive = distanceToDrive;
     }
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        mShooter.setIsBadBall(mIsBadBall);
-
         // Get low and wait a minimum of 3.5 seconds
         runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(3.5))));
 

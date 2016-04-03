@@ -11,6 +11,7 @@ import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.Rotation2d;
 
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -33,10 +34,12 @@ public class Shooter extends Subsystem {
         STOWED_AND_HOMING_HOOD, // The shooter is stowed and the hood is homing
         STOWED_OR_STOWING, // The shooter is stowed (or stowing)
         UNSTOWING, // The shooter is in the process of unstowing
+        LOADING, // The shooter is bringing in the ball
         SPINNING_AIM, // The shooter is auto aiming
         SPINNING_BATTER, // The shooter is in batter mode
         FIRING_AIM, // The shooter is firing in auto aim mode
         FIRING_BATTER, // The shooter is firing in batter mode
+        IDLE, // THe shooter is deployed but idle
         UNSTOWED_RETURNING_TO_SAFE // The shooter is preparing to stow
     }
 
@@ -44,6 +47,7 @@ public class Shooter extends Subsystem {
      * Drives state changes. Outputs should not be decided based on this enum.
      */
     public enum WantedState {
+        WANT_TO_IDLE, // The user is okay with leaving the hood up
         WANT_TO_STOW, // The user wants to stow the shooter
         WANT_TO_AIM, // The user wants to auto aim
         WANT_TO_BATTER // The user wants to use batter mode
@@ -56,8 +60,9 @@ public class Shooter extends Subsystem {
     public enum WantedFiringState {
         WANT_TO_HOLD_FIRE, // The user does not wish to fire
         WANT_TO_FIRE_NOW, // The user wants to fire now, regardless of readiness
-        WANT_TO_FIRE_WHEN_READY // The user wants to fire as soon as we achieve
-                                // readiness
+        WANT_TO_FIRE_WHEN_READY, // The user wants to fire as soon as we achieve
+                                 // readiness
+        WANT_TO_EXHAUST // The user wants to exhaust the ball
     }
 
     private WantedState mWantedState = WantedState.WANT_TO_STOW;
@@ -67,7 +72,6 @@ public class Shooter extends Subsystem {
     private double mCurrentAngleForLogging;
     private SystemState mSystemStateForLogging;
     private boolean mTuningMode = false;
-    private boolean mIsBadBall = false;
 
     private double mTurretManualScanOutput = 0;
     private double mHoodManualScanOutput = 0;
@@ -80,7 +84,7 @@ public class Shooter extends Subsystem {
     Turret mTurret = new Turret();
     Flywheel mFlywheel = new Flywheel();
     Hood mHood = new Hood();
-    Solenoid mShooterSolenoid = Constants.makeSolenoidForId(Constants.kShooterSolenoidId);
+    HoodRoller mHoodRoller = new HoodRoller();
     Intake mIntake = Intake.getInstance();
     RobotState mRobotState = RobotState.getInstance();
 
@@ -101,6 +105,7 @@ public class Shooter extends Subsystem {
         public void onStart() {
             synchronized (Shooter.this) {
                 mHood.getLoop().onStart();
+                mHoodRoller.getLoop().onStart();
                 mWantedState = WantedState.WANT_TO_STOW;
                 mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
                 mCurrentStateStartTime = Timer.getFPGATimestamp();
@@ -113,6 +118,7 @@ public class Shooter extends Subsystem {
         public void onLoop() {
             synchronized (Shooter.this) {
                 mHood.getLoop().onLoop();
+                mHoodRoller.getLoop().onLoop();
                 double now = Timer.getFPGATimestamp();
                 SystemState newState;
                 switch (mSystemState) {
@@ -128,6 +134,9 @@ public class Shooter extends Subsystem {
                 case UNSTOWING:
                     newState = handleUnstowing(now, mCurrentStateStartTime);
                     break;
+                case LOADING:
+                    newState = handleLoading(now, mCurrentStateStartTime);
+                    break;
                 case SPINNING_AIM:
                     newState = handleSpinningAim(now, mStateChanged);
                     break;
@@ -137,6 +146,9 @@ public class Shooter extends Subsystem {
                 case FIRING_AIM: // fallthrough
                 case FIRING_BATTER:
                     newState = handleShooting(mSystemState, now, mCurrentStateStartTime);
+                    break;
+                case IDLE:
+                    newState = handleIdle();
                     break;
                 case UNSTOWED_RETURNING_TO_SAFE:
                     newState = handleReturningToSafe(now, mCurrentStateStartTime);
@@ -174,6 +186,7 @@ public class Shooter extends Subsystem {
         public void onStop() {
             synchronized (Shooter.this) {
                 mHood.getLoop().onStop();
+                mHoodRoller.getLoop().onStop();
                 mFlywheel.stop();
                 mHood.stop();
                 mTurret.stop();
@@ -197,6 +210,7 @@ public class Shooter extends Subsystem {
         mFlywheel.outputToSmartDashboard();
         mHood.outputToSmartDashboard();
         mTurret.outputToSmartDashboard();
+        mHoodRoller.outputToSmartDashboard();
         SmartDashboard.putNumber("current_range", mCurrentRangeForLogging);
         SmartDashboard.putNumber("current_angle", mCurrentAngleForLogging);
         SmartDashboard.putString("shooter_state", "" + mSystemStateForLogging);
@@ -206,6 +220,7 @@ public class Shooter extends Subsystem {
     public synchronized void stop() {
         mFlywheel.stop();
         mHood.stop();
+        mHoodRoller.stop();
         mTurret.stop();
     }
 
@@ -213,6 +228,7 @@ public class Shooter extends Subsystem {
     public synchronized void zeroSensors() {
         mFlywheel.zeroSensors();
         mHood.zeroSensors();
+        mHoodRoller.zeroSensors();
         mTurret.zeroSensors();
         mCachedAimingParams.clear();
     }
@@ -257,6 +273,10 @@ public class Shooter extends Subsystem {
         mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
     }
 
+    public synchronized void setWantsToExhaust() {
+        mWantedFiringState = WantedFiringState.WANT_TO_EXHAUST;
+    }
+
     public synchronized int getNumShotsFired() {
         return mNumShotsFired;
     }
@@ -277,10 +297,6 @@ public class Shooter extends Subsystem {
         mTuningMode = tuning_on;
     }
 
-    public void setIsBadBall(boolean isBadBall) {
-        mIsBadBall = isBadBall;
-    }
-
     private synchronized SystemState handleReenabled() {
         if (!mHood.hasHomed()) {
             // We assume that this only happens when we are first enabled
@@ -288,8 +304,8 @@ public class Shooter extends Subsystem {
         }
         mTurret.setDesiredAngle(new Rotation2d());
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
+        mHoodRoller.stop();
         mFlywheel.stop();
-        setShooterSolenoidLift(false);
 
         if (mTurret.isSafe() && mHood.isSafe()) {
             return handleStowedOrStowing();
@@ -304,7 +320,7 @@ public class Shooter extends Subsystem {
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(true);
-        setShooterSolenoidLift(false);
+        mHoodRoller.stop();
 
         return mHood.hasHomed() ? SystemState.STOWED_OR_STOWING : SystemState.STOWED_AND_HOMING_HOOD;
     }
@@ -315,11 +331,12 @@ public class Shooter extends Subsystem {
         mFlywheel.stop();
         mHood.setStowed(true);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        setShooterSolenoidLift(false);
+        mHoodRoller.stop();
 
         switch (mWantedState) {
         case WANT_TO_AIM: // fallthrough
         case WANT_TO_BATTER:
+        case WANT_TO_IDLE:
             return SystemState.UNSTOWING;
         case WANT_TO_STOW: // fallthrough
         default:
@@ -334,24 +351,55 @@ public class Shooter extends Subsystem {
         mFlywheel.stop();
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        setShooterSolenoidLift(false);
+        mHoodRoller.stop();
 
         // State transitions
         switch (mWantedState) {
         case WANT_TO_AIM: // fallthrough
-        case WANT_TO_BATTER:
+        case WANT_TO_BATTER: // fallthrough
+        case WANT_TO_IDLE:
             boolean isDoneUnstowing = now - stateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
             if (!isDoneUnstowing) {
                 return SystemState.UNSTOWING;
             } else {
-                mRobotState.resetVision();
-                mCurrentTrackId = -1;
-                return mWantedState == WantedState.WANT_TO_AIM ? SystemState.SPINNING_AIM : SystemState.SPINNING_BATTER;
+                return SystemState.LOADING;
             }
         case WANT_TO_STOW: // fallthrough
         default:
             mHood.startHoming();
             return SystemState.STOWED_OR_STOWING;
+        }
+    }
+
+    private synchronized SystemState handleLoading(double now, double stateStartTime) {
+        mIntake.overrideIntaking(true);
+        mTurret.setDesiredAngle(new Rotation2d());
+        mFlywheel.stop();
+        mHood.setStowed(false);
+        mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
+        mHoodRoller.intake();
+
+        switch (mWantedState) {
+        case WANT_TO_AIM: // fallthrough
+        case WANT_TO_BATTER:
+        case WANT_TO_IDLE:
+            boolean isDoneLoading = now - stateStartTime > Constants.kLoadingTime;
+            if (isDoneLoading) {
+                mRobotState.resetVision();
+                mCurrentTrackId = -1;
+                if (mWantedState == WantedState.WANT_TO_AIM) {
+                    return SystemState.SPINNING_AIM;
+                } else if (mWantedState == WantedState.WANT_TO_BATTER) {
+                    return SystemState.SPINNING_BATTER;
+                } else {
+                    return SystemState.IDLE;
+                }
+            } else {
+                return SystemState.LOADING;
+            }
+        case WANT_TO_STOW:
+        default:
+            return SystemState.UNSTOWED_RETURNING_TO_SAFE;
         }
     }
 
@@ -364,7 +412,7 @@ public class Shooter extends Subsystem {
         }
 
         mHood.setStowed(false);
-        setShooterSolenoidLift(false);
+        mHoodRoller.intake();
         autoAim(now, true);
 
         // State transition
@@ -379,6 +427,8 @@ public class Shooter extends Subsystem {
             }
         case WANT_TO_BATTER:
             return SystemState.SPINNING_BATTER;
+        case WANT_TO_IDLE:
+            return SystemState.IDLE;
         case WANT_TO_STOW: // fallthrough
         default:
             return SystemState.UNSTOWED_RETURNING_TO_SAFE;
@@ -390,8 +440,8 @@ public class Shooter extends Subsystem {
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         mHood.setStowed(false);
+        mHoodRoller.intake();
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        setShooterSolenoidLift(false);
 
         // state transitions
         switch (mWantedState) {
@@ -405,6 +455,8 @@ public class Shooter extends Subsystem {
             } else {
                 return SystemState.SPINNING_BATTER;
             }
+        case WANT_TO_IDLE:
+            return SystemState.IDLE;
         case WANT_TO_STOW: // fallthrough
         default:
             return SystemState.UNSTOWED_RETURNING_TO_SAFE;
@@ -418,20 +470,42 @@ public class Shooter extends Subsystem {
         }
 
         if (now - stateStartTime < Constants.kShootActuationTime) {
-            setShooterSolenoidLift(true);
+            mHoodRoller.shoot();
             return state;
         } else {
-            setShooterSolenoidLift(false);
+            mHoodRoller.stop();
             mNumShotsFired++;
             switch (mWantedState) {
             case WANT_TO_AIM:
                 return SystemState.SPINNING_AIM;
             case WANT_TO_BATTER:
                 return SystemState.SPINNING_BATTER;
+            case WANT_TO_IDLE:
+                return SystemState.IDLE;
             case WANT_TO_STOW: // fallthrough
             default:
                 return SystemState.UNSTOWED_RETURNING_TO_SAFE;
             }
+        }
+    }
+
+    private synchronized SystemState handleIdle() {
+        mTurret.setDesiredAngle(new Rotation2d());
+        mIntake.overrideIntaking(!mTurret.isSafe());
+        mFlywheel.stop();
+        mHood.setStowed(false);
+        mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
+        mHoodRoller.stop();
+
+        switch (mWantedState) {
+        case WANT_TO_AIM: // fallthrough
+        case WANT_TO_BATTER:
+            return SystemState.LOADING;
+        case WANT_TO_IDLE:
+            return SystemState.IDLE;
+        case WANT_TO_STOW: // fallthrough
+        default:
+            return SystemState.UNSTOWED_RETURNING_TO_SAFE;
         }
     }
 
@@ -440,14 +514,16 @@ public class Shooter extends Subsystem {
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(false);
+        mHoodRoller.stop();
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        setShooterSolenoidLift(false);
 
         switch (mWantedState) {
         case WANT_TO_AIM:
             return SystemState.SPINNING_AIM;
         case WANT_TO_BATTER:
             return SystemState.SPINNING_BATTER;
+        case WANT_TO_IDLE:
+            return SystemState.IDLE;
         default:
             if ((mTurret.isSafe() && mHood.isSafe()) || (now - start_time > Constants.kStowingOverrideTime)) {
                 mHood.startHoming();
@@ -456,10 +532,6 @@ public class Shooter extends Subsystem {
                 return SystemState.UNSTOWED_RETURNING_TO_SAFE;
             }
         }
-    }
-
-    private void setShooterSolenoidLift(boolean shouldLift) {
-        mShooterSolenoid.set(shouldLift);
     }
 
     private double getHoodAngleForRange(double range) {

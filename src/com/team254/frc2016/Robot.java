@@ -51,6 +51,8 @@ public class Robot extends IterativeRobot {
 
     boolean mLogToSmartdashboard = true;
     boolean mHoodTuningMode = false;
+    
+    boolean mGetDown = true;
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
@@ -181,6 +183,8 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+        
+        mGetDown = true;
     }
 
     @Override
@@ -193,7 +197,6 @@ public class Robot extends IterativeRobot {
 
         outputAllToSmartDashboard();
 
-        mShooter.setIsBadBall(mControls.getBadBallOverride());
         mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
         mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
     }
@@ -230,15 +233,15 @@ public class Robot extends IterativeRobot {
 
         if (mControls.getAutoAim()) {
             mShooter.setWantedState(Shooter.WantedState.WANT_TO_AIM);
+            mGetDown = false;
         } else if (mControls.getBatterShot()) {
             mShooter.setWantedState(Shooter.WantedState.WANT_TO_BATTER);
+            mGetDown = false;
         } else {
-            mShooter.setWantedState(Shooter.WantedState.WANT_TO_STOW);
+            mShooter.setWantedState(mGetDown ? Shooter.WantedState.WANT_TO_STOW : Shooter.WantedState.WANT_TO_IDLE);
         }
 
         mShooter.setTurretManualScanOutput(mControls.getTurretManual() * .66);
-
-        mShooter.setIsBadBall(mControls.getBadBallOverride());
 
         if (mControls.getFireButton()) {
             mShooter.setWantsToFireWhenReady();
@@ -248,6 +251,7 @@ public class Robot extends IterativeRobot {
 
         if (mControls.getPortcullisButton()) {
             mIntake.setDeploy(true);
+            mGetDown = true;
             mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
         } else if (mControls.getCdfButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.CDF);

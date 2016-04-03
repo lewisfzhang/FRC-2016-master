@@ -47,18 +47,40 @@ public class Path {
     }
 
     public Translation2d getLookaheadPoint(Translation2d position, double lookahead_distance) {
-        Translation2d rv = new Translation2d(); // FIXME
+        Translation2d rv = new Translation2d();
+        if (mSegments.size() == 0) {
+            return rv;
+        }
 
         // Check the distances to the start and end of each segment. As soon as
         // we find a point > lookahead_distance away, we know the right point
         // lies somewhere on that segment.
-        // TODO
-        
-        // Special case: Before the first point
-        // TODO
-        // Special case: After the last point
-        // TODO
+        Translation2d position_inverse = position.inverse();
+        if (position_inverse.translateBy(mSegments.get(0).getStart()).norm() >= lookahead_distance) {
+            // Special case: Before the first point
+            // TODO
+        } else {
+            boolean found_segment = false;
+            for (int i = 0; i < mSegments.size(); ++i) {
+                PathSegment segment = mSegments.get(i);
+                double distance = position_inverse.translateBy(segment.getEnd()).norm();
+                if (distance >= lookahead_distance) {
+                    // This segment contains the lookahead point
+                    // TODO
+                    found_segment = true;
+                }
+            }
+            if (!found_segment) {
+                // Special case: After the last point
+                // TODO
+            }
+        }
 
         return rv;
+    }
+    
+    static double getFirstCircleSegmentIntersection(PathSegment segment, Translation2d center, double radius) {
+        // TODO
+        return 0.0;
     }
 }

@@ -14,7 +14,6 @@ public class SmartDashboardInteractions {
 
     private static final String HOOD_TUNING_MODE = "Hood Tuning Mode";
     private static final String OUTPUT_TO_SMART_DASHBOARD = "Output To SmartDashboard";
-    private static final String IS_AUTON_BALL_BAD = "Auton Ball Worn?";
     private static final String SHOULD_RESET_UTILITY_ARM = "Robot in Start Position";
     private static final String AUTON_MODE = "Auton Mode";
     private static final String AUTON_LANE = "Auton Lane";
@@ -25,7 +24,6 @@ public class SmartDashboardInteractions {
     public void initWithDefaults() {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
         SmartDashboard.putBoolean(OUTPUT_TO_SMART_DASHBOARD, true);
-        SmartDashboard.putBoolean(IS_AUTON_BALL_BAD, false);
         SmartDashboard.putBoolean(SHOULD_RESET_UTILITY_ARM, false);
 
         mAutonModeChooser = new SendableChooser();
@@ -101,11 +99,11 @@ public class SmartDashboardInteractions {
     private AutoModeBase createAutoMode(AutonOption autonOption, AutonLane autonLane) {
         switch (autonOption) {
         case STAY_HIGH_ONE_BALL:
-            return new StayHighOneBall(isAutonBallBad(), false, autonLane.distanceToDrive);
+            return new StayHighOneBall(false, autonLane.distanceToDrive);
         case STAY_HIGH_ONE_BALL_DRIVE_BACK:
-            return new StayHighOneBall(isAutonBallBad(), true, autonLane.distanceToDrive);
+            return new StayHighOneBall(true, autonLane.distanceToDrive);
         case GET_LOW_ONE_BALL:
-            return new GetLowOneBallMode(isAutonBallBad(), false, autonLane.distanceToDrive);
+            return new GetLowOneBallMode(false, autonLane.distanceToDrive);
         case CDF_ONE_BALL:
             return new ShovelTheFriesMode(autonLane.distanceToDrive);
         case TWO_BALL:
@@ -115,9 +113,5 @@ public class SmartDashboardInteractions {
             System.out.println("ERROR: unexpected auto mode: " + autonOption);
             return new StandStillMode();
         }
-    }
-
-    private boolean isAutonBallBad() {
-        return SmartDashboard.getBoolean(IS_AUTON_BALL_BAD, false);
     }
 }

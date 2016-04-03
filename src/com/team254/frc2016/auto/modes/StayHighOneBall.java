@@ -15,24 +15,19 @@ import java.util.Arrays;
 public class StayHighOneBall extends AutoModeBase {
 
     private final Drive mDrive = Drive.getInstance();
-    private final Shooter mShooter = Shooter.getInstance();
-    private final boolean mIsBadBall;
     private final boolean mShouldDriveBack;
     private final double mDistanceToDrive;
 
     // TODO: validate this distance
     public static final double DISTANCE_TO_DROP_ARM = 85;
 
-    public StayHighOneBall(boolean isBadBall, boolean shouldDriveBack, double distanceToDrive) {
-        mIsBadBall = isBadBall;
+    public StayHighOneBall(boolean shouldDriveBack, double distanceToDrive) {
         mShouldDriveBack = shouldDriveBack;
         mDistanceToDrive = distanceToDrive;
     }
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        mShooter.setIsBadBall(mIsBadBall);
-
         runAction(new ParallelAction(Arrays.asList(
                 new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
                 new SeriesAction(Arrays.asList(

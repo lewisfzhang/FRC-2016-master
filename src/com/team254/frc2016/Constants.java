@@ -14,10 +14,10 @@ public class Constants extends ConstantsBase {
     public static double kTurretAngleOffsetDegrees = 0.0;
 
     // Pose of the camera frame w.r.t. the turret frame
-    public static double kCameraXOffset = -5.81;
+    public static double kCameraXOffset = -6.475;
     public static double kCameraYOffset = 0.0;
-    public static double kCameraZOffset = 20.784;
-    public static double kCameraPitchAngleDegrees = 30.0;
+    public static double kCameraZOffset = 19.489;
+    public static double kCameraPitchAngleDegrees = 33.67;
     public static double kCameraYawAngleDegrees = 0.0;
     public static double kCameraDeadband = 0.01;
 
@@ -28,13 +28,13 @@ public class Constants extends ConstantsBase {
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
 
     // Hood constants
-    public static double kMinHoodAngle = 41.29;
-    public static double kMaxHoodAngle = 84.0;
-    public static double kBatterHoodAngle = 41.29;
+    public static double kMinHoodAngle = 42.48;
+    public static double kMaxHoodAngle = 71.42;
+    public static double kBatterHoodAngle = 42.5;
     public static double kHoodNeutralAngle = 42.5;
-    public static double kHoodMaxSafeAngle = 45.0;
+    public static double kHoodMaxSafeAngle = 43.0;
     public static double kHoodOnTargetTolerance = 0.4;
-    public static double kHoodGearReduction = 12.0 / 708.0;
+    public static double kHoodGearReduction = 12.0 / 644.0;
 
     // Turret constants
     public static double kHardMaxTurretAngle = 109.5;
@@ -47,20 +47,21 @@ public class Constants extends ConstantsBase {
 
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 150.0;
-    public static double kFlywheelGoodBallRpmSetpoint = 7000.0;
+    public static double kFlywheelGoodBallRpmSetpoint = 7100.0;
     public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
-    public static double kAutoAimMaxRange = 180.0;
+    public static double kAutoAimMaxRange = 220.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 5;
     public static double kShootActuationTime = 0.75;
-    public static double kHoodUnstowToFlywheelSpinTime = 0.75;
+    public static double kHoodUnstowToFlywheelSpinTime = 0.25;
+    public static double kLoadingTime = 0.5;
     public static double kStowingOverrideTime = 2.0;
 
     // Goal tracker constants
-    public static double kMaxGoalTrackAge = 0.5;
+    public static double kMaxGoalTrackAge = 0.3;
     public static double kMaxTrackerDistance = 12.0;
     public static double kCameraFrameRate = 30.0;
     public static double kTrackReportComparatorStablityWeight = 1.0;
@@ -132,7 +133,7 @@ public class Constants extends ConstantsBase {
     public static double kFlywheelKp = 0.075;
     public static double kFlywheelKi = 0.0;
     public static double kFlywheelKd = 0.5;
-    public static double kFlywheelKf = 0.015;
+    public static double kFlywheelKf = 0.012;
     public static int kFlywheelIZone = 0;
     public static double kFlywheelRampRate = 0;
     public static int kFlywheelAllowableError = 0;
@@ -173,23 +174,24 @@ public class Constants extends ConstantsBase {
     public static final int kShooterSlaveId = 2;
     public static final int kIntakeTalonId = 7;
     public static final int kFixedRollerTalonId = 8;
+    public static final int kHoodRollerTalonId = 6;
 
     // SOLENOIDS
-    public static final int kShifterSolenoidId = 11; // PCM 1, Solenoid 3
+    public static final int kShifterSolenoidId = 7; // PCM 0, Solenoid 7
     public static final int kHoodStowSolenoidId = 1; // PCM 0, Solenoid 1
-    public static final int kIntakeSolenoidId = 10; // PCM 1, Solenoid 2
-    public static final int kShooterSolenoidId = 0; // PCM 0, Solenoid 0
+    public static final int kIntakeSolenoidId = 6; // PCM 0, Solenoid 6
 
-    public static final int kArmLiftSolenoidId = 9; // PCM 1, Solenoid 1
+    public static final int kArmLiftSolenoidId = 5; // PCM 0, Solenoid 5
     public static final int kAdjustableHardStopSolenoidId = 2; // PCM 0,
                                                                // Solenoid 2
     public static final int kCdfFlapSolenoidId = 3; // PCM 0, Solenoid 3
     public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct
                                                        // solenoid
-    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the correct solenoid
+    public static final int kGasSpringReleaseSolenoidId = 0; // TODO: find the correct solenoid
 
     // Analog Inputs
     public static int kHaveBallSensorAnalogId = 1;
+    public static int kBallReadyAnalogId = 2;
 
     /**
      * Make an {@link Solenoid} instance for the single-number ID of the
@@ -277,11 +279,14 @@ public class Constants extends ConstantsBase {
     static {
         // Tuned on long, smooth metal hood with pinch standoff and 4 wheels, 3d
         // printed camera mount 3/9
-        kFlywheelAutoAimMap.put(new InterpolatingDouble(65.0), new InterpolatingDouble(5000.0));
+        /*kFlywheelAutoAimMap.put(new InterpolatingDouble(65.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(70.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(5000.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(120.0), new InterpolatingDouble(5500.0));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(6000.0));
+        */
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMinRange), new InterpolatingDouble(Constants.kFlywheelGoodBallRpmSetpoint));
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMaxRange), new InterpolatingDouble(Constants.kFlywheelGoodBallRpmSetpoint));
     }
 
     static {
