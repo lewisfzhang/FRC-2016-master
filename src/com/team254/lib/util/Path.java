@@ -78,7 +78,7 @@ public class Path {
 
         return rv;
     }
-    
+
     static double getFirstCircleSegmentIntersection(PathSegment segment, Translation2d center, double radius) {
         // TODO
         return 0.0;

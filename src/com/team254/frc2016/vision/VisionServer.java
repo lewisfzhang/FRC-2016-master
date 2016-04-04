@@ -29,7 +29,6 @@ public class VisionServer implements Runnable {
 
     private ArrayList<ServerThread> serverThreads = new ArrayList<>();
 
-
     public static VisionServer getInstance() {
         if (s_instance == null) {
             s_instance = new VisionServer(Constants.kAndroidAppTcpPort);
@@ -185,7 +184,6 @@ public class VisionServer implements Runnable {
         sendMessage(SetCameraModeMessage.getIntakeModeMessage());
         mUseVisionMode = false;
     }
-
 
     private class SendCameraModeThread implements Runnable {
 

@@ -9,19 +9,12 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake extends Subsystem {
-    static Intake instance_ = new Intake();
-
-    public static Intake getInstance() {
-        return instance_;
-    }
-
     private CANTalon intake_talon_;
     private CANTalon fixed_talon_;
     private Solenoid deploy_solenoid_;
-    private boolean overridden_intake_ = false;
     private AnalogInput have_ball_sensor_;
 
-    private Intake() {
+    Intake() {
         intake_talon_ = new CANTalon(Constants.kIntakeTalonId);
         intake_talon_.changeControlMode(TalonControlMode.PercentVbus);
         intake_talon_.enableBrakeMode(false);
@@ -32,24 +25,15 @@ public class Intake extends Subsystem {
         have_ball_sensor_ = new AnalogInput(Constants.kHaveBallSensorAnalogId);
     }
 
-    synchronized void overrideIntaking(boolean overriding) {
-        overridden_intake_ = overriding;
-    }
-
     // Positive intakes balls, negative exhausts
-    public synchronized void setIntakeRoller(double power) {
+    public synchronized void setIntakeRoller(double outer_power, double fixed_power) {
         boolean has_ball = hasBall();
-        if (!overridden_intake_) {
-            if (has_ball) {
-                intake_talon_.set(Math.max(-power, 0));
-            } else {
-                intake_talon_.set(-power);
-            }
-            fixed_talon_.set(-power);
+        if (has_ball) {
+            intake_talon_.set(Math.max(-outer_power, 0));
         } else {
-            intake_talon_.set(Math.max(-power, 0));
-            fixed_talon_.set(Math.max(-power, 0));
+            intake_talon_.set(-outer_power);
         }
+        fixed_talon_.set(-fixed_power);
     }
 
     public synchronized void setDeploy(boolean deploy) {
@@ -62,7 +46,7 @@ public class Intake extends Subsystem {
 
     @Override
     public synchronized void stop() {
-        setIntakeRoller(0);
+        setIntakeRoller(0, 0);
         setDeploy(false);
     }
 

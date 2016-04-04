@@ -8,6 +8,7 @@ import com.team254.frc2016.subsystems.UtilityArm;
 public class SetArmModeAction implements Action {
 
     private UtilityArm.WantedState mDesiredState;
+
     public SetArmModeAction(UtilityArm.WantedState state) {
         mDesiredState = state;
     }

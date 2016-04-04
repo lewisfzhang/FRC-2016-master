@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Shooter extends Subsystem {
+public class Superstructure extends Subsystem {
 
-    static Shooter mInstance = new Shooter();
+    static Superstructure mInstance = new Superstructure();
 
-    public static Shooter getInstance() {
+    public static Superstructure getInstance() {
         return mInstance;
     }
 
@@ -57,13 +57,19 @@ public class Shooter extends Subsystem {
     public enum WantedFiringState {
         WANT_TO_HOLD_FIRE, // The user does not wish to fire
         WANT_TO_FIRE_NOW, // The user wants to fire now, regardless of readiness
-        WANT_TO_FIRE_WHEN_READY, // The user wants to fire as soon as we achieve
-                                 // readiness
-        WANT_TO_EXHAUST // The user wants to exhaust the ball
+        WANT_TO_FIRE_WHEN_READY // The user wants to fire as soon as we achieve
+                                // readiness
+    }
+
+    public enum WantedIntakeState {
+        WANT_TO_STOP_INTAKE, // The user does not wish to intake balls
+        WANT_TO_RUN_INTAKE, // The user wants to intake balls
+        WANT_TO_EXHAUST // The user wants to exhaust balls
     }
 
     private WantedState mWantedState = WantedState.WANT_TO_STOW;
     private WantedFiringState mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
+    private WantedIntakeState mWantedIntakeState = WantedIntakeState.WANT_TO_STOP_INTAKE;
 
     private double mCurrentRangeForLogging;
     private double mCurrentAngleForLogging;
@@ -82,7 +88,7 @@ public class Shooter extends Subsystem {
     Flywheel mFlywheel = new Flywheel();
     Hood mHood = new Hood();
     HoodRoller mHoodRoller = new HoodRoller();
-    Intake mIntake = Intake.getInstance();
+    Intake mIntake = new Intake();
     RobotState mRobotState = RobotState.getInstance();
 
     // NetworkTables
@@ -100,11 +106,12 @@ public class Shooter extends Subsystem {
 
         @Override
         public void onStart() {
-            synchronized (Shooter.this) {
+            synchronized (Superstructure.this) {
                 mHood.getLoop().onStart();
                 mHoodRoller.getLoop().onStart();
                 mWantedState = WantedState.WANT_TO_STOW;
                 mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
+                mWantedIntakeState = WantedIntakeState.WANT_TO_STOP_INTAKE;
                 mCurrentStateStartTime = Timer.getFPGATimestamp();
                 mSystemState = SystemState.REENABLED;
                 mStateChanged = true;
@@ -113,7 +120,7 @@ public class Shooter extends Subsystem {
 
         @Override
         public void onLoop() {
-            synchronized (Shooter.this) {
+            synchronized (Superstructure.this) {
                 mHood.getLoop().onLoop();
                 double now = Timer.getFPGATimestamp();
                 SystemState newState;
@@ -181,17 +188,18 @@ public class Shooter extends Subsystem {
 
         @Override
         public void onStop() {
-            synchronized (Shooter.this) {
+            synchronized (Superstructure.this) {
                 mHood.getLoop().onStop();
                 mHoodRoller.getLoop().onStop();
                 mFlywheel.stop();
                 mHood.stop();
                 mTurret.stop();
+                mIntake.stop();
             }
         }
     };
 
-    private Shooter() {
+    private Superstructure() {
     }
 
     public Loop getLoop() {
@@ -208,6 +216,7 @@ public class Shooter extends Subsystem {
         mHood.outputToSmartDashboard();
         mTurret.outputToSmartDashboard();
         mHoodRoller.outputToSmartDashboard();
+        mIntake.outputToSmartDashboard();
         SmartDashboard.putNumber("current_range", mCurrentRangeForLogging);
         SmartDashboard.putNumber("current_angle", mCurrentAngleForLogging);
         SmartDashboard.putString("shooter_state", "" + mSystemStateForLogging);
@@ -219,6 +228,7 @@ public class Shooter extends Subsystem {
         mHood.stop();
         mHoodRoller.stop();
         mTurret.stop();
+        mIntake.stop();
     }
 
     @Override
@@ -228,6 +238,7 @@ public class Shooter extends Subsystem {
         mHoodRoller.zeroSensors();
         mTurret.zeroSensors();
         mCachedAimingParams.clear();
+        mIntake.zeroSensors();
     }
 
     public synchronized void resetTurretAtMax() {
@@ -271,7 +282,23 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized void setWantsToExhaust() {
-        mWantedFiringState = WantedFiringState.WANT_TO_EXHAUST;
+        mWantedIntakeState = WantedIntakeState.WANT_TO_EXHAUST;
+    }
+
+    public synchronized void setWantsToStopIntake() {
+        mWantedIntakeState = WantedIntakeState.WANT_TO_STOP_INTAKE;
+    }
+
+    public synchronized void setWantsToRunIntake() {
+        mWantedIntakeState = WantedIntakeState.WANT_TO_RUN_INTAKE;
+    }
+
+    public synchronized void deployIntake() {
+        mIntake.setDeploy(true);
+    }
+
+    public synchronized void stowIntake() {
+        mIntake.setDeploy(false);
     }
 
     public synchronized int getNumShotsFired() {
@@ -313,7 +340,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleStowedAndHomingHood() {
-        mIntake.overrideIntaking(true);
+        handleIntake(true, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(true);
@@ -323,12 +350,12 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleStowedOrStowing() {
-        mIntake.overrideIntaking(false);
+        handleIntake(false, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(true);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        if (mWantedFiringState == WantedFiringState.WANT_TO_EXHAUST) {
+        if (mWantedIntakeState == WantedIntakeState.WANT_TO_EXHAUST) {
             mHoodRoller.reverse();
         } else {
             mHoodRoller.stop();
@@ -347,7 +374,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleUnstowing(double now, double stateStartTime) {
-        mIntake.overrideIntaking(true);
+        handleIntake(true, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(false);
@@ -373,7 +400,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleLoading(double now, double stateStartTime) {
-        mIntake.setIntakeRoller(1.0);
+        handleIntake(true, true);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         mHood.setStowed(false);
@@ -386,7 +413,6 @@ public class Shooter extends Subsystem {
         case WANT_TO_IDLE:
             boolean isDoneLoading = now - stateStartTime > Constants.kLoadingTime;
             if (isDoneLoading) {
-                mIntake.setIntakeRoller(0.0);
                 mRobotState.resetVision();
                 mCurrentTrackId = -1;
                 if (mWantedState == WantedState.WANT_TO_AIM) {
@@ -401,13 +427,12 @@ public class Shooter extends Subsystem {
             }
         case WANT_TO_STOW:
         default:
-            mIntake.setIntakeRoller(0.0);
             return SystemState.UNSTOWED_RETURNING_TO_SAFE;
         }
     }
 
     private synchronized SystemState handleSpinningAim(double now, boolean isFirstCycle) {
-        mIntake.overrideIntaking(true);
+        handleIntake(true, false);
         if (isFirstCycle) {
             // Start flywheel
             mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
@@ -439,7 +464,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleSpinningBatter(double now) {
-        mIntake.overrideIntaking(true);
+        handleIntake(true, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         mHood.setStowed(false);
@@ -467,7 +492,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
-        mIntake.overrideIntaking(true);
+        handleIntake(true, true);
         if (state == SystemState.FIRING_AIM) {
             autoAim(now, false);
         }
@@ -494,11 +519,12 @@ public class Shooter extends Subsystem {
 
     private synchronized SystemState handleIdle() {
         mTurret.setDesiredAngle(new Rotation2d());
-        mIntake.overrideIntaking(!mTurret.isSafe());
+
+        handleIntake(!mTurret.isSafe(), false);
         mFlywheel.stop();
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
-        if (mWantedFiringState == WantedFiringState.WANT_TO_EXHAUST) {
+        if (mWantedIntakeState == WantedIntakeState.WANT_TO_EXHAUST) {
             mHoodRoller.reverse();
         } else {
             mHoodRoller.stop();
@@ -517,7 +543,7 @@ public class Shooter extends Subsystem {
     }
 
     private synchronized SystemState handleReturningToSafe(double now, double start_time) {
-        mIntake.overrideIntaking(true);
+        handleIntake(true, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(false);
@@ -635,5 +661,24 @@ public class Shooter extends Subsystem {
             mConsecutiveCyclesOnTarget = 0;
         }
         return mConsecutiveCyclesOnTarget > Constants.kAutoAimMinConsecutiveCyclesOnTarget && is_stopped;
+    }
+
+    private void handleIntake(boolean disallow_intaking, boolean loading) {
+        switch (mWantedIntakeState) {
+        case WANT_TO_RUN_INTAKE:
+            if (disallow_intaking) {
+                mIntake.setIntakeRoller(0.0, loading ? 1.0 : 0.0);
+            } else {
+                mIntake.setIntakeRoller(1.0, 1.0);
+            }
+            break;
+        case WANT_TO_EXHAUST:
+            mIntake.setIntakeRoller(-1.0, loading ? 1.0 : -1.0);
+            break;
+        case WANT_TO_STOP_INTAKE:
+        default:
+            mIntake.setIntakeRoller(0.0, loading ? 1.0 : 0.0);
+            break;
+        }
     }
 }

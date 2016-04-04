@@ -27,15 +27,11 @@ public class StayHighOneBall extends AutoModeBase {
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        runAction(new ParallelAction(Arrays.asList(
-                new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
-                new SeriesAction(Arrays.asList(
-                        new WaitForDistanceAction(DISTANCE_TO_DROP_ARM),
-                        new SetArmModeAction(UtilityArm.WantedState.PORTCULLIS),
-                        new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
-                        new StartAutoAimingAction()
-                ))
-        )));
+        runAction(new ParallelAction(
+                Arrays.asList(new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
+                        new SeriesAction(Arrays.asList(new StartAutoAimingAction(),
+                                new WaitForDistanceAction(DISTANCE_TO_DROP_ARM),
+                                new SetArmModeAction(UtilityArm.WantedState.PORTCULLIS))))));
 
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());

@@ -1,11 +1,11 @@
 package com.team254.frc2016.loops;
 
-import com.team254.frc2016.subsystems.Shooter;
+import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.Turret;
 
 public class TurretResetter implements Loop {
-    Shooter mShooter = Shooter.getInstance();
-    Turret mTurret = Shooter.getInstance().getTurret();
+    Superstructure mSuperstructure = Superstructure.getInstance();
+    Turret mTurret = Superstructure.getInstance().getTurret();
 
     @Override
     public void onStart() {
@@ -15,9 +15,9 @@ public class TurretResetter implements Loop {
     @Override
     public void onLoop() {
         if (mTurret.getForwardLimitSwitch()) {
-            mShooter.resetTurretAtMax();
+            mSuperstructure.resetTurretAtMax();
         } else if (mTurret.getReverseLimitSwitch()) {
-            mShooter.resetTurretAtMin();
+            mSuperstructure.resetTurretAtMin();
         }
     }
 

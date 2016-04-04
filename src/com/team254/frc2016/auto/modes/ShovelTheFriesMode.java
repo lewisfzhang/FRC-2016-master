@@ -25,13 +25,9 @@ public class ShovelTheFriesMode extends AutoModeBase {
         runAction(new WaitAction(0.5));
         runAction(new GetLowAction());
         runAction(new WaitAction(0.5));
-        runAction(new ParallelAction(Arrays.asList(
-                new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
-                new SeriesAction(Arrays.asList(
-                        new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD - mDistanceToCDF),
-                        new StartAutoAimingAction()
-                ))
-        )));
+        runAction(new ParallelAction(Arrays.asList(new SeriesAction(
+                Arrays.asList(new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
+                        new StartAutoAimingAction())))));
 
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());

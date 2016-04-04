@@ -1,7 +1,7 @@
 package com.team254.frc2016.auto.actions;
 
 import com.team254.frc2016.subsystems.Drive;
-import com.team254.frc2016.subsystems.Shooter;
+import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.ShooterAimingParameters;
 import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Rotation2d;
@@ -13,7 +13,7 @@ public class DriveUntilInRangeAction implements Action {
     private double mMinDistanceAway, mMaxDistanceToDrive, mVelocity;
     private double startingDistance;
     private Drive mDrive = Drive.getInstance();
-    private Shooter mShooter = Shooter.getInstance();
+    private Superstructure mSuperstructure = Superstructure.getInstance();
 
     public DriveUntilInRangeAction(double velocity, double minDistanceAway, double maxDistanceToDrive) {
         mMaxDistanceToDrive = maxDistanceToDrive;
@@ -27,7 +27,7 @@ public class DriveUntilInRangeAction implements Action {
             return true;
         }
 
-        List<ShooterAimingParameters> params = mShooter.getCachedAimingParams();
+        List<ShooterAimingParameters> params = mSuperstructure.getCachedAimingParams();
         System.out.println("#l: " + params.size());
         if (params.isEmpty()) {
             return false;

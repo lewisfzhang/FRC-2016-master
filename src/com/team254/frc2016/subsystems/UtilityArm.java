@@ -223,8 +223,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private synchronized SystemState handleSizeBox() {
-        return mWantedState == WantedState.STAY_IN_SIZE_BOX ? SystemState.SIZE_BOX
-                : SystemState.SIZE_BOX_TO_PORTCULLIS;
+        return mWantedState == WantedState.STAY_IN_SIZE_BOX ? SystemState.SIZE_BOX : SystemState.SIZE_BOX_TO_PORTCULLIS;
     }
 
     private synchronized SystemState handleSizeBoxToPortcullis(double timeSinceStateStart) {
@@ -240,8 +239,7 @@ public class UtilityArm extends Subsystem {
         case PREPARE_FOR_HANG: // fallthrough
         case BATTER_CHALLENGE: // fallthrough
         case PORTCULLIS:
-            return timeSinceStateStart >= Constants.kUtilityArmDriveToPortcullisDelay
-                    ? SystemState.PORTCULLIS
+            return timeSinceStateStart >= Constants.kUtilityArmDriveToPortcullisDelay ? SystemState.PORTCULLIS
                     : SystemState.DRIVE_TO_PORTCULLIS;
         case DRIVING: // fallthrough
         case CDF:
@@ -265,7 +263,8 @@ public class UtilityArm extends Subsystem {
             return SystemState.DRIVE;
         case PREPARE_FOR_HANG:
             mIsSafeToDriveThroughPortcullis = false;
-            return SystemState.LIFTING_ARM_FOR_HANG; // TODO: should be wait for clearance
+            return SystemState.LIFTING_ARM_FOR_HANG; // TODO: should be wait for
+                                                     // clearance
         case BATTER_CHALLENGE:
             mIsSafeToDriveThroughPortcullis = false;
             return SystemState.PORTCULLIS_WAIT_FOR_HARDSTOP_CLEARANCE;
@@ -367,43 +366,43 @@ public class UtilityArm extends Subsystem {
 
     private synchronized SystemState handleBatterChallenge() {
         switch (mWantedState) {
-            case PORTCULLIS: // fallthrough
-            case DRIVING: // fallthrough
-            case CDF: // fallthrough
-                // HACK: assuming size box drop delay is the same as batter challenge delay
-                return SystemState.SIZE_BOX_TO_PORTCULLIS;
-            case PREPARE_FOR_HANG:
-                return SystemState.LIFTING_ARM_FOR_HANG;
-            case BATTER_CHALLENGE:
-                return SystemState.BATTER_CHALLENGE;
-            case PULL_UP_HANG: // fallthrough
-            case STAY_IN_SIZE_BOX: // fallthrough
-            default:
-                logIllegalWantedState(SystemState.BATTER_CHALLENGE, mWantedState);
-                return SystemState.BATTER_CHALLENGE;
+        case PORTCULLIS: // fallthrough
+        case DRIVING: // fallthrough
+        case CDF: // fallthrough
+            // HACK: assuming size box drop delay is the same as batter
+            // challenge delay
+            return SystemState.SIZE_BOX_TO_PORTCULLIS;
+        case PREPARE_FOR_HANG:
+            return SystemState.LIFTING_ARM_FOR_HANG;
+        case BATTER_CHALLENGE:
+            return SystemState.BATTER_CHALLENGE;
+        case PULL_UP_HANG: // fallthrough
+        case STAY_IN_SIZE_BOX: // fallthrough
+        default:
+            logIllegalWantedState(SystemState.BATTER_CHALLENGE, mWantedState);
+            return SystemState.BATTER_CHALLENGE;
         }
     }
 
-    private synchronized SystemState handlePortcullisWaitForHardstopClearance(
-            double timeSinceStateStart) {
+    private synchronized SystemState handlePortcullisWaitForHardstopClearance(double timeSinceStateStart) {
         switch (mWantedState) {
-            case PORTCULLIS: // fallthrough
-            case DRIVING: // fallthrough
-            case CDF: // fallthrough
-                // HACK: assuming size box drop delay is the same as batter challenge delay
-                return SystemState.SIZE_BOX_TO_PORTCULLIS;
-            case PREPARE_FOR_HANG:
-                // TODO: stay in this state?
-                return SystemState.LIFTING_ARM_FOR_HANG;
-            case BATTER_CHALLENGE:
-                return timeSinceStateStart >= Constants.kUtilityArmHardStopsMoveForRaiseArmDelay
-                        ? SystemState.BATTER_CHALLENGE
-                        : SystemState.PORTCULLIS_WAIT_FOR_HARDSTOP_CLEARANCE;
-            case PULL_UP_HANG: // fallthrough
-            case STAY_IN_SIZE_BOX: // fallthrough
-            default:
-                logIllegalWantedState(SystemState.BATTER_CHALLENGE, mWantedState);
-                return SystemState.PORTCULLIS_WAIT_FOR_HARDSTOP_CLEARANCE;
+        case PORTCULLIS: // fallthrough
+        case DRIVING: // fallthrough
+        case CDF: // fallthrough
+            // HACK: assuming size box drop delay is the same as batter
+            // challenge delay
+            return SystemState.SIZE_BOX_TO_PORTCULLIS;
+        case PREPARE_FOR_HANG:
+            // TODO: stay in this state?
+            return SystemState.LIFTING_ARM_FOR_HANG;
+        case BATTER_CHALLENGE:
+            return timeSinceStateStart >= Constants.kUtilityArmHardStopsMoveForRaiseArmDelay
+                    ? SystemState.BATTER_CHALLENGE : SystemState.PORTCULLIS_WAIT_FOR_HARDSTOP_CLEARANCE;
+        case PULL_UP_HANG: // fallthrough
+        case STAY_IN_SIZE_BOX: // fallthrough
+        default:
+            logIllegalWantedState(SystemState.BATTER_CHALLENGE, mWantedState);
+            return SystemState.PORTCULLIS_WAIT_FOR_HARDSTOP_CLEARANCE;
         }
     }
 
@@ -416,73 +415,41 @@ public class UtilityArm extends Subsystem {
         case SIZE_BOX_TO_PORTCULLIS: // fallthrough
         case DRIVE_TO_PORTCULLIS: // fallthrough
         case PORTCULLIS:
-            setOutputs(
-                    ArmOutput.ARM_DOWN,
-                    AdjustableHardstopOutput.PREVENT_HANG,
-                    CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN,
-                    GasSpringReleaseOutput.STOWED);
+            setOutputs(ArmOutput.ARM_DOWN, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.STOWED,
+                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         case SIZE_BOX: // fallthrough
         case CDF_TO_DRIVING: // fallthrough
         case DRIVE:
-            setOutputs(
-                    ArmOutput.ARM_UP,
-                    AdjustableHardstopOutput.PREVENT_HANG,
-                    CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN,
-                    GasSpringReleaseOutput.STOWED);
+            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.STOWED,
+                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         case CDF:
-            setOutputs(
-                    ArmOutput.ARM_UP,
-                    AdjustableHardstopOutput.PREVENT_HANG,
-                    CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_HELD_IN,
-                    GasSpringReleaseOutput.STOWED);
+            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         case BATTER_CHALLENGE: // fallthrough
         case LIFTING_ARM_FOR_HANG:
-            setOutputs(
-                    ArmOutput.ARM_UP,
-                    AdjustableHardstopOutput.ALLOW_HANG,
-                    CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN,
-                    GasSpringReleaseOutput.STOWED);
+            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.STOWED,
+                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         case OPENING_CDF_FOR_HANG:
-            setOutputs(
-                    ArmOutput.ARM_UP,
-                    AdjustableHardstopOutput.ALLOW_HANG,
-                    CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_HELD_IN,
-                    GasSpringReleaseOutput.STOWED);
+            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         case DEPLOY_HOOKS:
             // TODO: add an intake up control here?
-            setOutputs(
-                    ArmOutput.ARM_UP,
-                    AdjustableHardstopOutput.ALLOW_HANG,
-                    CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_RELEASED,
-                    GasSpringReleaseOutput.STOWED);
+            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_RELEASED, GasSpringReleaseOutput.STOWED);
             break;
         case HANG:
             // TODO: add an intake up control here?
-            setOutputs(
-                    ArmOutput.ARM_UP,
-                    AdjustableHardstopOutput.ALLOW_HANG,
-                    CdfFlapOutput.OPEN,
-                    HookReleaseOutput.HOOKS_RELEASED,
-                    GasSpringReleaseOutput.LIFTING_ROBOT);
+            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.OPEN,
+                    HookReleaseOutput.HOOKS_RELEASED, GasSpringReleaseOutput.LIFTING_ROBOT);
             break;
         case PORTCULLIS_WAIT_FOR_HARDSTOP_CLEARANCE:
-            setOutputs(
-                    ArmOutput.ARM_DOWN,
-                    AdjustableHardstopOutput.ALLOW_HANG,
-                    CdfFlapOutput.STOWED,
-                    HookReleaseOutput.HOOKS_HELD_IN,
-                    GasSpringReleaseOutput.STOWED);
+            setOutputs(ArmOutput.ARM_DOWN, AdjustableHardstopOutput.ALLOW_HANG, CdfFlapOutput.STOWED,
+                    HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         default:
             System.out.println("Utility arm unknown state for output: " + systemState);
@@ -494,11 +461,8 @@ public class UtilityArm extends Subsystem {
      * solenoid outputs (which lose state on disable) and this state machine
      * (which keeps state through disable).
      */
-    private void setOutputs(
-            ArmOutput armOutput,
-            AdjustableHardstopOutput adjustableHardstopOutput,
-            CdfFlapOutput cdfFlapOutput,
-            HookReleaseOutput hookReleaseOutput,
+    private void setOutputs(ArmOutput armOutput, AdjustableHardstopOutput adjustableHardstopOutput,
+            CdfFlapOutput cdfFlapOutput, HookReleaseOutput hookReleaseOutput,
             GasSpringReleaseOutput gasSpringReleaseOutput) {
         mArmLiftSolenoid.set(armOutput.value);
         mAdjustableHardStopSolenoid.set(adjustableHardstopOutput.value);
@@ -510,8 +474,7 @@ public class UtilityArm extends Subsystem {
     // These enums strongly type solenoid outputs to their respective solenoid
     // directions
     private enum ArmOutput {
-        ARM_UP(false),
-        ARM_DOWN(!ARM_UP.value);
+        ARM_UP(false), ARM_DOWN(!ARM_UP.value);
 
         final boolean value;
 
@@ -521,8 +484,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum AdjustableHardstopOutput {
-        PREVENT_HANG(false),
-        ALLOW_HANG(!PREVENT_HANG.value);
+        PREVENT_HANG(false), ALLOW_HANG(!PREVENT_HANG.value);
 
         final boolean value;
 
@@ -532,8 +494,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum CdfFlapOutput {
-        STOWED(false),
-        OPEN(!STOWED.value);
+        STOWED(false), OPEN(!STOWED.value);
 
         final boolean value;
 
@@ -543,8 +504,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum HookReleaseOutput {
-        HOOKS_HELD_IN(false),
-        HOOKS_RELEASED(!HOOKS_HELD_IN.value);
+        HOOKS_HELD_IN(false), HOOKS_RELEASED(!HOOKS_HELD_IN.value);
 
         final boolean value;
 
@@ -554,8 +514,7 @@ public class UtilityArm extends Subsystem {
     }
 
     private enum GasSpringReleaseOutput {
-        STOWED(false),
-        LIFTING_ROBOT(!STOWED.value);
+        STOWED(false), LIFTING_ROBOT(!STOWED.value);
 
         final boolean value;
 

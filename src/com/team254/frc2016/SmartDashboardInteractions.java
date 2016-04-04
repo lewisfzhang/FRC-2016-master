@@ -57,8 +57,7 @@ public class SmartDashboardInteractions {
     }
 
     public AutoModeBase getSelectedAutonMode() {
-        return createAutoMode(
-                (AutonOption) mAutonModeChooser.getSelected(),
+        return createAutoMode((AutonOption) mAutonModeChooser.getSelected(),
                 (AutonLane) mAutonLaneChooser.getSelected());
     }
 
@@ -67,12 +66,8 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
-        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"),
-        STAY_HIGH_ONE_BALL("No Drop Stay"),
-        GET_LOW_ONE_BALL("Portcullis"),
-        CDF_ONE_BALL("CDF"),
-        TWO_BALL("Two Ball"),
-        STAND_STILL("Stand Still");
+        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"), STAY_HIGH_ONE_BALL("No Drop Stay"), GET_LOW_ONE_BALL(
+                "Portcullis"), CDF_ONE_BALL("CDF"), TWO_BALL("Two Ball"), STAND_STILL("Stand Still");
 
         public final String name;
 
@@ -82,14 +77,12 @@ public class SmartDashboardInteractions {
     }
 
     enum AutonLane {
-        LANE_1("Lane 1 (low bar)", 240),
-        LANE_2("Lane 2", 245),
-        LANE_3("Lane 3", 200),
-        LANE_4("Lane 4", 195),
-        LANE_5("Lane 5", 230);
+        LANE_1("Lane 1 (low bar)", 200), LANE_2("Lane 2", 205), LANE_3("Lane 3", 160), LANE_4("Lane 4",
+                155), LANE_5("Lane 5", 220);
 
         public final String name;
         public final double distanceToDrive;
+
         AutonLane(String name, double distanceToDrive) {
             this.name = name;
             this.distanceToDrive = distanceToDrive;

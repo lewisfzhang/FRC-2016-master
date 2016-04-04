@@ -8,7 +8,7 @@ import com.team254.frc2016.loops.RobotStateEstimator;
 import com.team254.frc2016.loops.TurretResetter;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Intake;
-import com.team254.frc2016.subsystems.Shooter;
+import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
@@ -29,8 +29,7 @@ public class Robot extends IterativeRobot {
 
     // Subsystems
     Drive mDrive = Drive.getInstance();
-    Intake mIntake = Intake.getInstance();
-    Shooter mShooter = Shooter.getInstance();
+    Superstructure mSuperstructure = Superstructure.getInstance();
     UtilityArm mUtilityArm = UtilityArm.getInstance();
     Compressor mCompressor = new Compressor(1);
     RevRoboticsAirPressureSensor mAirPressureSensor = new RevRoboticsAirPressureSensor(3);
@@ -51,7 +50,7 @@ public class Robot extends IterativeRobot {
 
     boolean mLogToSmartdashboard = true;
     boolean mHoodTuningMode = false;
-    
+
     boolean mGetDown = true;
 
     public Robot() {
@@ -79,16 +78,14 @@ public class Robot extends IterativeRobot {
 
     public void stopAll() {
         mDrive.stop();
-        mIntake.stop();
-        mShooter.stop();
+        mSuperstructure.stop();
         mUtilityArm.stop();
     }
 
     public void outputAllToSmartDashboard() {
         if (mLogToSmartdashboard) {
             mDrive.outputToSmartDashboard();
-            mIntake.outputToSmartDashboard();
-            mShooter.outputToSmartDashboard();
+            mSuperstructure.outputToSmartDashboard();
             mRobotState.outputToSmartDashboard();
             mUtilityArm.outputToSmartDashboard();
         }
@@ -98,8 +95,7 @@ public class Robot extends IterativeRobot {
 
     public void zeroAllSensors() {
         mDrive.zeroSensors();
-        mIntake.zeroSensors();
-        mShooter.zeroSensors();
+        mSuperstructure.zeroSensors();
         mUtilityArm.zeroSensors();
         mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), new Rotation2d());
     }
@@ -121,7 +117,7 @@ public class Robot extends IterativeRobot {
         // Configure loopers
         mEnabledLooper.register(new TurretResetter());
         mEnabledLooper.register(RobotStateEstimator.getInstance());
-        mEnabledLooper.register(Shooter.getInstance().getLoop());
+        mEnabledLooper.register(Superstructure.getInstance().getLoop());
         mEnabledLooper.register(mDrive.getLoop());
         mEnabledLooper.register(mUtilityArm.getLoop());
         mDisabledLooper.register(new GyroCalibrator());
@@ -156,7 +152,7 @@ public class Robot extends IterativeRobot {
 
         // Shift to low
         mDrive.setHighGear(false);
-        mShooter.setTuningMode(false);
+        mSuperstructure.setTuningMode(false);
 
         maybeResetUtilityArmState();
 
@@ -183,7 +179,7 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
-        
+
         mGetDown = true;
     }
 
@@ -220,39 +216,38 @@ public class Robot extends IterativeRobot {
         }
 
         if (mControls.getIntakeButton()) {
-            mIntake.setDeploy(true);
-            mIntake.setIntakeRoller(1.0);
+            mSuperstructure.deployIntake();
+            mSuperstructure.setWantsToRunIntake();
         } else if (mControls.getStowIntakeButton()) {
-            mIntake.setDeploy(false);
-            mIntake.setIntakeRoller(0.0);
+            mSuperstructure.stowIntake();
+            mSuperstructure.setWantsToStopIntake();
         } else if (mControls.getExhaustButton()) {
-            mIntake.setIntakeRoller(-1.0);
+            mSuperstructure.setWantsToExhaust();
         } else {
-            mIntake.setIntakeRoller(0.0);
+            mSuperstructure.setWantsToStopIntake();
         }
 
         if (mControls.getAutoAim()) {
-            mShooter.setWantedState(Shooter.WantedState.WANT_TO_AIM);
+            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
             mGetDown = false;
         } else if (mControls.getBatterShot()) {
-            mShooter.setWantedState(Shooter.WantedState.WANT_TO_BATTER);
+            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_BATTER);
             mGetDown = false;
         } else {
-            mShooter.setWantedState(mGetDown ? Shooter.WantedState.WANT_TO_STOW : Shooter.WantedState.WANT_TO_IDLE);
+            mSuperstructure.setWantedState(
+                    mGetDown ? Superstructure.WantedState.WANT_TO_STOW : Superstructure.WantedState.WANT_TO_IDLE);
         }
 
-        mShooter.setTurretManualScanOutput(mControls.getTurretManual() * .66);
+        mSuperstructure.setTurretManualScanOutput(mControls.getTurretManual() * .66);
 
         if (mControls.getFireButton()) {
-            mShooter.setWantsToFireWhenReady();
-        } else if (mControls.getExhaustButton()) {
-            mShooter.setWantsToExhaust();
+            mSuperstructure.setWantsToFireWhenReady();
         } else {
-            mShooter.setWantsToHoldFire();
+            mSuperstructure.setWantsToHoldFire();
         }
 
         if (mControls.getPortcullisButton()) {
-            mIntake.setDeploy(true);
+            mSuperstructure.deployIntake();
             mGetDown = true;
             mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
         } else if (mControls.getCdfButton()) {
@@ -260,29 +255,29 @@ public class Robot extends IterativeRobot {
         } else if (mControls.getBailButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
         } else if (mControls.getBatterChallengeButton()) {
-            mIntake.setDeploy(false);
+            mSuperstructure.stowIntake();
             mUtilityArm.setWantedState(UtilityArm.WantedState.BATTER_CHALLENGE);
         }
 
         if (mHoodTuningMode) {
-            mShooter.setTuningMode(true);
+            mSuperstructure.setTuningMode(true);
             if (mControls.getHoodTuningPositiveButton()) {
-                mShooter.setHoodManualScanOutput(0.1);
+                mSuperstructure.setHoodManualScanOutput(0.1);
             } else if (mControls.getHoodTuningNegativeButton()) {
-                mShooter.setHoodManualScanOutput(-0.1);
+                mSuperstructure.setHoodManualScanOutput(-0.1);
             } else {
-                mShooter.setHoodManualScanOutput(0.0);
+                mSuperstructure.setHoodManualScanOutput(0.0);
             }
         } else {
-            mShooter.setTuningMode(false);
+            mSuperstructure.setTuningMode(false);
         }
 
         if (mControls.getHoodTuningPositiveButton()) {
-            mShooter.setTestServoSpeed(1.0);
+            mSuperstructure.setTestServoSpeed(1.0);
         } else if (mControls.getHoodTuningNegativeButton()) {
-            mShooter.setTestServoSpeed(-1.0);
+            mSuperstructure.setTestServoSpeed(-1.0);
         } else {
-            mShooter.setTestServoSpeed(0.0);
+            mSuperstructure.setTestServoSpeed(0.0);
         }
 
         outputAllToSmartDashboard();

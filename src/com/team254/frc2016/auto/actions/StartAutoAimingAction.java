@@ -1,15 +1,15 @@
 package com.team254.frc2016.auto.actions;
 
-import com.team254.frc2016.subsystems.Shooter;
+import com.team254.frc2016.subsystems.Superstructure;
 
 public class StartAutoAimingAction implements Action {
 
-    private final Shooter mShooter = Shooter.getInstance();
+    private final Superstructure mSuperstructure = Superstructure.getInstance();
     private boolean mIsDone = false;
 
     @Override
     public void start() {
-        mShooter.setWantedState(Shooter.WantedState.WANT_TO_AIM);
+        mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
         mIsDone = true;
     }
 
@@ -19,9 +19,11 @@ public class StartAutoAimingAction implements Action {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
-    public void done() {}
+    public void done() {
+    }
 
 }

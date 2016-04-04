@@ -1,6 +1,5 @@
 package com.team254.frc2016.vision.messages;
 
-
 import org.json.simple.JSONObject;
 
 public abstract class VisionMessage {

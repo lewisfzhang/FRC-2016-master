@@ -1,11 +1,11 @@
 package com.team254.frc2016.auto.actions;
 
-import com.team254.frc2016.subsystems.Intake;
+import com.team254.frc2016.subsystems.Superstructure;
 
 public class DeployIntakeAction implements Action {
 
     private boolean mIsDone = false;
-    private final Intake mIntake = Intake.getInstance();
+    private final Superstructure mSuperstructure = Superstructure.getInstance();
 
     @Override
     public boolean isFinished() {
@@ -13,14 +13,16 @@ public class DeployIntakeAction implements Action {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
-    public void done() {}
+    public void done() {
+    }
 
     @Override
     public void start() {
-        mIntake.setDeploy(true);
+        mSuperstructure.deployIntake();
         mIsDone = true;
     }
 }

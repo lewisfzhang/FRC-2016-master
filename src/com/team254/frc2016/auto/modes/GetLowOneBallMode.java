@@ -29,17 +29,12 @@ public class GetLowOneBallMode extends AutoModeBase {
         // Get low and wait a minimum of 3.5 seconds
         runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(3.5))));
 
-        runAction(new ParallelAction(Arrays.asList(
-                new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
-                new SeriesAction(Arrays.asList(
-                        new WaitForDistanceAction(DISTANCE_TO_DROP_INTAKE),
-                        new DeployIntakeAction()
-                )),
-                new SeriesAction(Arrays.asList(
-                        new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
-                        new StartAutoAimingAction()
-                ))
-        )));
+        runAction(new ParallelAction(
+                Arrays.asList(new DriveStraightAction(mDistanceToDrive, AutoModeUtils.FORWARD_DRIVE_VELOCITY),
+                        new SeriesAction(Arrays.asList(new WaitForDistanceAction(DISTANCE_TO_DROP_INTAKE),
+                                new DeployIntakeAction())),
+                new SeriesAction(Arrays.asList(new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
+                        new StartAutoAimingAction())))));
 
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());

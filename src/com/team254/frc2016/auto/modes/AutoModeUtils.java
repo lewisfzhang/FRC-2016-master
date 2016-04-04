@@ -10,9 +10,7 @@ public class AutoModeUtils {
     public static final double FORWARD_DRIVE_VELOCITY = 30;
 
     public static Action makeDriveBackAction(Drive drive) {
-        double driveBackDistance =
-                -(drive.getLeftDistanceInches() + drive.getRightDistanceInches()) / 2.0
-                        + 28.0;
+        double driveBackDistance = -(drive.getLeftDistanceInches() + drive.getRightDistanceInches()) / 2.0 + 28.0;
         return new DriveStraightAction(driveBackDistance, -45);
     }
 }
