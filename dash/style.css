@@ -134,3 +134,39 @@ li {
 .booleanBoxTrue {
     background-color: green;
 }
+
+.topLineView {
+    overflow: auto;
+    width: 100%;
+}
+
+.firstPersonViewDiv {
+    width: 500px;
+    float: left;
+}
+
+.firstPersonViewImg {
+    width: 100%;
+}
+
+.hudBoxes {
+    width: 200px;
+    float: left;
+}
+
+#haveBallBox {
+    height: 45%;
+}
+
+.boolBoxPadding {
+    height: 10%;
+}
+
+#onTargetBox {
+    height: 45%;
+}
+
+.autoSelector {
+    width: 200px;
+    float: left;
+}
