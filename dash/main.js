@@ -8,8 +8,8 @@ var model = {
 
 var MIN_PLOT_UPDATE_TIME_MILLIS = 50;
 var TABLE = "/SmartDashboard";
-var SELECTED_AUTO_MODE_KEY = "selectedAutoMode";
-var SELECTED_AUTO_LANE_KEY = "selectedAutoLane";
+var SELECTED_AUTO_MODE_KEY = "selected_auto_mode";
+var SELECTED_AUTO_LANE_KEY = "selected_auto_lane";
 
 $(document).ready(function() {
 

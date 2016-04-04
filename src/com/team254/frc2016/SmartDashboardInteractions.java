@@ -4,6 +4,7 @@ import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.modes.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.json.simple.JSONArray;
 
 /**
  * Controls the interactive elements of smartdashboard.
@@ -15,29 +16,27 @@ public class SmartDashboardInteractions {
     private static final String HOOD_TUNING_MODE = "Hood Tuning Mode";
     private static final String OUTPUT_TO_SMART_DASHBOARD = "Output To SmartDashboard";
     private static final String SHOULD_RESET_UTILITY_ARM = "Robot in Start Position";
-    private static final String AUTON_MODE = "Auton Mode";
-    private static final String AUTON_LANE = "Auton Lane";
 
-    private SendableChooser mAutonModeChooser;
-    private SendableChooser mAutonLaneChooser;
+    private static final String AUTO_OPTIONS = "auto_options";
+    private static final String SELECTED_AUTO_MODE = "selected_auto_mode";
+    private static final String SELECTED_AUTO_LANE = "selected_auto_lane";
+
+    private static final AutonOption DEFAULT_MODE = AutonOption.STAY_HIGH_ONE_BALL;
+    private static final AutonLane DEFAULT_LANE = AutonLane.LANE_4;
+
 
     public void initWithDefaults() {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
         SmartDashboard.putBoolean(OUTPUT_TO_SMART_DASHBOARD, true);
         SmartDashboard.putBoolean(SHOULD_RESET_UTILITY_ARM, false);
 
-        mAutonModeChooser = new SendableChooser();
-        // first entry will become default
+        JSONArray autoOptionsArray = new JSONArray();
         for (AutonOption autonOption : AutonOption.values()) {
-            mAutonModeChooser.addObject(autonOption.name, autonOption);
+            autoOptionsArray.add(autonOption.name);
         }
-        SmartDashboard.putData(AUTON_MODE, mAutonModeChooser);
-
-        mAutonLaneChooser = new SendableChooser();
-        for (AutonLane autonLane : AutonLane.values()) {
-            mAutonLaneChooser.addObject(autonLane.name, autonLane);
-        }
-        SmartDashboard.putData(AUTON_LANE, mAutonLaneChooser);
+        SmartDashboard.putString(AUTO_OPTIONS, autoOptionsArray.toString());
+        SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
+        SmartDashboard.putString(SELECTED_AUTO_LANE, DEFAULT_LANE.numberString);
     }
 
     public boolean isInHoodTuningMode() {
@@ -57,8 +56,25 @@ public class SmartDashboardInteractions {
     }
 
     public AutoModeBase getSelectedAutonMode() {
-        return createAutoMode((AutonOption) mAutonModeChooser.getSelected(),
-                (AutonLane) mAutonLaneChooser.getSelected());
+        String autoModeString = SmartDashboard.getString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
+        AutonOption selectedOption = DEFAULT_MODE;
+        for (AutonOption autonOption : AutonOption.values()) {
+            if (autonOption.name.equals(autoModeString)) {
+                selectedOption = autonOption;
+                break;
+            }
+        }
+
+        String autoLaneString =
+                SmartDashboard.getString(SELECTED_AUTO_LANE, DEFAULT_LANE.numberString);
+        AutonLane selectedLane = DEFAULT_LANE;
+        for (AutonLane autonLane : AutonLane.values()) {
+            if (autonLane.numberString.equals(autoLaneString)) {
+                selectedLane = autonLane;
+            }
+        }
+
+        return createAutoMode(selectedOption, selectedLane);
     }
 
     /**
@@ -66,8 +82,12 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
-        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"), STAY_HIGH_ONE_BALL("No Drop Stay"), GET_LOW_ONE_BALL(
-                "Portcullis"), CDF_ONE_BALL("CDF"), TWO_BALL("Two Ball"), STAND_STILL("Stand Still");
+        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"),
+        STAY_HIGH_ONE_BALL("No Drop Stay"),
+        GET_LOW_ONE_BALL("Portcullis"),
+        CDF_ONE_BALL("CDF"),
+        TWO_BALL("Two Ball"),
+        STAND_STILL("Stand Still");
 
         public final String name;
 
@@ -77,15 +97,18 @@ public class SmartDashboardInteractions {
     }
 
     enum AutonLane {
-        LANE_1("Lane 1 (low bar)", 160), LANE_2("Lane 2", 205), LANE_3("Lane 3", 160), LANE_4("Lane 4",
-                155), LANE_5("Lane 5", 220);
+        LANE_1(160, "1"),
+        LANE_2(205, "2"),
+        LANE_3(160, "3"),
+        LANE_4(155, "4"),
+        LANE_5(220, "5");
 
-        public final String name;
         public final double distanceToDrive;
+        public final String numberString;
 
-        AutonLane(String name, double distanceToDrive) {
-            this.name = name;
+        AutonLane(double distanceToDrive, String numberString) {
             this.distanceToDrive = distanceToDrive;
+            this.numberString = numberString;
         }
     }
 
