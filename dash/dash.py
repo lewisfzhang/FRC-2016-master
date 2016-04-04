@@ -33,10 +33,13 @@ tableConnectionListener = TableConnectionListener()
 table.addConnectionListener(tableConnectionListener)
 
 activeBridges = set()
+clientInitMessages = {}
 class BridgeServer(WebSocket):
     def handleConnected(self):
         print("Connected", self.address)
         activeBridges.add(self)
+        for _, (tableName, key, value) in clientInitMessages.iteritems():
+            self.sendValue(tableName, key, value)
 
     def handleMessage(self):
         print("Got Message:", self.data)
@@ -45,14 +48,19 @@ class BridgeServer(WebSocket):
         print("Closed", self.address)
         activeBridges.remove(self)
 
+    def sendValue(self, tableName, key, value):
+        jsonPayload = {}
+        jsonPayload["table"] = tableName
+        jsonPayload["key"] = key
+        jsonPayload["value"] = value
+        jsonString = u"" + json.dumps(jsonPayload)
+        self.sendMessage(jsonString)
+
 def valueChanged(table, key, value, isNew):
-    jsonPayload = {}
-    jsonPayload["table"] = table.path
-    jsonPayload["key"] = key
-    jsonPayload["value"] = value
-    jsonString = u"" + json.dumps(jsonPayload)
+    clientInitMessages[(table, key)] = (table.path, key, value)
     for bridge in activeBridges:
-        bridge.sendMessage(jsonString)
+        bridge.sendValue(table.path, key, value)
+
 
 table.addTableListener(valueChanged)
 
