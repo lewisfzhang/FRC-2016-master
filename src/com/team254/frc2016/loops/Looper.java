@@ -35,6 +35,12 @@ public class Looper {
         loops_ = new ArrayList<>();
     }
 
+    public synchronized void clearAllLoops() {
+        synchronized (taskRunningLock_) {
+            loops_.clear();
+        }
+    }
+
     public synchronized void register(Loop loop) {
         synchronized (taskRunningLock_) {
             loops_.add(loop);
