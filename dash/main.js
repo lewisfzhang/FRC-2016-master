@@ -9,11 +9,25 @@ var model = {
 var MIN_PLOT_UPDATE_TIME_MILLIS = 50;
 var TABLE = "/SmartDashboard";
 var SELECTED_AUTO_MODE_KEY = "selectedAutoMode";
+var SELECTED_AUTO_LANE_KEY = "selectedAutoLane";
 
 $(document).ready(function() {
+
+  initAutoLaneButton($("#autoLane1"), "1");
+  initAutoLaneButton($("#autoLane2"), "2");
+  initAutoLaneButton($("#autoLane3"), "3");
+  initAutoLaneButton($("#autoLane4"), "4");
+  initAutoLaneButton($("#autoLane5"), "5");
+
   kickWebSocket();
   setInterval(kickWebSocket, 1000);
 });
+
+function initAutoLaneButton(autoLaneButton, stringValue) {
+  autoLaneButton.click(function() {
+    sendValueUpdate(TABLE, SELECTED_AUTO_LANE_KEY, stringValue);
+  });
+}
 
 function kickWebSocket() {
   if (webSocket != null) {
@@ -75,7 +89,7 @@ function setOrCreateElement(table, key, value) {
   
   if (element == null) {
     // Make a new container
-    var field = $("<input type='text'></input>");
+    var field = $("<input type='text' disabled></input>");
     var button = $("<button type='button'>Chart</button>");
     button.click(function() {
       startChartingKey(table.name, key);
@@ -206,6 +220,10 @@ function refreshDriverStatusElements() {
 
   maybeRefreshAutoOptions();
   refreshAutoMode();
+
+  var autoLaneElement = findElementModelOrNull(TABLE, SELECTED_AUTO_LANE_KEY);
+  $("#selectedAutoLane").text(
+    autoLaneElement == null ? "UNKNOWN" : ("Lane " + autoLaneElement.value));
 }
 
 function maybeRefreshAutoOptions() {
@@ -222,9 +240,8 @@ function maybeRefreshAutoOptions() {
   var container = $("#autoSelectorContainer");
   container.empty();
   for (var i = 0; i < options.length; i++) {
-    var box = $("<div>" + options[i] + "</div>");
-
-    var button = $("<button type='button'>select</button>");
+    var box = $("<div/>");
+    var button = $("<button type='button'>" + options[i] + "</button>");
     (function (mode) {
       button.click(function() {
         sendValueUpdate(TABLE, SELECTED_AUTO_MODE_KEY, mode);
@@ -239,6 +256,10 @@ function maybeRefreshAutoOptions() {
 }
 
 function sendValueUpdate(tableName, key, value) {
+  if (webSocket == null || webSocket.readyState != WebSocket.OPEN) {
+    console.error("Can't send update to " + tableName + ", " + key);
+    return;
+  }
   webSocket.send(JSON.stringify({"table": tableName, "key": key, "value": value}));
 }
 
