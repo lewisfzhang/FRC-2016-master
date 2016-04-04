@@ -107,6 +107,10 @@ public class ControlBoard {
         return mButtonBoard.getRawButton(1);
     }
 
+    public boolean getSelfieModeButton() {
+        return mButtonBoard.getRawButton(1);
+    }
+
     public boolean getHoodTuningNegativeButton() {
         return mButtonBoard.getRawButton(2);
     }

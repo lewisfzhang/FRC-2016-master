@@ -27,6 +27,7 @@ public class TestVisionServer {
         server.addVisionUpdateReceiver(r);
         System.out.println("Running");
         int i = 0;
+        //server.setUseIntakeMode();
         while (true) {
             try {
                 Thread.sleep(1000);

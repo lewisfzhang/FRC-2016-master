@@ -7,6 +7,7 @@ import com.team254.frc2016.vision.messages.OffWireMessage;
 import com.team254.frc2016.vision.messages.SetCameraModeMessage;
 import com.team254.frc2016.vision.messages.VisionMessage;
 import edu.wpi.first.wpilibj.Timer;
+import jtcpfwd.Main;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +27,10 @@ public class VisionServer implements Runnable {
     double lastMessageReceivedTime = 0;
     private boolean m_use_java_time = false;
     private boolean mUseVisionMode = true;
+
+    private static final int m_selfie_external_port = 5801;
+    private static final int m_selfie_internal_port = 5800;
+
 
     private ArrayList<ServerThread> serverThreads = new ArrayList<>();
 
@@ -134,11 +139,24 @@ public class VisionServer implements Runnable {
         new Thread(this).start();
         new Thread(new ForcePortForwardingThread()).start();
         new Thread(new SendCameraModeThread()).start();
+
+        // Start a port forwarder because Adb doesnt listen to anything but loopback
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Main.main(new String[] {"5800", "127.0.0.1:5801" });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public void restartAdb() {
         adb.restart();
         adb.reversePortForward(m_port, m_port);
+        adb.portForward(m_selfie_external_port, m_selfie_internal_port);
     }
 
     public void addVisionUpdateReceiver(VisionUpdateReceiver receiver) {
@@ -211,6 +229,7 @@ public class VisionServer implements Runnable {
                 if (getTimestamp() - lastMessageReceivedTime > .1) {
                     // camera disconnected
                     adb.reversePortForward(m_port, m_port);
+                    adb.portForward(m_selfie_external_port, m_selfie_internal_port);
                     mIsConnect = false;
                 } else {
                     mIsConnect = true;

@@ -14,10 +14,7 @@ import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
-import com.team254.lib.util.DriveSignal;
-import com.team254.lib.util.RevRoboticsAirPressureSensor;
-import com.team254.lib.util.RigidTransform2d;
-import com.team254.lib.util.Rotation2d;
+import com.team254.lib.util.*;
 import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -52,6 +49,9 @@ public class Robot extends IterativeRobot {
     boolean mHoodTuningMode = false;
 
     boolean mGetDown = true;
+
+    private LatchedBoolean mSelfieLatch = new LatchedBoolean();
+    private LatchedBoolean mVisionLatch = new LatchedBoolean();
 
     public Robot() {
         mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
@@ -125,6 +125,8 @@ public class Robot extends IterativeRobot {
         mSmartDashboardInteractions.initWithDefaults();
 
         mCompressor.start();
+
+        VisionServer.getInstance().setUseVisionMode();
     }
 
     @Override
@@ -136,6 +138,8 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.stop();
         mDisabledLooper.start();
 
+        VisionServer.getInstance().setUseVisionMode();
+
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
         // Stop all actuators
         stopAll();
@@ -146,6 +150,8 @@ public class Robot extends IterativeRobot {
         // TODO: add option to force reset utility arm into starting box
         mAutoModeExecuter.stop();
         mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
+
+        VisionServer.getInstance().setUseVisionMode();
 
         // Reset all sensors
         zeroAllSensors();
@@ -179,6 +185,8 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+
+        VisionServer.getInstance().setUseVisionMode();
 
         mGetDown = true;
     }
@@ -259,6 +267,8 @@ public class Robot extends IterativeRobot {
             mUtilityArm.setWantedState(UtilityArm.WantedState.BATTER_CHALLENGE);
         }
 
+        boolean wantSelfieMode = false;
+
         if (mHoodTuningMode) {
             mSuperstructure.setTuningMode(true);
             if (mControls.getHoodTuningPositiveButton()) {
@@ -270,6 +280,14 @@ public class Robot extends IterativeRobot {
             }
         } else {
             mSuperstructure.setTuningMode(false);
+            wantSelfieMode = mControls.getSelfieModeButton();
+        }
+
+        if (mSelfieLatch.update(wantSelfieMode)) {
+            VisionServer.getInstance().setUseIntakeMode();
+        }
+        if (mVisionLatch.update(!wantSelfieMode)) {
+            VisionServer.getInstance().setUseVisionMode();
         }
 
         if (mControls.getHoodTuningPositiveButton()) {
