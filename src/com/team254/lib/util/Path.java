@@ -113,8 +113,6 @@ public class Path {
                 (det * dy - (dy < 0 ? -1 : 1) * dx * sqrt_discriminant) / dr_squared + center.getX(),
                 (-det * dx - Math.abs(dy) * sqrt_discriminant) / dr_squared + center.getY());
 
-        System.out.println("Pos solution " + pos_solution + ", neg solution " + neg_solution);
-
         // Choose the one between start and end that is closest to start
         double pos_dot_product = segment.dotProduct(pos_solution);
         double neg_dot_product = segment.dotProduct(neg_solution);

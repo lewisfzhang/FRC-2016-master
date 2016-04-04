@@ -221,134 +221,24 @@ public class Constants extends ConstantsBase {
     }
 
     // Shooter Operational consts
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapWornBalls = new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
-        // Tuned on long, smooth metal hood with 4 wheels 3/7
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(62.0), new InterpolatingDouble(39.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(69.0), new InterpolatingDouble(40.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(75.0), new InterpolatingDouble(44.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(85.0), new InterpolatingDouble(48.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(95.0), new InterpolatingDouble(53.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(102.0), new InterpolatingDouble(58.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(114.0), new InterpolatingDouble(62.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(122.0), new InterpolatingDouble(62.0));
-        kHoodAutoAimMapWornBalls.put(new InterpolatingDouble(137.0), new InterpolatingDouble(62.0));
-    }
-
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapNewBalls = new InterpolatingTreeMap<>();
-
-    static {
-        // Tuned on long, smooth metal hood with 4 wheels 3/7
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(58.5), new InterpolatingDouble(40.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(64.3), new InterpolatingDouble(51.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(77.0), new InterpolatingDouble(58.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(88.0), new InterpolatingDouble(65.5));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(94.0), new InterpolatingDouble(67.5));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(99.0), new InterpolatingDouble(69.5));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(108.0), new InterpolatingDouble(73.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(114.0), new InterpolatingDouble(75.0));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(120.0), new InterpolatingDouble(76.5));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(132.0), new InterpolatingDouble(79.5));
-        kHoodAutoAimMapNewBalls.put(new InterpolatingDouble(137.0), new InterpolatingDouble(79.5));
-    }
-
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMapMixedBalls = new InterpolatingTreeMap<>();
-
-    static {
-        /*
-         * // Tuned on long, smooth metal hood with pinch standoff and 4 wheels,
-         * 3d // printed camera mount 3/9 kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(67.0), new InterpolatingDouble(41.29));
-         * 
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(71.0), new
-         * InterpolatingDouble(47.0));
-         * 
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(75.0), new
-         * InterpolatingDouble(50.0)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(85.0), new InterpolatingDouble(52.5));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(92.0), new
-         * InterpolatingDouble(53.5));
-         * 
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(94.0), new
-         * InterpolatingDouble(53.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(110.0), new InterpolatingDouble(53.5));
-         * 
-         * 
-         * // maybe invalid old points? kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(115.0), new InterpolatingDouble(60.0));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(125.0), new
-         * InterpolatingDouble(66.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(135.0), new InterpolatingDouble(70.5));
-         */
-
-        // Tuned on rigid hood with 4 McMaster gray wheels, 4/2
-        /*
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(68.0), new
-         * InterpolatingDouble(42.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(74.0), new InterpolatingDouble(44.5));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(80.0), new
-         * InterpolatingDouble(46.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(90.0), new InterpolatingDouble(47.5));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(100.0), new
-         * InterpolatingDouble(49.0)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(110.0), new InterpolatingDouble(51.0));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(120.0), new
-         * InterpolatingDouble(52.0)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(130.0), new InterpolatingDouble(53.0));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(140.0), new
-         * InterpolatingDouble(54.0));
-         */
-
-        // 6000 rpm angles
-        /*
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(62.0), new
-         * InterpolatingDouble(42.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(69.0), new InterpolatingDouble(45.0));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(75.0), new
-         * InterpolatingDouble(46.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(83.0), new InterpolatingDouble(49.0));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(90.0), new
-         * InterpolatingDouble(50.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(96.0), new InterpolatingDouble(51.5));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(110.0), new
-         * InterpolatingDouble(54.0)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(115.0), new InterpolatingDouble(55.5));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(130.0), new
-         * InterpolatingDouble(57.0)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(140.0), new InterpolatingDouble(58.5));
-         * kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(162.0), new
-         * InterpolatingDouble(60.5)); kHoodAutoAimMapMixedBalls.put(new
-         * InterpolatingDouble(170.0), new InterpolatingDouble(61.0));
-         */
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(62.0), new InterpolatingDouble(42.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(67.0), new InterpolatingDouble(42.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(77.0), new InterpolatingDouble(44.8));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(85.0), new InterpolatingDouble(48.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(92.0), new InterpolatingDouble(50.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(100.0), new InterpolatingDouble(51.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(110.0), new InterpolatingDouble(53.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(125.0), new InterpolatingDouble(54.5));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(140.0), new InterpolatingDouble(56.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(155.0), new InterpolatingDouble(57.0));
-        kHoodAutoAimMapMixedBalls.put(new InterpolatingDouble(168.0), new InterpolatingDouble(57.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(62.0), new InterpolatingDouble(42.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(67.0), new InterpolatingDouble(42.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(77.0), new InterpolatingDouble(44.8));
+        kHoodAutoAimMap.put(new InterpolatingDouble(85.0), new InterpolatingDouble(48.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(92.0), new InterpolatingDouble(50.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(51.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(53.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(54.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(140.0), new InterpolatingDouble(56.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(57.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(168.0), new InterpolatingDouble(57.5));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();
-
     static {
-        // Tuned on long, smooth metal hood with pinch standoff and 4 wheels, 3d
-        // printed camera mount 3/9
-        /*
-         * kFlywheelAutoAimMap.put(new InterpolatingDouble(65.0), new
-         * InterpolatingDouble(5000.0)); kFlywheelAutoAimMap.put(new
-         * InterpolatingDouble(70.0), new InterpolatingDouble(5000.0));
-         * kFlywheelAutoAimMap.put(new InterpolatingDouble(110.0), new
-         * InterpolatingDouble(5000.0)); kFlywheelAutoAimMap.put(new
-         * InterpolatingDouble(120.0), new InterpolatingDouble(5500.0));
-         * kFlywheelAutoAimMap.put(new InterpolatingDouble(130.0), new
-         * InterpolatingDouble(6000.0));
-         */
         kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMinRange),
                 new InterpolatingDouble(Constants.kFlywheelGoodBallRpmSetpoint));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMaxRange),
