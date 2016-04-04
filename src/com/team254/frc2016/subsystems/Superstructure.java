@@ -340,7 +340,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleStowedAndHomingHood() {
-        handleIntake(true, false);
+        handleIntake(false, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
         mHood.setStowed(true);
@@ -603,6 +603,7 @@ public class Superstructure extends Subsystem {
                 mHood.setOpenLoop(mHoodManualScanOutput);
             }
         } else {
+            mHoodManualScanOutput = 0.0;
             // System.out.println("Picking a target");
             // Pick the target to aim at
             boolean has_target = false;
@@ -620,6 +621,7 @@ public class Superstructure extends Subsystem {
                     } else {
                         mHood.setOpenLoop(mHoodManualScanOutput);
                     }
+                    System.out.println("Angle to target: " + param.getTurretAngle());
                     mTurret.setDesiredAngle(param.getTurretAngle());
                     // mTurret.setOpenLoop(mTurretManualScanOutput / 10.0);
                     mCurrentAngleForLogging = param.getTurretAngle().getDegrees();

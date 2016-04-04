@@ -77,7 +77,7 @@ public class SmartDashboardInteractions {
     }
 
     enum AutonLane {
-        LANE_1("Lane 1 (low bar)", 200), LANE_2("Lane 2", 205), LANE_3("Lane 3", 160), LANE_4("Lane 4",
+        LANE_1("Lane 1 (low bar)", 180), LANE_2("Lane 2", 205), LANE_3("Lane 3", 160), LANE_4("Lane 4",
                 155), LANE_5("Lane 5", 220);
 
         public final String name;
@@ -100,7 +100,7 @@ public class SmartDashboardInteractions {
         case CDF_ONE_BALL:
             return new ShovelTheFriesMode(autonLane.distanceToDrive);
         case TWO_BALL:
-            return new TwoBallMode();
+            return new TwoBallMode(autonLane.distanceToDrive);
         case STAND_STILL: // fallthrough
         default:
             System.out.println("ERROR: unexpected auto mode: " + autonOption);
