@@ -12,7 +12,6 @@ $(document).ready(function() {
   setInterval(kickWebSocket, 1000);
 });
 
-
 function kickWebSocket() {
   if (webSocket != null) {
     // already working
@@ -37,6 +36,7 @@ function addOrUpdateValue(tableName, key, value) {
   var table = getOrCreateTable(tableName);
   setOrCreateElement(table, key, value);
   maybeUpdateChart(tableName, key, value);
+  refreshDriverStatusElements();
 }
 
 function getOrCreateTable(tableName) {
@@ -178,6 +178,33 @@ function findChartModelOrNull(tableName, key) {
     var curChart = model.charts[i];
     if (curChart.tableName == tableName && curChart.key == key) {
       return curChart;
+    }
+  }
+  return null;
+}
+
+/**
+ * Update for the hard-coded keys which we want to show in the driver UI
+ */
+function refreshDriverStatusElements() {
+  var TABLE = "/SmartDashboard";
+  var haveBallElement = findElementModelOrNull(TABLE, "have_ball");
+  var haveBallValue = haveBallElement != null && haveBallElement.value;
+  var haveBallBox = $("#haveBallBox");
+  haveBallBox
+    .removeClass("booleanBoxFalse booleanBoxTrue")
+    .addClass(haveBallValue ? "booleanBoxTrue" : "booleanBoxFalse");
+}
+
+function findElementModelOrNull(tableName, key) {
+  var table = model.tables[tableName];
+  if (table == null) {
+    return null;
+  }
+  for (var i = 0; i < table.elements.length; i++) {
+    var element = table.elements[i];
+    if (element.key == key) {
+      return element;
     }
   }
   return null;

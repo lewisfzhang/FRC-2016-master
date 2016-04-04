@@ -17,5 +17,6 @@ table.addTableListener(valueChanged)
 i = 0
 while True:
     table.putNumber("server_count", i)
+    table.putBoolean("have_ball", i % 2 == 0)
     i += 1
     time.sleep(1)
