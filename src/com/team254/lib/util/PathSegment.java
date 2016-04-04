@@ -46,13 +46,16 @@ public class PathSegment {
         return mStart.interpolate(mEnd, index);
     }
 
+    public double dotProduct(Translation2d other) {
+        Translation2d start_to_other = mStart.inverse().translateBy(other);
+        return mStartToEnd.getX() * start_to_other.getX() + mStartToEnd.getY() * start_to_other.getY();
+    }
+
     public ClosestPointReport getClosestPoint(Translation2d query_point) {
         ClosestPointReport rv = new ClosestPointReport();
         if (mLength > kEpsilon) {
-            Translation2d start_to_query = mStart.inverse().translateBy(query_point);
-            double dot_product = mStartToEnd.getX() * start_to_query.getX()
-                    + mStartToEnd.getY() * start_to_query.getY();
-            rv.index = dot_product / mLength;
+            double dot_product = dotProduct(query_point);
+            rv.index = dot_product / (mLength * mLength);
             rv.clamped_index = Math.min(1.0, Math.max(0.0, rv.index));
             rv.closest_point = interpolate(rv.index);
         } else {
