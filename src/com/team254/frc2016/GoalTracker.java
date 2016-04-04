@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.team254.lib.util.Translation2d;
 
+import edu.wpi.first.wpilibj.Timer;
+
 public class GoalTracker {
     // Track reports contain all of the relevant information about a given goal
     // track.
@@ -117,13 +119,13 @@ public class GoalTracker {
             GoalTrack track = it.next();
             if (!track.isAlive()) {
                 it.remove();
-                System.out.println("KILLED OLD TRACK");
+                // System.out.println("KILLED OLD TRACK");
             }
         }
         // If all tracks are dead, start new tracks for any detections
         if (mCurrentTracks.isEmpty()) {
             for (Translation2d target : odometric_to_goals) {
-                System.out.println("STARTING NEW TRACK");
+                // System.out.println("STARTING NEW TRACK");
                 mCurrentTracks.add(GoalTrack.makeNewTrack(timestamp, target, mNextId));
                 ++mNextId;
             }

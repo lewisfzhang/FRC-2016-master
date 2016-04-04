@@ -15,6 +15,7 @@ import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -179,13 +180,11 @@ public class RobotState {
         addTurretRotationObservation(timestamp, turret_rotation);
     }
 
-    public synchronized void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
+    public void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
+        //System.out.println("Start addVisionUpdate at " + Timer.getFPGATimestamp());
         List<Translation2d> odometric_to_goals = new ArrayList<>();
         RigidTransform2d odometric_to_camera = getOdometricToCamera(timestamp);
-        if (vision_update == null || vision_update.isEmpty()) {
-            latest_camera_to_goals_undetected_timestamp_ = timestamp;
-        } else {
-            latest_camera_to_goals_detected_timestamp_ = timestamp;
+        if (!(vision_update == null || vision_update.isEmpty())) {
             for (TargetInfo target : vision_update) {
                 double ydeadband = (target.getY() > -Constants.kCameraDeadband
                         && target.getY() < Constants.kCameraDeadband) ? 0.0 : target.getY();
@@ -212,7 +211,15 @@ public class RobotState {
                 }
             }
         }
-        goal_tracker_.update(timestamp, odometric_to_goals);
+        synchronized (this) {
+            if (vision_update == null || vision_update.isEmpty()) {
+                latest_camera_to_goals_undetected_timestamp_ = timestamp;
+            } else {
+                latest_camera_to_goals_detected_timestamp_ = timestamp;
+            }
+            goal_tracker_.update(timestamp, odometric_to_goals);
+        }
+        //System.out.println("Done addVisionUpdate at " + Timer.getFPGATimestamp());
     }
 
     public synchronized void resetVision() {

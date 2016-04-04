@@ -15,15 +15,12 @@ import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
 import com.team254.lib.util.*;
-import com.team254.logger.CheesyLogger;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
-    private final CheesyLogger mCheesyLogger;
-
     // Subsystems
     Drive mDrive = Drive.getInstance();
     Superstructure mSuperstructure = Superstructure.getInstance();
@@ -54,7 +51,6 @@ public class Robot extends IterativeRobot {
     private LatchedBoolean mVisionLatch = new LatchedBoolean();
 
     public Robot() {
-        mCheesyLogger = CheesyLogger.makeCheesyLogger("localhost");
     }
 
     public class TestReceiver implements VisionUpdateReceiver {
@@ -64,9 +60,6 @@ public class Robot extends IterativeRobot {
             mRobotState.addVisionUpdate(update.getCapturedAtTimestamp(), update.getTargets());
             for (int i = 0; i < update.getTargets().size(); i++) {
                 TargetInfo target = update.getTargets().get(i);
-                mCheesyLogger.sendTimePlotPoint("vision", "x", target.getX(), 1);
-                mCheesyLogger.sendTimePlotPoint("vision", "y", target.getY(), 1);
-                mCheesyLogger.sendTimePlotPoint("vision", "z", target.getZ(), 1);
                 if (mLogToSmartdashboard) {
                     SmartDashboard.putNumber("goal_centroid_x", target.getX());
                     SmartDashboard.putNumber("goal_centroid_y", target.getY());
@@ -106,7 +99,6 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void robotInit() {
-        mCheesyLogger.sendLogMessage("Robot Init-ed");
         mVisionServer.addVisionUpdateReceiver(new TestReceiver());
 
         // Reset all state
@@ -132,7 +124,6 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledInit() {
         mAutoModeExecuter.stop();
-        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.DISABLED);
 
         // Configure loopers
         mEnabledLooper.stop();
@@ -149,7 +140,6 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
         // TODO: add option to force reset utility arm into starting box
         mAutoModeExecuter.stop();
-        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.AUTO);
 
         VisionServer.getInstance().setUseVisionMode();
 
@@ -174,7 +164,6 @@ public class Robot extends IterativeRobot {
     public void teleopInit() {
         // TODO: add option to force reset utility arm into starting box
         mAutoModeExecuter.stop();
-        mCheesyLogger.sendCompetitionState(CheesyLogger.CompetitionState.TELEOP);
 
         // Reset drive
         mDrive.resetEncoders();
