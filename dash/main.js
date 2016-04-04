@@ -3,9 +3,11 @@ var webSocket = null;
 var model = {
   tables: {},
   charts: [],
+  curAutoOptions: [],
 };
 
 var MIN_PLOT_UPDATE_TIME_MILLIS = 50;
+var TABLE = "/SmartDashboard";
 
 $(document).ready(function() {
   kickWebSocket();
@@ -46,7 +48,7 @@ function getOrCreateTable(tableName) {
   }
   // Make a new container
   var container = $("<div/>");
-  container.append($("<div> Table: " + tableName + "</div>"));
+  container.append($("<h3> Table: " + tableName + "</h3>"));
   $("#rawValuesContainer").append(container);
   var pane = $("<div/>");
   container.append(pane);
@@ -187,8 +189,6 @@ function findChartModelOrNull(tableName, key) {
  * Update for the hard-coded keys which we want to show in the driver UI
  */
 function refreshDriverStatusElements() {
-  var TABLE = "/SmartDashboard";
-
   setBooleanBoxStyle(
     $("#haveBallBox"),
     getBooleanElementValue(TABLE, "have_ball"));
@@ -202,7 +202,60 @@ function refreshDriverStatusElements() {
   // TODO: drive on target
 
   setBooleanBoxStyle($("#onTargetBox"), hood && flywheel && turret);
+
+  maybeRefreshAutoOptions();
+  refreshAutoMode();
 }
+
+function maybeRefreshAutoOptions() {
+  var autoOptionsModel = findElementModelOrNull(TABLE, "auto_options");
+  var options = autoOptionsModel == null ? [] : JSON.parse(autoOptionsModel.value);
+
+  // See if the arrays are different
+  if (arraysEqual(model.curAutoOptions, options)) {
+    // no update
+    return;
+  }
+
+  // Update the UI
+  var container = $("#autoSelectorContainer");
+  container.empty();
+  for (var i = 0; i < options.length; i++) {
+    var box = $("<div>" + options[i] + "</div>");
+
+    var button = $("<button type='button'>select</button>");
+    (function (mode) {
+      button.click(function() {
+        console.log("Clicked " + mode);
+      });
+    })(options[i]);
+
+    box.append(button);
+    container.append(box);
+  }
+  // Update the model
+  model.curAutoOptions = options;
+}
+
+function arraysEqual(a, b) {
+  if (a.length != b.length) {
+    return false;
+  }
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function refreshAutoMode() {
+  var selectedModeElement = findElementModelOrNull(TABLE, "selectedAutoMode");
+
+  $("#selectedAutoMode").text(
+    selectedModeElement == null ? "UNKNOWN" : selectedModeElement.value);
+}
+
 function getBooleanElementValue(table, key) {
   var elementModel = findElementModelOrNull(table, key);
   return elementModel != null && elementModel.value;

@@ -22,7 +22,10 @@ while True:
     if i % 5 == 0:
         table.putString(
             "auto_options",
-            json.dumps(
-                ["some auto option", "another auto option", "crappy option"]))
+            json.dumps([
+                "some auto option",
+                "another auto option",
+                "crappy option",
+                "4th option"]))
     i += 1
     time.sleep(1)
