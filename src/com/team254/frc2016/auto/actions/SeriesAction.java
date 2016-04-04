@@ -21,7 +21,7 @@ public class SeriesAction implements Action {
 
     @Override
     public boolean isFinished() {
-        return mRemainingActions.isEmpty();
+        return mRemainingActions.isEmpty() && mCurAction == null;
     }
 
     @Override

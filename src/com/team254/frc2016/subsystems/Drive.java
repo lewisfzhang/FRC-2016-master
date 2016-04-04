@@ -287,7 +287,8 @@ public class Drive extends Subsystem {
     }
 
     private synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-        if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL) {
+        if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL
+                || driveControlState_ == DriveControlState.VELOCITY_SETPOINT) {
             leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
             rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
         } else {

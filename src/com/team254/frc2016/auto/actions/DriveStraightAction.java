@@ -35,17 +35,23 @@ public class DriveStraightAction implements Action {
 
     @Override
     public boolean isFinished() {
+        boolean rv = false;
         if (mWantedDistance > 0) {
-            return getCurrentDistance() - startingDistance >= mWantedDistance;
+            rv = getCurrentDistance() - startingDistance >= mWantedDistance;
         } else {
-            return getCurrentDistance() - startingDistance <= mWantedDistance;
+            rv = getCurrentDistance() - startingDistance <= mWantedDistance;
         }
+        if (rv) {
+            mDrive.setVelocitySetpoint(0, 0);
+        }
+        return rv;
     }
 
     @Override
     public void done() {
-        System.out.println("Drive done, Setting drive to neutral");
-        mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+        // System.out.println("Drive done, Setting drive to neutral");
+        // mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+        mDrive.setVelocitySetpoint(0, 0);
     }
 
     private double getCurrentDistance() {

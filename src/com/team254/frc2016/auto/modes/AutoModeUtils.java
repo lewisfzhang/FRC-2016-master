@@ -6,7 +6,7 @@ import com.team254.frc2016.subsystems.Drive;
 
 public class AutoModeUtils {
 
-    public static final double DISTANCE_TO_POP_HOOD = 100;
+    public static final double DISTANCE_TO_POP_HOOD = 90;
     public static final double FORWARD_DRIVE_VELOCITY = 30;
     
     public static final double TWO_BALL_FORWARD_DRIVE_VELOCITY = 72.0;

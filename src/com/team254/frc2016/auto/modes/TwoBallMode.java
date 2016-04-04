@@ -23,43 +23,33 @@ public class TwoBallMode extends AutoModeBase {
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        /*runAction(new WaitAction(2));
-        runAction(new StartAutoAimingAction());
-        runAction(
-                new ParallelAction(Arrays.asList(new WaitAction(5), new AimHintAction(Rotation2d.fromDegrees(-45.0)))));
-        runAction(new ShootWhenReadyAction());
-        runAction(new WaitAction(20.75));*/
-        
         mSuperstructure.setWantsToRunIntake();
         mSuperstructure.deployIntake();
-        runAction(new GetLowAction());
+        runAction(new ParallelAction(
+                Arrays.asList(new GetLowAction(), new WaitAction(1))));
         mSuperstructure.setWantsToStopIntake();
 
         runAction(new ParallelAction(
                 Arrays.asList(new DriveStraightAction(mDistanceToDrive, AutoModeUtils.TWO_BALL_FORWARD_DRIVE_VELOCITY),
-                        new SeriesAction(Arrays.asList(new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
-                                new StartAutoAimingAction())),
-                        new AimHintAction(Rotation2d.fromDegrees(-45.0)))));
-        mDrive.setVelocitySetpoint(0, 0);
-
-        runAction(
-                new ParallelAction(Arrays.asList(new SeriesAction(Arrays.asList(new WaitAction(1), new ShootWhenReadyAction())), new AimHintAction(Rotation2d.fromDegrees(-45.0)))));
-        runAction(new WaitAction(0.75));
+                        new SeriesAction(Arrays.asList(
+                                new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
+                                new StartAutoAimingAction(),
+                                new PointTurretAction(Rotation2d.fromDegrees(-45.0)))))));
+        runAction(new ShootWhenReadyAction());
+        runAction(new WaitAction(1.0));
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
         mSuperstructure.setWantsToRunIntake();
         runAction(new DriveStraightAction(-mDistanceToDrive + 6.0, -AutoModeUtils.TWO_BALL_FORWARD_DRIVE_VELOCITY));
         mDrive.setVelocitySetpoint(0, 0);
+
         runAction(new ParallelAction(
                 Arrays.asList(new DriveStraightAction(mDistanceToDrive - 6.0, AutoModeUtils.TWO_BALL_FORWARD_DRIVE_VELOCITY),
-                        new SeriesAction(Arrays.asList(new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
-                                new StartAutoAimingAction())),
-                        new AimHintAction(Rotation2d.fromDegrees(-45.0)))));
-        mDrive.setVelocitySetpoint(0, 0);
-
-        runAction(
-                new ParallelAction(Arrays.asList(new WaitAction(1), new AimHintAction(Rotation2d.fromDegrees(-45.0)))));
+                        new SeriesAction(Arrays.asList(
+                                new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
+                                new StartAutoAimingAction(),
+                                new PointTurretAction(Rotation2d.fromDegrees(-45.0)))))));
         runAction(new ShootWhenReadyAction());
-        runAction(new WaitAction(0.75));
+        runAction(new WaitAction(1.0));
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
         mSuperstructure.setWantsToStopIntake();
 

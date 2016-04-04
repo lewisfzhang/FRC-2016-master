@@ -20,12 +20,13 @@ public class ParallelAction implements Action {
 
     @Override
     public boolean isFinished() {
+        boolean all_finished = true;
         for (Action action : mActions) {
             if (!action.isFinished()) {
-                return false;
+                all_finished = false;
             }
         }
-        return true;
+        return all_finished;
     }
 
     @Override

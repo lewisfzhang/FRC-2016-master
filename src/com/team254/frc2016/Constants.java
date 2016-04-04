@@ -115,9 +115,9 @@ public class Constants extends ConstantsBase {
     // PID gains for constant heading velocity control
     // Units: Error is degrees. Output is inches/second difference to
     // left/right.
-    public static double kDriveHeadingVeloctyKp = 1.0; // 6.0;
+    public static double kDriveHeadingVeloctyKp = 4.0; // 6.0;
     public static double kDriveHeadingVeloctyKi = 0.0;
-    public static double kDriveHeadingVeloctyKd = 30.0;
+    public static double kDriveHeadingVeloctyKd = 50.0;
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.

@@ -2,6 +2,7 @@ package com.team254.frc2016.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.GoalTracker;
@@ -77,6 +78,7 @@ public class Superstructure extends Subsystem {
     private boolean mTuningMode = false;
 
     private double mTurretManualScanOutput = 0;
+    private Optional<Rotation2d> mTurretManualSetpoint = Optional.empty();
     private double mHoodManualScanOutput = 0;
     int mCurrentTrackId = -1;
     int mConsecutiveCyclesOnTarget = 0;
@@ -115,6 +117,7 @@ public class Superstructure extends Subsystem {
                 mCurrentStateStartTime = Timer.getFPGATimestamp();
                 mSystemState = SystemState.REENABLED;
                 mStateChanged = true;
+                mTurretManualSetpoint = Optional.empty();
             }
         }
 
@@ -263,6 +266,14 @@ public class Superstructure extends Subsystem {
 
     public synchronized void setHoodManualScanOutput(double output) {
         mHoodManualScanOutput = output;
+    }
+
+    public synchronized void setTurretManualPositionSetpoint(Rotation2d angle) {
+        mTurretManualSetpoint = Optional.of(angle);
+    }
+
+    public synchronized void clearTurretManualPositionSetpoint() {
+        mTurretManualSetpoint = Optional.empty();
     }
 
     public void setTestServoSpeed(double speed) {
@@ -593,10 +604,15 @@ public class Superstructure extends Subsystem {
 
     private void autoAim(double now, boolean allow_changing_tracks) {
         List<ShooterAimingParameters> aimingParameters = getCurrentAimingParameters(now);
-        if (aimingParameters.isEmpty() && allow_changing_tracks) {
+        if (aimingParameters.isEmpty() && allow_changing_tracks || mTurretManualSetpoint.isPresent()) {
             // Manual search
-            System.out.println("No targets");
-            mTurret.setOpenLoop(mTurretManualScanOutput);
+            if (mTurretManualSetpoint.isPresent()) {
+                System.out.println("Going to manual setpoint");
+                mTurret.setDesiredAngle(mTurretManualSetpoint.get());
+            } else {
+                System.out.println("No targets - Manual scan");
+                mTurret.setOpenLoop(mTurretManualScanOutput);
+            }
             if (!mTuningMode) {
                 mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
             } else {
@@ -621,7 +637,6 @@ public class Superstructure extends Subsystem {
                     } else {
                         mHood.setOpenLoop(mHoodManualScanOutput);
                     }
-                    System.out.println("Angle to target: " + param.getTurretAngle());
                     mTurret.setDesiredAngle(param.getTurretAngle());
                     // mTurret.setOpenLoop(mTurretManualScanOutput / 10.0);
                     mCurrentAngleForLogging = param.getTurretAngle().getDegrees();
