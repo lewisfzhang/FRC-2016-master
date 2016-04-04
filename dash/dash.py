@@ -43,6 +43,11 @@ class BridgeServer(WebSocket):
 
     def handleMessage(self):
         print("Got Message:", self.data)
+        jsonPayload = json.loads(self.data)
+        if jsonPayload["table"] != table.path:
+            print "Unknown table"
+            return
+        table.putString(jsonPayload["key"], jsonPayload["value"]);
 
     def handleClose(self):
         print("Closed", self.address)

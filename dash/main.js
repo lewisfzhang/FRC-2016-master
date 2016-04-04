@@ -8,6 +8,7 @@ var model = {
 
 var MIN_PLOT_UPDATE_TIME_MILLIS = 50;
 var TABLE = "/SmartDashboard";
+var SELECTED_AUTO_MODE_KEY = "selectedAutoMode";
 
 $(document).ready(function() {
   kickWebSocket();
@@ -226,7 +227,7 @@ function maybeRefreshAutoOptions() {
     var button = $("<button type='button'>select</button>");
     (function (mode) {
       button.click(function() {
-        console.log("Clicked " + mode);
+        sendValueUpdate(TABLE, SELECTED_AUTO_MODE_KEY, mode);
       });
     })(options[i]);
 
@@ -235,6 +236,10 @@ function maybeRefreshAutoOptions() {
   }
   // Update the model
   model.curAutoOptions = options;
+}
+
+function sendValueUpdate(tableName, key, value) {
+  webSocket.send(JSON.stringify({"table": tableName, "key": key, "value": value}));
 }
 
 function arraysEqual(a, b) {
@@ -250,7 +255,7 @@ function arraysEqual(a, b) {
 }
 
 function refreshAutoMode() {
-  var selectedModeElement = findElementModelOrNull(TABLE, "selectedAutoMode");
+  var selectedModeElement = findElementModelOrNull(TABLE, SELECTED_AUTO_MODE_KEY);
 
   $("#selectedAutoMode").text(
     selectedModeElement == null ? "UNKNOWN" : selectedModeElement.value);
