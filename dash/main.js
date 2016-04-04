@@ -188,12 +188,24 @@ function findChartModelOrNull(tableName, key) {
  */
 function refreshDriverStatusElements() {
   var TABLE = "/SmartDashboard";
-  var haveBallElement = findElementModelOrNull(TABLE, "have_ball");
-  var haveBallValue = haveBallElement != null && haveBallElement.value;
-  var haveBallBox = $("#haveBallBox");
-  haveBallBox
-    .removeClass("booleanBoxFalse booleanBoxTrue")
-    .addClass(haveBallValue ? "booleanBoxTrue" : "booleanBoxFalse");
+
+  setBooleanBoxStyle(
+    $("#haveBallBox"),
+    getBooleanElementValue(TABLE, "have_ball"));
+
+  var hood = getBooleanElementValue(TABLE, "hood_on_target");
+  setBooleanBoxStyle($("#hoodOnTargetBox"), hood);
+  var flywheel = getBooleanElementValue(TABLE, "flywheel_on_target");
+  setBooleanBoxStyle($("#flywheelOnTargetBox"), flywheel);
+  var turret = getBooleanElementValue(TABLE, "turret_on_target");
+  setBooleanBoxStyle($("#turretOnTargetBox"), turret);
+  // TODO: drive on target
+
+  setBooleanBoxStyle($("#onTargetBox"), hood && flywheel && turret);
+}
+function getBooleanElementValue(table, key) {
+  var elementModel = findElementModelOrNull(table, key);
+  return elementModel != null && elementModel.value;
 }
 
 function findElementModelOrNull(tableName, key) {
@@ -208,4 +220,10 @@ function findElementModelOrNull(tableName, key) {
     }
   }
   return null;
+}
+
+function setBooleanBoxStyle(booleanBox, value) {
+  booleanBox
+    .removeClass("booleanBoxFalse booleanBoxTrue")
+    .addClass(value ? "booleanBoxTrue" : "booleanBoxFalse");
 }
