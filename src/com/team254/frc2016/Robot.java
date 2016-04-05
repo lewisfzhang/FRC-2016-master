@@ -7,7 +7,6 @@ import com.team254.frc2016.loops.Looper;
 import com.team254.frc2016.loops.RobotStateEstimator;
 import com.team254.frc2016.loops.TurretResetter;
 import com.team254.frc2016.subsystems.Drive;
-import com.team254.frc2016.subsystems.Intake;
 import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.frc2016.vision.TargetInfo;
@@ -201,7 +200,7 @@ public class Robot extends IterativeRobot {
         if (mControls.getTractionControl()) {
             Rotation2d heading_setpoint = mDrive.getGyroAngle();
             if (mDrive.getControlState() == Drive.DriveControlState.VELOCITY_HEADING_CONTROL) {
-                heading_setpoint = mDrive.getVelocityHeadingSetpoint().getHeading(Timer.getFPGATimestamp());
+                heading_setpoint = mDrive.getVelocityHeadingSetpoint().getHeading();
             }
             mDrive.setVelocityHeadingSetpoint(
                     mCheesyDriveHelper.handleDeadband(throttle, CheesyDriveHelper.kThrottleDeadband)

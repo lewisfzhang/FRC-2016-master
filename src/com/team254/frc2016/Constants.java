@@ -25,6 +25,8 @@ public class Constants extends ConstantsBase {
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
     public static double kTrackLengthInches = 8.265;
     public static double kTrackWidthInches = 23.8;
+    public static double kTrackScrubFactor = 1.0
+            / Math.sqrt(1 + (kTrackLengthInches * kTrackLengthInches / kTrackWidthInches * kTrackWidthInches));
 
     // Drive constants
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
@@ -79,16 +81,6 @@ public class Constants extends ConstantsBase {
     // PID gains for hood position loop
     // Units: error is degrees of hood rotation. Max output is +/- 1.0.
     // Loop runs at 100Hz
-    /**
-     * comp bot old server bot consts
-     */
-    // public static double kHoodKp = 0.05;
-    // public static double kHoodKi = 0.0001;
-    // public static double kHoodKd = 0.0;
-
-    /**
-     * Practice bot new servo consts
-     */
     public static double kHoodKp = 0.1;
     public static double kHoodKi = 0.0;
     public static double kHoodKd = 0.0;
@@ -120,6 +112,9 @@ public class Constants extends ConstantsBase {
     public static double kDriveHeadingVeloctyKp = 4.0; // 6.0;
     public static double kDriveHeadingVeloctyKi = 0.0;
     public static double kDriveHeadingVeloctyKd = 50.0;
+
+    // Path following constants
+    public static double kPathFollowingLookahead = 24.0; // inches
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.

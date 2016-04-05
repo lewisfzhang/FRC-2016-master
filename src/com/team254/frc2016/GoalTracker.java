@@ -7,8 +7,6 @@ import java.util.List;
 
 import com.team254.lib.util.Translation2d;
 
-import edu.wpi.first.wpilibj.Timer;
-
 public class GoalTracker {
     // Track reports contain all of the relevant information about a given goal
     // track.

@@ -36,16 +36,8 @@ public class AdaptivePurePursuitController {
         // " + lookahead_point.translation);
 
         if (circle.isPresent()) {
-            // System.out
-            // .println("Circle radius is " + circle.get().radius + " and center
-            // point is " + circle.get().center);
-            Translation2d robot_pose_inverse = robot_pose.getTranslation().inverse();
-            Translation2d pose_to_circle = robot_pose_inverse.translateBy(circle.get().center);
-            Translation2d pose_to_lookahead = robot_pose_inverse.translateBy(lookahead_point.translation);
-            double cross_product = pose_to_circle.getX() * pose_to_lookahead.getY()
-                    - pose_to_circle.getY() * pose_to_lookahead.getX();
             return new Command(lookahead_point.speed,
-                    (cross_product >= 0 ? -1 : 1) * lookahead_point.speed / circle.get().radius);
+                    (circle.get().turn_right ? -1 : 1) * lookahead_point.speed / circle.get().radius);
         } else {
             return new Command(lookahead_point.speed, 0.0);
         }

@@ -6,10 +6,8 @@ import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
 import com.team254.frc2016.subsystems.Drive;
-import com.team254.frc2016.subsystems.Intake;
 import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.Superstructure.WantedState;
-import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.lib.util.Rotation2d;
 
 public class TwoBallMode extends AutoModeBase {

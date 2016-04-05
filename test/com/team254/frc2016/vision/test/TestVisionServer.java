@@ -4,8 +4,6 @@ import com.team254.frc2016.vision.TargetInfo;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.frc2016.vision.VisionUpdate;
 import com.team254.frc2016.vision.VisionUpdateReceiver;
-import com.team254.frc2016.vision.messages.SetCameraModeMessage;
-import com.team254.frc2016.vision.messages.VisionMessage;
 
 public class TestVisionServer {
 

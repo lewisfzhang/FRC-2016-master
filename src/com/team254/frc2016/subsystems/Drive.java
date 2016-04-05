@@ -1,9 +1,15 @@
 package com.team254.frc2016.subsystems;
 
 import com.team254.frc2016.Constants;
+import com.team254.frc2016.Kinematics;
+import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.ADXRS453_Gyro;
+import com.team254.lib.util.AdaptivePurePursuitController;
+import com.team254.lib.util.AdaptivePurePursuitController.Command;
 import com.team254.lib.util.DriveSignal;
+import com.team254.lib.util.Path;
+import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 
 import com.team254.lib.util.SynchronousPID;
@@ -11,7 +17,6 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends Subsystem {
@@ -26,7 +31,7 @@ public class Drive extends Subsystem {
     }
 
     public enum DriveControlState {
-        OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL
+        OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL
     }
 
     private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
@@ -36,6 +41,7 @@ public class Drive extends Subsystem {
 
     private DriveControlState driveControlState_;
     private VelocityHeadingSetpoint velocityHeadingSetpoint_;
+    private AdaptivePurePursuitController pathFollowingController_;
     private SynchronousPID velocityHeadingPid_;
 
     private final Loop mLoop = new Loop() {
@@ -47,7 +53,6 @@ public class Drive extends Subsystem {
         @Override
         public void onLoop() {
             synchronized (Drive.this) {
-                double now = Timer.getFPGATimestamp();
                 // System.out.println("State " + driveControlState_);
                 switch (driveControlState_) {
                 case OPEN_LOOP:
@@ -58,8 +63,11 @@ public class Drive extends Subsystem {
                     // Talons are updating the control loop state
                     return;
                 case VELOCITY_HEADING_CONTROL:
-                    updateVelocityHeadingSetpoint(now);
+                    updateVelocityHeadingSetpoint();
                     return;
+                case PATH_FOLLOWING_CONTROL:
+                    updatePathFollower();
+                    break;
                 default:
                     System.out.println("WTF: unexpected drive control state: " + driveControlState_);
                     break;
@@ -194,8 +202,19 @@ public class Drive extends Subsystem {
             driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
             velocityHeadingPid_.reset();
         }
-        velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
-        updateVelocityHeadingSetpoint(Timer.getFPGATimestamp());
+        velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, forward_inches_per_sec,
+                headingSetpoint);
+        updateVelocityHeadingSetpoint();
+    }
+
+    public synchronized void followPath(Path path) {
+        if (driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
+            configureTalonsForSpeedControl();
+            driveControlState_ = DriveControlState.PATH_FOLLOWING_CONTROL;
+            velocityHeadingPid_.reset();
+        }
+        pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead, path);
+        updatePathFollower();
     }
 
     public double getLeftDistanceInches() {
@@ -272,7 +291,8 @@ public class Drive extends Subsystem {
 
     private void configureTalonsForSpeedControl() {
         if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL
-                && driveControlState_ != DriveControlState.VELOCITY_SETPOINT) {
+                && driveControlState_ != DriveControlState.VELOCITY_SETPOINT
+                && driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             leftMaster_.setProfile(kVelocityControlSlot);
             leftMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
@@ -300,15 +320,23 @@ public class Drive extends Subsystem {
         }
     }
 
-    private void updateVelocityHeadingSetpoint(double current_time) {
+    private void updateVelocityHeadingSetpoint() {
         Rotation2d actualGyroAngle = getGyroAngle();
 
-        mLastHeadingErrorDegrees = velocityHeadingSetpoint_.getHeading(current_time).rotateBy(actualGyroAngle.inverse())
+        mLastHeadingErrorDegrees = velocityHeadingSetpoint_.getHeading().rotateBy(actualGyroAngle.inverse())
                 .getDegrees();
 
         double deltaSpeed = velocityHeadingPid_.calculate(mLastHeadingErrorDegrees);
         updateVelocitySetpoint(velocityHeadingSetpoint_.getLeftSpeed() + deltaSpeed / 2,
                 velocityHeadingSetpoint_.getRightSpeed() - deltaSpeed / 2);
+    }
+
+    private void updatePathFollower() {
+        RigidTransform2d robot_pose = RobotState.getInstance().getLatestOdometricToVehicle().getValue();
+        Command command = pathFollowingController_.update(robot_pose);
+        Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command.linear_velocity,
+                command.angular_velocity);
+        updateVelocitySetpoint(setpoint.left, setpoint.right);
     }
 
     private static double rotationsToInches(double rotations) {
@@ -330,40 +358,25 @@ public class Drive extends Subsystem {
     public static class VelocityHeadingSetpoint {
         private final double leftSpeed_;
         private final double rightSpeed_;
-        private final double headingVelocityDegPerSec_;
-        private final Rotation2d startHeadingSetpoint_;
-        private final double startTime_;
+        private final Rotation2d headingSetpoint_;
 
         // Constructor for straight line motion
-        public VelocityHeadingSetpoint(double forwardInchesPerSec, Rotation2d headingSetpoint) {
-            startHeadingSetpoint_ = headingSetpoint;
-            leftSpeed_ = forwardInchesPerSec;
-            rightSpeed_ = forwardInchesPerSec;
-            headingVelocityDegPerSec_ = 0;
-            startTime_ = 0;
-        }
-
-        // Constructor for following arcs
-        public VelocityHeadingSetpoint(double leftInchesPerSec, double rightInchesPerSec,
-                Rotation2d startHeadingSetpoint, double headingVelocityDegPerSec, double startTime) {
-            leftSpeed_ = leftInchesPerSec;
-            rightSpeed_ = rightInchesPerSec;
-            startHeadingSetpoint_ = startHeadingSetpoint;
-            headingVelocityDegPerSec_ = headingVelocityDegPerSec;
-            startTime_ = startTime;
+        public VelocityHeadingSetpoint(double leftSpeed, double rightSpeed, Rotation2d headingSetpoint) {
+            leftSpeed_ = leftSpeed;
+            rightSpeed_ = rightSpeed;
+            headingSetpoint_ = headingSetpoint;
         }
 
         public double getLeftSpeed() {
-            return this.leftSpeed_;
+            return leftSpeed_;
         }
 
         public double getRightSpeed() {
-            return this.rightSpeed_;
+            return rightSpeed_;
         }
 
-        public Rotation2d getHeading(double currentTime) {
-            return this.startHeadingSetpoint_
-                    .rotateBy(Rotation2d.fromDegrees(headingVelocityDegPerSec_ * (currentTime - startTime_)));
+        public Rotation2d getHeading() {
+            return headingSetpoint_;
         }
     }
 }

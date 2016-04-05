@@ -1,11 +1,11 @@
 package com.team254.frc2016;
 
-import com.team254.frc2016.subsystems.Drive;
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
 public class Kinematics {
+    private static final double kEpsilon = 1E-9;
 
     public static RigidTransform2d forwardKinematics(double left_encoder_delta_distance,
             double right_encoder_delta_distance, Rotation2d delta_rotation) {
@@ -19,12 +19,23 @@ public class Kinematics {
                 current_pose.getRotation().inverse().rotateBy(current_heading)));
     }
 
-    public static Drive.VelocityHeadingSetpoint inverseKinematics(double linear_velocity, double curvature,
-            Rotation2d start_heading, double start_time) {
+    public static class DriveVelocity {
+        public final double left;
+        public final double right;
+
+        public DriveVelocity(double left, double right) {
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    public static DriveVelocity inverseKinematics(double linear_velocity, double angular_velocity) {
+        if (Math.abs(angular_velocity) < kEpsilon) {
+            return new DriveVelocity(linear_velocity, linear_velocity);
+        }
         // From linear velocity and curvature, compute left velocity, right
         // velocity, and heading velocity.
-
-        Drive.VelocityHeadingSetpoint setpoint = null;
-        return setpoint;
+        double delta_v = Constants.kTrackWidthInches / 2 * angular_velocity / Constants.kTrackScrubFactor;
+        return new DriveVelocity(linear_velocity - delta_v, linear_velocity + delta_v);
     }
 }
