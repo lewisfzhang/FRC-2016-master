@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends Subsystem {
@@ -213,7 +214,8 @@ public class Drive extends Subsystem {
             driveControlState_ = DriveControlState.PATH_FOLLOWING_CONTROL;
             velocityHeadingPid_.reset();
         }
-        pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead, path);
+        pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
+                Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path);
         updatePathFollower();
     }
 
@@ -333,7 +335,7 @@ public class Drive extends Subsystem {
 
     private void updatePathFollower() {
         RigidTransform2d robot_pose = RobotState.getInstance().getLatestOdometricToVehicle().getValue();
-        Command command = pathFollowingController_.update(robot_pose);
+        Command command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
         Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command.linear_velocity,
                 command.angular_velocity);
         updateVelocitySetpoint(setpoint.left, setpoint.right);

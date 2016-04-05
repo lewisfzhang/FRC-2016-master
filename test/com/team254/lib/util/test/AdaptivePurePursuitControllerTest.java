@@ -99,17 +99,20 @@ public class AdaptivePurePursuitControllerTest {
         waypoints.add(new Waypoint(new Translation2d(1, 0), 1));
         waypoints.add(new Waypoint(new Translation2d(2, 0), 2));
         waypoints.add(new Waypoint(new Translation2d(2, -1), 2));
-        waypoints.add(new Waypoint(new Translation2d(2, -2), 2));
+        waypoints.add(new Waypoint(new Translation2d(2, -2), 1));
+        waypoints.add(new Waypoint(new Translation2d(3, -2), 1));
+        waypoints.add(new Waypoint(new Translation2d(4, -2), 1));
+        waypoints.add(new Waypoint(new Translation2d(5, -2), 1));
         Path path = new Path(waypoints);
 
-        AdaptivePurePursuitController controller = new AdaptivePurePursuitController(0.25, path);
+        double dt = .01;
+        AdaptivePurePursuitController controller = new AdaptivePurePursuitController(0.25, 1.0, dt, path);
 
         RigidTransform2d robot_pose = new RigidTransform2d();
-        double dt = .01;
         double t = 0;
-        while (!controller.isDone() && t < 3) {
+        while (!controller.isDone() && t < 10) {
             // Follow the path
-            Command command = controller.update(robot_pose);
+            Command command = controller.update(robot_pose, t);
             robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.linear_velocity * dt, 0),
                     Rotation2d.fromRadians(command.angular_velocity * dt)));
 
@@ -118,7 +121,7 @@ public class AdaptivePurePursuitControllerTest {
             t += dt;
         }
         assertTrue(controller.isDone());
-        assertEquals(2, robot_pose.getTranslation().getX(), .01);
+        assertEquals(5, robot_pose.getTranslation().getX(), .01);
         assertEquals(-2, robot_pose.getTranslation().getY(), .01);
     }
 

@@ -3,10 +3,12 @@ package com.team254.frc2016.loops;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.team254.frc2016.Constants;
+
 import edu.wpi.first.wpilibj.Notifier;
 
 public class Looper {
-    public final double kPeriod = 0.01; // 100Hz
+    public final double kPeriod = Constants.kLooperDt;
 
     private boolean running_;
 

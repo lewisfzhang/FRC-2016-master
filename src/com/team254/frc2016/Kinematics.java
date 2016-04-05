@@ -36,6 +36,13 @@ public class Kinematics {
         // From linear velocity and curvature, compute left velocity, right
         // velocity, and heading velocity.
         double delta_v = Constants.kTrackWidthInches / 2 * angular_velocity / Constants.kTrackScrubFactor;
+
+        // Adjust linear velocity if either side is moving too fast
+        if (linear_velocity - delta_v < -Constants.kPathFollowingMaxVel) {
+            linear_velocity = -Constants.kPathFollowingMaxVel + delta_v;
+        } else if (linear_velocity + delta_v > Constants.kPathFollowingMaxVel) {
+            linear_velocity = Constants.kPathFollowingMaxVel - delta_v;
+        }
         return new DriveVelocity(linear_velocity - delta_v, linear_velocity + delta_v);
     }
 }

@@ -7,10 +7,17 @@ public class AdaptivePurePursuitController {
 
     double mFixedLookahead;
     Path mPath;
+    Command mLastCommand;
+    double mLastTime;
+    double mMaxAccel;
+    double mDt;
 
-    public AdaptivePurePursuitController(double fixed_lookahead, Path path) {
+    public AdaptivePurePursuitController(double fixed_lookahead, double max_accel, double nominal_dt, Path path) {
         mFixedLookahead = fixed_lookahead;
+        mMaxAccel = max_accel;
         mPath = path;
+        mDt = nominal_dt;
+        mLastCommand = null;
     }
 
     public boolean isDone() {
@@ -18,8 +25,8 @@ public class AdaptivePurePursuitController {
     }
 
     public static class Command {
-        public double linear_velocity;
-        public double angular_velocity;
+        public final double linear_velocity;
+        public final double angular_velocity;
 
         public Command(double linear_velocity, double angular_velocity) {
             this.linear_velocity = linear_velocity;
@@ -27,7 +34,7 @@ public class AdaptivePurePursuitController {
         }
     }
 
-    public Command update(RigidTransform2d robot_pose) {
+    public Command update(RigidTransform2d robot_pose, double now) {
         double distance_from_path = mPath.update(robot_pose.getTranslation());
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
@@ -35,12 +42,38 @@ public class AdaptivePurePursuitController {
         // System.out.println("Pose is " + robot_pose + " and lookahead point is
         // " + lookahead_point.translation);
 
-        if (circle.isPresent()) {
-            return new Command(lookahead_point.speed,
-                    (circle.get().turn_right ? -1 : 1) * lookahead_point.speed / circle.get().radius);
-        } else {
-            return new Command(lookahead_point.speed, 0.0);
+        double speed = Math.abs(lookahead_point.speed);
+        // Ensure we don't accelerate too fast from the previous command
+        double dt = now - mLastTime;
+        if (mLastCommand == null) {
+            mLastCommand = new Command(0, 0);
+            dt = mDt;
         }
+        double accel = (speed - mLastCommand.linear_velocity) / dt;
+        if (accel < -mMaxAccel) {
+            speed = mLastCommand.linear_velocity - mMaxAccel * dt;
+        } else if (accel > mMaxAccel) {
+            speed = mLastCommand.linear_velocity + mMaxAccel * dt;
+        }
+
+        // Ensure we slow down in time to stop
+        // vf^2 = v^2 + 2*a*d
+        // 0 = v^2 + 2*a*d
+        double remaining_distance = mPath.getRemainingLength();
+        double max_allowed_speed = Math.sqrt(2 * mMaxAccel * remaining_distance);
+        if (speed > max_allowed_speed) {
+            speed = max_allowed_speed;
+        }
+
+        Command rv;
+        if (circle.isPresent()) {
+            rv = new Command(speed, (circle.get().turn_right ? -1 : 1) * speed / circle.get().radius);
+        } else {
+            rv = new Command(speed, 0.0);
+        }
+        mLastTime = now;
+        mLastCommand = rv;
+        return rv;
     }
 
     public static class Circle {

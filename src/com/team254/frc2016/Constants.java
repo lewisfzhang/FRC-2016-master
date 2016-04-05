@@ -76,6 +76,8 @@ public class Constants extends ConstantsBase {
 
     public static int kAndroidAppTcpPort = 8254;
 
+    public static double kLooperDt = 0.01;
+
     // CONTROL LOOP GAINS
 
     // PID gains for hood position loop
@@ -115,6 +117,8 @@ public class Constants extends ConstantsBase {
 
     // Path following constants
     public static double kPathFollowingLookahead = 24.0; // inches
+    public static double kPathFollowingMaxVel = 84.0; // inches/sec
+    public static double kPathFollowingMaxAccel = 84.0; // inches/sec^2
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
