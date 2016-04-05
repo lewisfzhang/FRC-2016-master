@@ -106,7 +106,7 @@ public class AdaptivePurePursuitControllerTest {
         Path path = new Path(waypoints);
 
         double dt = .01;
-        AdaptivePurePursuitController controller = new AdaptivePurePursuitController(0.25, 1.0, dt, path);
+        AdaptivePurePursuitController controller = new AdaptivePurePursuitController(0.25, 1.0, dt, path, false);
 
         RigidTransform2d robot_pose = new RigidTransform2d();
         double t = 0;
@@ -125,4 +125,38 @@ public class AdaptivePurePursuitControllerTest {
         assertEquals(-2, robot_pose.getTranslation().getY(), .01);
     }
 
+    @Test
+    public void testControllerReversed() {
+        List<Waypoint> waypoints = new ArrayList<>();
+        waypoints.add(new Waypoint(new Translation2d(0, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(1, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(2, 0), 2, "StartedTurn"));
+        waypoints.add(new Waypoint(new Translation2d(2, -1), 2));
+        waypoints.add(new Waypoint(new Translation2d(2, -2), 1, "FinishedTurn"));
+        waypoints.add(new Waypoint(new Translation2d(3, -2), 1));
+        waypoints.add(new Waypoint(new Translation2d(4, -2), 1));
+        waypoints.add(new Waypoint(new Translation2d(5, -2), 1));
+        Path path = new Path(waypoints);
+
+        double dt = .01;
+        AdaptivePurePursuitController controller = new AdaptivePurePursuitController(0.25, 1.0, dt, path, true);
+
+        RigidTransform2d robot_pose = RigidTransform2d.fromRotation(Rotation2d.fromRadians(Math.PI));
+        double t = 0;
+        while (!controller.isDone() && t < 10) {
+            // Follow the path
+            Command command = controller.update(robot_pose, t);
+            robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.linear_velocity * dt, 0),
+                    Rotation2d.fromRadians(command.angular_velocity * dt)));
+
+            System.out.println(
+                    "t = " + t + ", lin vel " + command.linear_velocity + ", ang vel " + command.angular_velocity
+                            + ", pose " + robot_pose + ", markers finished " + controller.getMarkersCrossed());
+            t += dt;
+        }
+        assertTrue(controller.isDone());
+        assertEquals(2, controller.getMarkersCrossed().size());
+        assertEquals(5, robot_pose.getTranslation().getX(), .01);
+        assertEquals(-2, robot_pose.getTranslation().getY(), .01);
+    }
 }

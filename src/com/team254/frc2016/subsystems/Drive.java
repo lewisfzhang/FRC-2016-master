@@ -1,5 +1,7 @@
 package com.team254.frc2016.subsystems;
 
+import java.util.Set;
+
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.Kinematics;
 import com.team254.frc2016.RobotState;
@@ -208,15 +210,27 @@ public class Drive extends Subsystem {
         updateVelocityHeadingSetpoint();
     }
 
-    public synchronized void followPath(Path path) {
+    public synchronized void followPath(Path path, boolean reversed) {
         if (driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
             configureTalonsForSpeedControl();
             driveControlState_ = DriveControlState.PATH_FOLLOWING_CONTROL;
             velocityHeadingPid_.reset();
         }
         pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
-                Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path);
+                Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed);
         updatePathFollower();
+    }
+
+    public synchronized boolean isFinishedPath() {
+        return (driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL && pathFollowingController_.isDone());
+    }
+
+    public synchronized Set<String> getPathMarkersCrossed() {
+        if (driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
+            return null;
+        } else {
+            return pathFollowingController_.getMarkersCrossed();
+        }
     }
 
     public double getLeftDistanceInches() {

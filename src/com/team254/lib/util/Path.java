@@ -1,30 +1,52 @@
 package com.team254.lib.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class Path {
     protected static final double kSegmentCompletePercentage = .99;
 
+    protected List<Waypoint> mWaypoints;
     protected List<PathSegment> mSegments;
+    protected Set<String> mMarkersCrossed;
 
     public static class Waypoint {
-        public Translation2d position;
-        public double speed;
+        public final Translation2d position;
+        public final double speed;
+        public final Optional<String> marker;
 
         public Waypoint(Translation2d position, double speed) {
             this.position = position;
             this.speed = speed;
+            this.marker = Optional.empty();
+        }
+
+        public Waypoint(Translation2d position, double speed, String marker) {
+            this.position = position;
+            this.speed = speed;
+            this.marker = Optional.of(marker);
         }
     }
 
     public Path(List<Waypoint> waypoints) {
+        mMarkersCrossed = new HashSet<String>();
+        mWaypoints = waypoints;
         mSegments = new ArrayList<PathSegment>();
         for (int i = 0; i < waypoints.size() - 1; ++i) {
             mSegments.add(
                     new PathSegment(waypoints.get(i).position, waypoints.get(i + 1).position, waypoints.get(i).speed));
+        }
+        // The first waypoint is already complete
+        if (mWaypoints.size() > 0) {
+            Waypoint first_waypoint = mWaypoints.get(0);
+            if (first_waypoint.marker.isPresent()) {
+                mMarkersCrossed.add(first_waypoint.marker.get());
+            }
+            mWaypoints.remove(0);
         }
     }
 
@@ -39,6 +61,13 @@ public class Path {
                 // System.out.println("Segment from " + segment.getStart() + "
                 // to " + segment.getEnd() + " complete");
                 it.remove();
+                if (mWaypoints.size() > 0) {
+                    Waypoint waypoint = mWaypoints.get(0);
+                    if (waypoint.marker.isPresent()) {
+                        mMarkersCrossed.add(waypoint.marker.get());
+                    }
+                    mWaypoints.remove(0);
+                }
             } else {
                 if (closest_point_report.index > 0.0) {
                     // Can shorten this segment
@@ -59,12 +88,23 @@ public class Path {
                         next.updateStart(next_closest_point_report.closest_point);
                         rv = next_closest_point_report.distance;
                         mSegments.remove(0);
+                        if (mWaypoints.size() > 0) {
+                            Waypoint waypoint = mWaypoints.get(0);
+                            if (waypoint.marker.isPresent()) {
+                                mMarkersCrossed.add(waypoint.marker.get());
+                            }
+                            mWaypoints.remove(0);
+                        }
                     }
                 }
                 break;
             }
         }
         return rv;
+    }
+
+    public Set<String> getMarkersCrossed() {
+        return mMarkersCrossed;
     }
 
     public double getRemainingLength() {

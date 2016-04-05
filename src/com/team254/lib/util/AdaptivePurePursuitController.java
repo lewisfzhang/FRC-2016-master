@@ -1,6 +1,7 @@
 package com.team254.lib.util;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class AdaptivePurePursuitController {
     private static final double kEpsilon = 1E-9;
@@ -11,13 +12,16 @@ public class AdaptivePurePursuitController {
     double mLastTime;
     double mMaxAccel;
     double mDt;
+    boolean mReversed;
 
-    public AdaptivePurePursuitController(double fixed_lookahead, double max_accel, double nominal_dt, Path path) {
+    public AdaptivePurePursuitController(double fixed_lookahead, double max_accel, double nominal_dt, Path path,
+            boolean reversed) {
         mFixedLookahead = fixed_lookahead;
         mMaxAccel = max_accel;
         mPath = path;
         mDt = nominal_dt;
         mLastCommand = null;
+        mReversed = reversed;
     }
 
     public boolean isDone() {
@@ -35,14 +39,23 @@ public class AdaptivePurePursuitController {
     }
 
     public Command update(RigidTransform2d robot_pose, double now) {
+        RigidTransform2d pose = robot_pose;
+        if (mReversed) {
+            pose = new RigidTransform2d(robot_pose.getTranslation(),
+                    robot_pose.getRotation().rotateBy(Rotation2d.fromRadians(Math.PI)));
+        }
+
         double distance_from_path = mPath.update(robot_pose.getTranslation());
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
-        Optional<Circle> circle = joinPath(robot_pose, lookahead_point.translation);
+        Optional<Circle> circle = joinPath(pose, lookahead_point.translation);
         // System.out.println("Pose is " + robot_pose + " and lookahead point is
         // " + lookahead_point.translation);
 
-        double speed = Math.abs(lookahead_point.speed);
+        double speed = lookahead_point.speed;
+        if (mReversed) {
+            speed *= -1;
+        }
         // Ensure we don't accelerate too fast from the previous command
         double dt = now - mLastTime;
         if (mLastCommand == null) {
@@ -61,19 +74,23 @@ public class AdaptivePurePursuitController {
         // 0 = v^2 + 2*a*d
         double remaining_distance = mPath.getRemainingLength();
         double max_allowed_speed = Math.sqrt(2 * mMaxAccel * remaining_distance);
-        if (speed > max_allowed_speed) {
-            speed = max_allowed_speed;
+        if (Math.abs(speed) > max_allowed_speed) {
+            speed = max_allowed_speed * Math.signum(speed);
         }
 
         Command rv;
         if (circle.isPresent()) {
-            rv = new Command(speed, (circle.get().turn_right ? -1 : 1) * speed / circle.get().radius);
+            rv = new Command(speed, (circle.get().turn_right ? -1 : 1) * Math.abs(speed) / circle.get().radius);
         } else {
             rv = new Command(speed, 0.0);
         }
         mLastTime = now;
         mLastCommand = rv;
         return rv;
+    }
+
+    public Set<String> getMarkersCrossed() {
+        return mPath.getMarkersCrossed();
     }
 
     public static class Circle {
