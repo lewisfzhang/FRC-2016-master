@@ -240,6 +240,7 @@ public class Constants extends ConstantsBase {
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();
+
     static {
         kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMinRange),
                 new InterpolatingDouble(Constants.kFlywheelGoodBallRpmSetpoint));

@@ -21,9 +21,9 @@ public class Kinematics {
 
     public static Drive.VelocityHeadingSetpoint inverseKinematics(double linear_velocity, double curvature,
             Rotation2d start_heading, double start_time) {
-        // From linear velocity and curvature, compute left velocity, right velocity, and heading velocity.
-        
-        
+        // From linear velocity and curvature, compute left velocity, right
+        // velocity, and heading velocity.
+
         Drive.VelocityHeadingSetpoint setpoint = null;
         return setpoint;
     }

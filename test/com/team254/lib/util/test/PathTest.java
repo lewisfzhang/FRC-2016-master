@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.team254.lib.util.*;
+import com.team254.lib.util.Path.Waypoint;
 
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ public class PathTest {
     public void testPathSegment() {
         Translation2d start = new Translation2d(0, 0);
         Translation2d end = new Translation2d(1, 0);
-        PathSegment segment = new PathSegment(start, end);
+        PathSegment segment = new PathSegment(start, end, 1);
         assertEquals(1, segment.getLength(), kTestEpsilon);
         assertEquals(start.getX(), segment.getStart().getX(), kTestEpsilon);
         assertEquals(start.getY(), segment.getStart().getY(), kTestEpsilon);
@@ -70,99 +71,107 @@ public class PathTest {
 
     @Test
     public void testPath() {
-        List<Translation2d> waypoints = new ArrayList<>();
-        waypoints.add(new Translation2d(0, 0));
-        waypoints.add(new Translation2d(1, 0));
-        waypoints.add(new Translation2d(2, 0));
-        waypoints.add(new Translation2d(2, 1));
-        waypoints.add(new Translation2d(2, 2));
+        List<Waypoint> waypoints = new ArrayList<>();
+        waypoints.add(new Waypoint(new Translation2d(0, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(1, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(2, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(2, 1), 1));
+        waypoints.add(new Waypoint(new Translation2d(2, 2), 1));
 
         Path path = new Path(waypoints);
         assertEquals(4, path.getRemainingLength(), kTestEpsilon);
 
         Translation2d robot_position = new Translation2d(0, 0);
-        path.update(robot_position);
+        double distance = path.update(robot_position);
+        assertEquals(0, distance, kTestEpsilon);
         assertEquals(4, path.getRemainingLength(), kTestEpsilon);
 
         robot_position = new Translation2d(.5, 0);
-        path.update(robot_position);
+        distance = path.update(robot_position);
+        assertEquals(0, distance, kTestEpsilon);
         assertEquals(3.5, path.getRemainingLength(), kTestEpsilon);
 
         robot_position = new Translation2d(1, 0);
-        path.update(robot_position);
+        distance = path.update(robot_position);
+        assertEquals(0, distance, kTestEpsilon);
         assertEquals(3, path.getRemainingLength(), kTestEpsilon);
 
         robot_position = new Translation2d(1, .5);
-        path.update(robot_position);
+        distance = path.update(robot_position);
+        assertEquals(.5, distance, kTestEpsilon);
         assertEquals(3, path.getRemainingLength(), kTestEpsilon);
 
         robot_position = new Translation2d(2.5, .5);
-        path.update(robot_position);
+        distance = path.update(robot_position);
+        assertEquals(.5, distance, kTestEpsilon);
         assertEquals(1.5, path.getRemainingLength(), kTestEpsilon);
 
         robot_position = new Translation2d(0, 0);
-        path.update(robot_position);
+        distance = path.update(robot_position);
+        assertTrue(distance > 1);
         assertEquals(1.5, path.getRemainingLength(), kTestEpsilon);
 
         robot_position = new Translation2d(2.5, 2.5);
-        path.update(robot_position);
+        distance = path.update(robot_position);
+        assertEquals(0, distance, kTestEpsilon);
         assertEquals(0, path.getRemainingLength(), kTestEpsilon);
 
         robot_position = new Translation2d(0, 0);
-        path.update(robot_position);
+        distance = path.update(robot_position);
+        assertEquals(0, distance, kTestEpsilon);
         assertEquals(0, path.getRemainingLength(), kTestEpsilon);
     }
 
     @Test
     public void testLookahead() {
-        List<Translation2d> waypoints = new ArrayList<>();
-        waypoints.add(new Translation2d(0, 0));
-        waypoints.add(new Translation2d(1, 0));
-        waypoints.add(new Translation2d(2, 0));
-        waypoints.add(new Translation2d(2, 1));
-        waypoints.add(new Translation2d(2, 2));
+        List<Waypoint> waypoints = new ArrayList<>();
+        waypoints.add(new Waypoint(new Translation2d(0, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(1, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(2, 0), 1));
+        waypoints.add(new Waypoint(new Translation2d(2, 1), 1));
+        waypoints.add(new Waypoint(new Translation2d(2, 2), 1));
         Path path = new Path(waypoints);
 
         // Robot at path start, lookahead 1 unit
         Translation2d robot_position = new Translation2d(0, 0);
         path.update(robot_position);
-        Translation2d lookahead_point = path.getLookaheadPoint(robot_position, 1);
-        assertEquals(1, lookahead_point.getX(), kTestEpsilon);
-        assertEquals(0, lookahead_point.getY(), kTestEpsilon);
+        PathSegment.Sample lookahead_point = path.getLookaheadPoint(robot_position, 1);
+        assertEquals(1, lookahead_point.translation.getX(), kTestEpsilon);
+        assertEquals(0, lookahead_point.translation.getY(), kTestEpsilon);
 
         // Robot at path start, lookahead 2 units
         robot_position = new Translation2d(0, 0);
         path.update(robot_position);
         lookahead_point = path.getLookaheadPoint(robot_position, 2);
-        assertEquals(2, lookahead_point.getX(), kTestEpsilon);
-        assertEquals(0, lookahead_point.getY(), kTestEpsilon);
+        assertEquals(2, lookahead_point.translation.getX(), kTestEpsilon);
+        assertEquals(0, lookahead_point.translation.getY(), kTestEpsilon);
 
         // Robot at path start, lookahead 2.1 units
         robot_position = new Translation2d(0, 0);
         path.update(robot_position);
         lookahead_point = path.getLookaheadPoint(robot_position, 2.1);
-        assertEquals(2, lookahead_point.getX(), kTestEpsilon);
-        assertTrue(0 < lookahead_point.getY());
+        assertEquals(2, lookahead_point.translation.getX(), kTestEpsilon);
+        assertTrue(0 < lookahead_point.translation.getY());
 
         // Robot near path start, lookahead 1 unit
         robot_position = new Translation2d(0, 0.1);
         path.update(robot_position);
         lookahead_point = path.getLookaheadPoint(robot_position, 1);
-        assertTrue(1 > lookahead_point.getX());
-        assertEquals(0, lookahead_point.getY(), kTestEpsilon);
+        assertTrue(1 > lookahead_point.translation.getX());
+        assertEquals(0, lookahead_point.translation.getY(), kTestEpsilon);
 
         // Robot behind path start, lookahead 1 unit
         robot_position = new Translation2d(-.5, 0);
         path.update(robot_position);
         lookahead_point = path.getLookaheadPoint(robot_position, 1);
-        assertEquals(.5, lookahead_point.getX(), kTestEpsilon);
-        assertEquals(0, lookahead_point.getY(), kTestEpsilon);
+        assertEquals(.5, lookahead_point.translation.getX(), kTestEpsilon);
+        assertEquals(0, lookahead_point.translation.getY(), kTestEpsilon);
 
         // Lookahead goes past end
         robot_position = new Translation2d(0, 0);
         path.update(robot_position);
         lookahead_point = path.getLookaheadPoint(robot_position, 5);
-        assertEquals(2, lookahead_point.getX(), kTestEpsilon);
-        assertTrue(2 < lookahead_point.getY());
+        assertEquals(2, lookahead_point.translation.getX(), kTestEpsilon);
+        assertTrue(2 < lookahead_point.translation.getY());
     }
 }

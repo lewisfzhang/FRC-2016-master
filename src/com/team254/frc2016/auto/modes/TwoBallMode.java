@@ -25,16 +25,13 @@ public class TwoBallMode extends AutoModeBase {
     protected void routine() throws AutoModeEndedException {
         mSuperstructure.setWantsToRunIntake();
         mSuperstructure.deployIntake();
-        runAction(new ParallelAction(
-                Arrays.asList(new GetLowAction(), new WaitAction(1))));
+        runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(1))));
         mSuperstructure.setWantsToStopIntake();
 
         runAction(new ParallelAction(
                 Arrays.asList(new DriveStraightAction(mDistanceToDrive, AutoModeUtils.TWO_BALL_FORWARD_DRIVE_VELOCITY),
-                        new SeriesAction(Arrays.asList(
-                                new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
-                                new StartAutoAimingAction(),
-                                new PointTurretAction(Rotation2d.fromDegrees(-45.0)))))));
+                        new SeriesAction(Arrays.asList(new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
+                                new StartAutoAimingAction(), new PointTurretAction(Rotation2d.fromDegrees(-45.0)))))));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(1.0));
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
@@ -42,12 +39,10 @@ public class TwoBallMode extends AutoModeBase {
         runAction(new DriveStraightAction(-mDistanceToDrive + 6.0, -AutoModeUtils.TWO_BALL_FORWARD_DRIVE_VELOCITY));
         mDrive.setVelocitySetpoint(0, 0);
 
-        runAction(new ParallelAction(
-                Arrays.asList(new DriveStraightAction(mDistanceToDrive - 6.0, AutoModeUtils.TWO_BALL_FORWARD_DRIVE_VELOCITY),
-                        new SeriesAction(Arrays.asList(
-                                new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
-                                new StartAutoAimingAction(),
-                                new PointTurretAction(Rotation2d.fromDegrees(-45.0)))))));
+        runAction(new ParallelAction(Arrays.asList(
+                new DriveStraightAction(mDistanceToDrive - 6.0, AutoModeUtils.TWO_BALL_FORWARD_DRIVE_VELOCITY),
+                new SeriesAction(Arrays.asList(new WaitForDistanceAction(AutoModeUtils.DISTANCE_TO_POP_HOOD),
+                        new StartAutoAimingAction(), new PointTurretAction(Rotation2d.fromDegrees(-45.0)))))));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(1.0));
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);

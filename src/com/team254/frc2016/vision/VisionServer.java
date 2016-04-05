@@ -31,7 +31,6 @@ public class VisionServer implements Runnable {
     private static final int m_selfie_external_port = 5801;
     private static final int m_selfie_internal_port = 5800;
 
-
     private ArrayList<ServerThread> serverThreads = new ArrayList<>();
 
     public static VisionServer getInstance() {
@@ -140,12 +139,13 @@ public class VisionServer implements Runnable {
         new Thread(new ForcePortForwardingThread()).start();
         new Thread(new SendCameraModeThread()).start();
 
-        // Start a port forwarder because Adb doesnt listen to anything but loopback
+        // Start a port forwarder because Adb doesnt listen to anything but
+        // loopback
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Main.main(new String[] {"5800", "127.0.0.1:5801" });
+                    Main.main(new String[] { "5800", "127.0.0.1:5801" });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -194,12 +194,16 @@ public class VisionServer implements Runnable {
     }
 
     public void setUseVisionMode() {
-        sendMessage(SetCameraModeMessage.getVisionModeMessage());
+        if (!mUseVisionMode) {
+            sendMessage(SetCameraModeMessage.getVisionModeMessage());
+        }
         mUseVisionMode = true;
     }
 
     public void setUseIntakeMode() {
-        sendMessage(SetCameraModeMessage.getIntakeModeMessage());
+        if (mUseVisionMode) {
+            sendMessage(SetCameraModeMessage.getIntakeModeMessage());
+        }
         mUseVisionMode = false;
     }
 

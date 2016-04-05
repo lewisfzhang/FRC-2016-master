@@ -1,7 +1,6 @@
 package com.team254.frc2016.auto.actions;
 
 import com.team254.frc2016.subsystems.Drive;
-import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Rotation2d;
 
 public class DriveStraightAction implements Action {

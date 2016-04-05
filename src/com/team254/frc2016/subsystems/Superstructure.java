@@ -579,8 +579,7 @@ public class Superstructure extends Subsystem {
     }
 
     private double getHoodAngleForRange(double range) {
-        InterpolatingDouble result = Constants.kHoodAutoAimMap
-                .getInterpolated(new InterpolatingDouble(range));
+        InterpolatingDouble result = Constants.kHoodAutoAimMap.getInterpolated(new InterpolatingDouble(range));
         if (result != null) {
             return result.value;
         } else {

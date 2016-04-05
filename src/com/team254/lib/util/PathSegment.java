@@ -3,6 +3,17 @@ package com.team254.lib.util;
 public class PathSegment {
     protected static final double kEpsilon = 1E-9;
 
+    public static class Sample {
+        public final Translation2d translation;
+        public final double speed;
+
+        public Sample(Translation2d translation, double speed) {
+            this.translation = translation;
+            this.speed = speed;
+        }
+    }
+
+    protected double mSpeed;
     protected Translation2d mStart;
     protected Translation2d mEnd;
     protected Translation2d mStartToEnd; // pre-computed for efficiency
@@ -18,8 +29,9 @@ public class PathSegment {
                                 // point
     }
 
-    public PathSegment(Translation2d start, Translation2d end) {
+    public PathSegment(Translation2d start, Translation2d end, double speed) {
         mEnd = end;
+        mSpeed = speed;
         updateStart(start);
     }
 
@@ -27,6 +39,10 @@ public class PathSegment {
         mStart = new_start;
         mStartToEnd = mStart.inverse().translateBy(mEnd);
         mLength = mStartToEnd.norm();
+    }
+
+    public double getSpeed() {
+        return mSpeed;
     }
 
     public Translation2d getStart() {

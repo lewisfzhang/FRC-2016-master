@@ -1,6 +1,5 @@
 package com.team254.lib.util;
 
-
 public class LatchedBoolean {
     private boolean mLast = false;
 

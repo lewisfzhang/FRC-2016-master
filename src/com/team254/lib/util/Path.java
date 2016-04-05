@@ -10,10 +10,21 @@ public class Path {
 
     protected List<PathSegment> mSegments;
 
-    public Path(List<Translation2d> waypoints) {
+    public static class Waypoint {
+        public Translation2d position;
+        public double speed;
+
+        public Waypoint(Translation2d position, double speed) {
+            this.position = position;
+            this.speed = speed;
+        }
+    }
+
+    public Path(List<Waypoint> waypoints) {
         mSegments = new ArrayList<PathSegment>();
         for (int i = 0; i < waypoints.size() - 1; ++i) {
-            mSegments.add(new PathSegment(waypoints.get(i), waypoints.get(i + 1)));
+            mSegments.add(
+                    new PathSegment(waypoints.get(i).position, waypoints.get(i + 1).position, waypoints.get(i).speed));
         }
     }
 
@@ -25,14 +36,31 @@ public class Path {
             PathSegment.ClosestPointReport closest_point_report = segment.getClosestPoint(position);
             if (closest_point_report.index >= kSegmentCompletePercentage) {
                 // This segment is complete and can be removed.
+                // System.out.println("Segment from " + segment.getStart() + "
+                // to " + segment.getEnd() + " complete");
                 it.remove();
             } else {
                 if (closest_point_report.index > 0.0) {
                     // Can shorten this segment
                     segment.updateStart(closest_point_report.closest_point);
+                    // System.out.println("Shortening segment start to " +
+                    // closest_point_report.closest_point);
                 }
                 // We are done
                 rv = closest_point_report.distance;
+                // ...unless the next segment is closer now
+                if (it.hasNext()) {
+                    PathSegment next = it.next();
+                    PathSegment.ClosestPointReport next_closest_point_report = next.getClosestPoint(position);
+                    if (next_closest_point_report.index > 0
+                            && next_closest_point_report.index < kSegmentCompletePercentage
+                            && next_closest_point_report.distance < rv) {
+                        // System.out.println("Jumping to next segment");
+                        next.updateStart(next_closest_point_report.closest_point);
+                        rv = next_closest_point_report.distance;
+                        mSegments.remove(0);
+                    }
+                }
                 break;
             }
         }
@@ -44,12 +72,13 @@ public class Path {
         for (int i = 0; i < mSegments.size(); ++i) {
             length += mSegments.get(i).getLength();
         }
+        // System.out.println("Remaining length " + length);
         return length;
     }
 
-    public Translation2d getLookaheadPoint(Translation2d position, double lookahead_distance) {
+    public PathSegment.Sample getLookaheadPoint(Translation2d position, double lookahead_distance) {
         if (mSegments.size() == 0) {
-            return new Translation2d();
+            return new PathSegment.Sample(new Translation2d(), 0);
         }
 
         // Check the distances to the start and end of each segment. As soon as
@@ -59,7 +88,7 @@ public class Path {
         if (position_inverse.translateBy(mSegments.get(0).getStart()).norm() >= lookahead_distance) {
             // Special case: Before the first point, so just return the first
             // point.
-            return mSegments.get(0).getStart();
+            return new PathSegment.Sample(mSegments.get(0).getStart(), mSegments.get(0).getSpeed());
         }
         for (int i = 0; i < mSegments.size(); ++i) {
             PathSegment segment = mSegments.get(i);
@@ -69,7 +98,7 @@ public class Path {
                 Optional<Translation2d> intersection_point = getFirstCircleSegmentIntersection(segment, position,
                         lookahead_distance);
                 if (intersection_point.isPresent()) {
-                    return intersection_point.get();
+                    return new PathSegment.Sample(intersection_point.get(), segment.getSpeed());
                 } else {
                     System.out.println("ERROR: No intersection point?");
                 }
@@ -77,14 +106,15 @@ public class Path {
         }
         // Special case: After the last point, so extrapolate forward.
         PathSegment last_segment = mSegments.get(mSegments.size() - 1);
-        PathSegment new_last_segment = new PathSegment(last_segment.getStart(), last_segment.interpolate(10000));
+        PathSegment new_last_segment = new PathSegment(last_segment.getStart(), last_segment.interpolate(10000),
+                last_segment.getSpeed());
         Optional<Translation2d> intersection_point = getFirstCircleSegmentIntersection(new_last_segment, position,
                 lookahead_distance);
         if (intersection_point.isPresent()) {
-            return intersection_point.get();
+            return new PathSegment.Sample(intersection_point.get(), last_segment.getSpeed());
         } else {
             System.out.println("ERROR: No intersection point anywhere on line?");
-            return last_segment.getEnd();
+            return new PathSegment.Sample(last_segment.getEnd(), last_segment.getSpeed());
         }
     }
 
