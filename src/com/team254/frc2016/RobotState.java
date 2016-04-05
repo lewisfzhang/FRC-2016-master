@@ -181,7 +181,8 @@ public class RobotState {
     }
 
     public void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
-        //System.out.println("Start addVisionUpdate at " + Timer.getFPGATimestamp());
+        // System.out.println("Start addVisionUpdate at " +
+        // Timer.getFPGATimestamp());
         List<Translation2d> odometric_to_goals = new ArrayList<>();
         RigidTransform2d odometric_to_camera = getOdometricToCamera(timestamp);
         if (!(vision_update == null || vision_update.isEmpty())) {
@@ -219,7 +220,8 @@ public class RobotState {
             }
             goal_tracker_.update(timestamp, odometric_to_goals);
         }
-        //System.out.println("Done addVisionUpdate at " + Timer.getFPGATimestamp());
+        // System.out.println("Done addVisionUpdate at " +
+        // Timer.getFPGATimestamp());
     }
 
     public synchronized void resetVision() {
@@ -230,12 +232,8 @@ public class RobotState {
     public RigidTransform2d generateOdometryFromSensors(double left_encoder_delta_distance,
             double right_encoder_delta_distance, Rotation2d current_gyro_angle) {
         RigidTransform2d last_measurement = getLatestOdometricToVehicle().getValue();
-        RigidTransform2d differential_pose = new RigidTransform2d(
-                new Translation2d((left_encoder_delta_distance + right_encoder_delta_distance) / 2, 0),
-                last_measurement.getRotation().inverse().rotateBy(current_gyro_angle));
-        RigidTransform2d new_observation = last_measurement.transformBy(differential_pose);
-        new_observation.getRotation().normalize();
-        return new_observation;
+        return Kinematics.integrateForwardKinematics(last_measurement, left_encoder_delta_distance,
+                right_encoder_delta_distance, current_gyro_angle);
     }
 
     public void outputToSmartDashboard() {

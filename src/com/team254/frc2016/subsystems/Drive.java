@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends Subsystem {
@@ -46,6 +47,7 @@ public class Drive extends Subsystem {
         @Override
         public void onLoop() {
             synchronized (Drive.this) {
+                double now = Timer.getFPGATimestamp();
                 // System.out.println("State " + driveControlState_);
                 switch (driveControlState_) {
                 case OPEN_LOOP:
@@ -56,7 +58,7 @@ public class Drive extends Subsystem {
                     // Talons are updating the control loop state
                     return;
                 case VELOCITY_HEADING_CONTROL:
-                    updateVelocityHeadingSetpoint();
+                    updateVelocityHeadingSetpoint(now);
                     return;
                 default:
                     System.out.println("WTF: unexpected drive control state: " + driveControlState_);
@@ -193,7 +195,7 @@ public class Drive extends Subsystem {
             velocityHeadingPid_.reset();
         }
         velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, headingSetpoint);
-        updateVelocityHeadingSetpoint();
+        updateVelocityHeadingSetpoint(Timer.getFPGATimestamp());
     }
 
     public double getLeftDistanceInches() {
@@ -298,15 +300,15 @@ public class Drive extends Subsystem {
         }
     }
 
-    private void updateVelocityHeadingSetpoint() {
+    private void updateVelocityHeadingSetpoint(double current_time) {
         Rotation2d actualGyroAngle = getGyroAngle();
 
-        mLastHeadingErrorDegrees = velocityHeadingSetpoint_.headingSetpoint_.rotateBy(actualGyroAngle.inverse())
+        mLastHeadingErrorDegrees = velocityHeadingSetpoint_.getHeading(current_time).rotateBy(actualGyroAngle.inverse())
                 .getDegrees();
 
         double deltaSpeed = velocityHeadingPid_.calculate(mLastHeadingErrorDegrees);
-        updateVelocitySetpoint(velocityHeadingSetpoint_.forwardInchesPerSec_ + deltaSpeed / 2,
-                velocityHeadingSetpoint_.forwardInchesPerSec_ - deltaSpeed / 2);
+        updateVelocitySetpoint(velocityHeadingSetpoint_.getLeftSpeed() + deltaSpeed / 2,
+                velocityHeadingSetpoint_.getRightSpeed() - deltaSpeed / 2);
     }
 
     private static double rotationsToInches(double rotations) {
@@ -326,20 +328,42 @@ public class Drive extends Subsystem {
     }
 
     public static class VelocityHeadingSetpoint {
-        private final double forwardInchesPerSec_;
-        private final Rotation2d headingSetpoint_;
+        private final double leftSpeed_;
+        private final double rightSpeed_;
+        private final double headingVelocityDegPerSec_;
+        private final Rotation2d startHeadingSetpoint_;
+        private final double startTime_;
 
+        // Constructor for straight line motion
         public VelocityHeadingSetpoint(double forwardInchesPerSec, Rotation2d headingSetpoint) {
-            forwardInchesPerSec_ = forwardInchesPerSec;
-            headingSetpoint_ = headingSetpoint;
+            startHeadingSetpoint_ = headingSetpoint;
+            leftSpeed_ = forwardInchesPerSec;
+            rightSpeed_ = forwardInchesPerSec;
+            headingVelocityDegPerSec_ = 0;
+            startTime_ = 0;
         }
 
-        public double getSpeed() {
-            return this.forwardInchesPerSec_;
+        // Constructor for following arcs
+        public VelocityHeadingSetpoint(double leftInchesPerSec, double rightInchesPerSec,
+                Rotation2d startHeadingSetpoint, double headingVelocityDegPerSec, double startTime) {
+            leftSpeed_ = leftInchesPerSec;
+            rightSpeed_ = rightInchesPerSec;
+            startHeadingSetpoint_ = startHeadingSetpoint;
+            headingVelocityDegPerSec_ = headingVelocityDegPerSec;
+            startTime_ = startTime;
         }
 
-        public Rotation2d getHeading() {
-            return this.headingSetpoint_;
+        public double getLeftSpeed() {
+            return this.leftSpeed_;
+        }
+
+        public double getRightSpeed() {
+            return this.rightSpeed_;
+        }
+
+        public Rotation2d getHeading(double currentTime) {
+            return this.startHeadingSetpoint_
+                    .rotateBy(Rotation2d.fromDegrees(headingVelocityDegPerSec_ * (currentTime - startTime_)));
         }
     }
 }

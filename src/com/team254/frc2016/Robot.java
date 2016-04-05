@@ -201,7 +201,7 @@ public class Robot extends IterativeRobot {
         if (mControls.getTractionControl()) {
             Rotation2d heading_setpoint = mDrive.getGyroAngle();
             if (mDrive.getControlState() == Drive.DriveControlState.VELOCITY_HEADING_CONTROL) {
-                heading_setpoint = mDrive.getVelocityHeadingSetpoint().getHeading();
+                heading_setpoint = mDrive.getVelocityHeadingSetpoint().getHeading(Timer.getFPGATimestamp());
             }
             mDrive.setVelocityHeadingSetpoint(
                     mCheesyDriveHelper.handleDeadband(throttle, CheesyDriveHelper.kThrottleDeadband)

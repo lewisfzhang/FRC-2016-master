@@ -21,8 +21,10 @@ public class Constants extends ConstantsBase {
     public static double kCameraYawAngleDegrees = -0.25;
     public static double kCameraDeadband = 0.01;
 
-    // Wheel diameter
+    // Wheels
     public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
+    public static double kTrackLengthInches = 8.265;
+    public static double kTrackWidthInches = 23.8;
 
     // Drive constants
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
