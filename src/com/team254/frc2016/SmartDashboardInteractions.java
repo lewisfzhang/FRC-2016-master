@@ -66,10 +66,14 @@ public class SmartDashboardInteractions {
      * objects directly, so use this enum to project us from WPILIb.
      */
     enum AutonOption {
-        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"), STAY_HIGH_ONE_BALL("No Drop Stay"), GET_LOW_ONE_BALL(
-                "Portcullis"), CDF_ONE_BALL("CDF - Stop"), CDF_COME_BACK_LEFT(
-                        "CDF - Come back left"), CDF_COME_BACK_RIGHT("CDF - Come back right"), TWO_BALL(
-                                "Two Ball"), STAND_STILL("Stand Still");
+        STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"), //
+        STAY_HIGH_ONE_BALL("No Drop Stay"), //
+        GET_LOW_ONE_BALL("Portcullis"), //
+        CDF_ONE_BALL("CDF - Stop"), //
+        CDF_COME_BACK_LEFT("CDF - Come back left"), //
+        CDF_COME_BACK_RIGHT("CDF - Come back right"), //
+        TWO_BALL("Two Ball"), //
+        STAND_STILL("Stand Still");
 
         public final String name;
 
@@ -79,8 +83,11 @@ public class SmartDashboardInteractions {
     }
 
     enum AutonLane {
-        LANE_1("Lane 1 (low bar)", 170), LANE_2("Lane 2", 230), LANE_3("Lane 3", 160), LANE_4("Lane 4",
-                155), LANE_5("Lane 5", 170);
+        LANE_1("Lane 1 (low bar)", 170), //
+        LANE_2("Lane 2", 230), //
+        LANE_3("Lane 3", 160), //
+        LANE_4("Lane 4", 155), //
+        LANE_5("Lane 5", 170);
 
         public final String name;
         public final double distanceToDrive;

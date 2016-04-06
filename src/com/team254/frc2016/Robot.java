@@ -24,7 +24,7 @@ public class Robot extends IterativeRobot {
     UtilityArm mUtilityArm = UtilityArm.getInstance();
     Compressor mCompressor = new Compressor(1);
     RevRoboticsAirPressureSensor mAirPressureSensor = new RevRoboticsAirPressureSensor(3);
-    AutoModeExecuter mAutoModeExecuter = new AutoModeExecuter();
+    AutoModeExecuter mAutoModeExecuter = null;
 
     // Other parts of the robot
     CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
@@ -106,6 +106,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledInit() {
         mAutoModeExecuter.stop();
+        mAutoModeExecuter = null;
 
         // Configure loopers
         mEnabledLooper.stop();
@@ -120,8 +121,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
-        // TODO: add option to force reset utility arm into starting box
         mAutoModeExecuter.stop();
+        mAutoModeExecuter = null;
 
         VisionServer.getInstance().setUseVisionMode();
 
@@ -138,14 +139,15 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
 
+        mAutoModeExecuter = new AutoModeExecuter();
         mAutoModeExecuter.setAutoMode(mSmartDashboardInteractions.getSelectedAutonMode());
         mAutoModeExecuter.start();
     }
 
     @Override
     public void teleopInit() {
-        // TODO: add option to force reset utility arm into starting box
         mAutoModeExecuter.stop();
+        mAutoModeExecuter = null;
 
         // Reset drive
         mDrive.resetEncoders();
