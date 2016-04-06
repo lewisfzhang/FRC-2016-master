@@ -1,6 +1,5 @@
 package com.team254.frc2016.auto.actions;
 
-import com.team254.frc2016.RobotState;
 import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.lib.util.Rotation2d;
 

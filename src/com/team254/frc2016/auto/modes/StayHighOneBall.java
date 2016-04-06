@@ -3,7 +3,6 @@ package com.team254.frc2016.auto.modes;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
-import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.Translation2d;
@@ -40,10 +39,11 @@ public class StayHighOneBall extends AutoModeBase {
         return_path.add(new Waypoint(new Translation2d(mDistanceToDrive, 0), 48.0));
         return_path.add(new Waypoint(new Translation2d(12, 0), 48.0));
 
-        runAction(new ParallelAction(
-                Arrays.asList(new FollowPathAction(new Path(first_path), false),
+        runAction(
+                new ParallelAction(Arrays.asList(new FollowPathAction(new Path(first_path), false),
                         new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("DropArm"),
-                                new SetArmModeAction(UtilityArm.WantedState.PORTCULLIS), new StartAutoAimingAction())))));
+                                new SetArmModeAction(UtilityArm.WantedState.PORTCULLIS),
+                                new StartAutoAimingAction())))));
 
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());

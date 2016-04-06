@@ -22,7 +22,8 @@ public class Constants extends ConstantsBase {
     public static double kCameraDeadband = 0.01;
 
     // Wheels
-    public static double kDriveWheelDiameterInches = 7.07; // Measured on 4/5/2016
+    public static double kDriveWheelDiameterInches = 7.07; // Measured on
+                                                           // 4/5/2016
     public static double kTrackLengthInches = 8.265;
     public static double kTrackWidthInches = 23.8;
     public static double kTrackScrubFactor = .5;

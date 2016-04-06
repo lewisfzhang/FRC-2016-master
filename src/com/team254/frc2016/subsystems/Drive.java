@@ -95,7 +95,7 @@ public class Drive extends Subsystem {
         rightMaster_ = new CANTalon(Constants.kRightDriveMasterId);
         rightSlave_ = new CANTalon(Constants.kRightDriveSlaveId);
         brake_ = Constants.makeSolenoidForId(Constants.kBrakeSolenoidId);
-        brake_.set(false); // TODO code
+        brake_.set(true);
         shifter_ = Constants.makeSolenoidForId(Constants.kShifterSolenoidId);
         shifter_.set(false); // high gear
         gyro_ = new ADXRS453_Gyro();
@@ -166,7 +166,7 @@ public class Drive extends Subsystem {
     public Loop getLoop() {
         return mLoop;
     }
-    
+
     public void setSneakyServo(double power) {
         sneaky_servo_.set(power);
     }
@@ -368,7 +368,8 @@ public class Drive extends Subsystem {
         Command command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
         Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command.linear_velocity,
                 command.angular_velocity);
-        //System.out.println("Left cmd: " + setpoint.left + ", Right cmd: " + setpoint.right);
+        // System.out.println("Left cmd: " + setpoint.left + ", Right cmd: " +
+        // setpoint.right);
         updateVelocitySetpoint(setpoint.left, setpoint.right);
     }
 

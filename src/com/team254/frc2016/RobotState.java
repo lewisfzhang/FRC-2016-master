@@ -222,7 +222,7 @@ public class RobotState {
         // System.out.println("Done addVisionUpdate at " +
         // Timer.getFPGATimestamp());
     }
-    
+
     public synchronized boolean seesGoal() {
         return latest_camera_to_goals_detected_timestamp_ > latest_camera_to_goals_undetected_timestamp_;
     }

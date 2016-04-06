@@ -3,14 +3,12 @@ package com.team254.frc2016.auto.modes;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
-import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.Translation2d;
 import com.team254.lib.util.Path.Waypoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ShovelTheFriesMode extends AutoModeBase {
@@ -52,9 +50,10 @@ public class ShovelTheFriesMode extends AutoModeBase {
             second_return_path.add(new Waypoint(new Translation2d(mDistanceToDrive, y_distance), 48.0));
             second_return_path.add(new Waypoint(new Translation2d(160, y_distance), 84.0));
         }
-        // CDF mode causes lots of counts to be skipped, so we can safely come back this far
+        // CDF mode causes lots of counts to be skipped, so we can safely come
+        // back this far
         second_return_path.add(new Waypoint(new Translation2d(-12, y_distance), 48.0));
-        
+
         runAction(new FollowPathAction(new Path(first_path), false));
         runAction(new GetLowAction());
         runAction(new StartAutoAimingAction());

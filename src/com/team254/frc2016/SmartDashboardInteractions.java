@@ -17,11 +17,9 @@ public class SmartDashboardInteractions {
     private static final String SHOULD_RESET_UTILITY_ARM = "Robot in Start Position";
     private static final String AUTON_MODE = "Auton Mode";
     private static final String AUTON_LANE = "Auton Lane";
-    private static final String CDF_LANE = "Auton CDF Comeback";
 
     private SendableChooser mAutonModeChooser;
     private SendableChooser mAutonLaneChooser;
-    private SendableChooser mAutonCDFComeBackLaneChooser;
 
     public void initWithDefaults() {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
@@ -40,12 +38,6 @@ public class SmartDashboardInteractions {
             mAutonLaneChooser.addObject(autonLane.name, autonLane);
         }
         SmartDashboard.putData(AUTON_LANE, mAutonLaneChooser);
-
-        mAutonCDFComeBackLaneChooser = new SendableChooser();
-        for (CDFComeBackLane cdfLane : CDFComeBackLane.values()) {
-            mAutonCDFComeBackLaneChooser.addObject(cdfLane.name, cdfLane);
-        }
-        SmartDashboard.putData(CDF_LANE, mAutonCDFComeBackLaneChooser);
     }
 
     public boolean isInHoodTuningMode() {
@@ -66,8 +58,7 @@ public class SmartDashboardInteractions {
 
     public AutoModeBase getSelectedAutonMode() {
         return createAutoMode((AutonOption) mAutonModeChooser.getSelected(),
-                (AutonLane) mAutonLaneChooser.getSelected(),
-                (CDFComeBackLane) mAutonCDFComeBackLaneChooser.getSelected());
+                (AutonLane) mAutonLaneChooser.getSelected());
     }
 
     /**
@@ -76,7 +67,9 @@ public class SmartDashboardInteractions {
      */
     enum AutonOption {
         STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"), STAY_HIGH_ONE_BALL("No Drop Stay"), GET_LOW_ONE_BALL(
-                "Portcullis"), CDF_ONE_BALL("CDF"), TWO_BALL("Two Ball"), STAND_STILL("Stand Still");
+                "Portcullis"), CDF_ONE_BALL("CDF - Stop"), CDF_COME_BACK_LEFT(
+                        "CDF - Come back left"), CDF_COME_BACK_RIGHT("CDF - Come back right"), TWO_BALL(
+                                "Two Ball"), STAND_STILL("Stand Still");
 
         public final String name;
 
@@ -98,23 +91,7 @@ public class SmartDashboardInteractions {
         }
     }
 
-    enum CDFComeBackLane {
-        STOP("CDF - Stop", false, false),
-        LEFT("CDF - Go Left", true, false),
-        RIGHT("CDF - Go Right", false, true);
-
-        public final String name;
-        public boolean goRight;
-        public boolean goLeft;
-
-        CDFComeBackLane(String name, boolean goLeft, boolean goRight) {
-            this.name = name;
-            this.goLeft = goLeft;
-            this.goRight = goRight;
-        }
-    }
-
-    private AutoModeBase createAutoMode(AutonOption autonOption, AutonLane autonLane, CDFComeBackLane cdfLane) {
+    private AutoModeBase createAutoMode(AutonOption autonOption, AutonLane autonLane) {
         switch (autonOption) {
         case STAY_HIGH_ONE_BALL:
             return new StayHighOneBall(false, autonLane.distanceToDrive);
@@ -123,7 +100,11 @@ public class SmartDashboardInteractions {
         case GET_LOW_ONE_BALL:
             return new GetLowOneBallMode(false, autonLane.distanceToDrive);
         case CDF_ONE_BALL:
-            return new ShovelTheFriesMode(autonLane.distanceToDrive, true, false); // TODO wire into dashboard
+            return new ShovelTheFriesMode(autonLane.distanceToDrive, false, false);
+        case CDF_COME_BACK_LEFT:
+            return new ShovelTheFriesMode(autonLane.distanceToDrive, true, false);
+        case CDF_COME_BACK_RIGHT:
+            return new ShovelTheFriesMode(autonLane.distanceToDrive, true, true);
         case TWO_BALL:
             return new TwoBallMode(autonLane.distanceToDrive);
         case STAND_STILL: // fallthrough

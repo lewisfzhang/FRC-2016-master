@@ -45,7 +45,7 @@ public class TwoBallMode extends AutoModeBase {
         third_path.add(new Waypoint(new Translation2d(80, 22), 84.0));
         third_path.add(new Waypoint(new Translation2d(86, 22), 84.0, "PopHood"));
         third_path.add(new Waypoint(new Translation2d(160, 22), 84.0));
-        
+
         mDrive.setSneakyServo(1.0);
         mSuperstructure.setWantsToRunIntake();
         mSuperstructure.deployIntake();
@@ -53,19 +53,23 @@ public class TwoBallMode extends AutoModeBase {
         mDrive.setSneakyServo(0.0);
         mSuperstructure.setWantsToStopIntake();
 
-        runAction(new ParallelAction(
-                Arrays.asList(new FollowPathAction(new Path(first_path), false),
-                        new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"),
-                                new StartAutoAimingAction(), new PointTurretAction(Rotation2d.fromDegrees(-32.0)))))));
+        runAction(
+                new ParallelAction(
+                        Arrays.asList(new FollowPathAction(new Path(first_path), false),
+                                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"),
+                                        new StartAutoAimingAction(),
+                                        new PointTurretAction(Rotation2d.fromDegrees(-32.0)))))));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(0.75));
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
         mSuperstructure.setWantsToRunIntake();
         runAction(new FollowPathAction(new Path(second_path), true));
-        runAction(new ParallelAction(
-                Arrays.asList(new FollowPathAction(new Path(third_path), false),
-                        new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"),
-                                new StartAutoAimingAction(), new PointTurretAction(Rotation2d.fromDegrees(-32.0)))))));
+        runAction(
+                new ParallelAction(
+                        Arrays.asList(new FollowPathAction(new Path(third_path), false),
+                                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"),
+                                        new StartAutoAimingAction(),
+                                        new PointTurretAction(Rotation2d.fromDegrees(-32.0)))))));
         runAction(new ShootWhenReadyAction());
         runAction(new WaitAction(0.75));
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
