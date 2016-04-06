@@ -1,5 +1,6 @@
 package com.team254.frc2016.auto.actions;
 
+import com.team254.frc2016.RobotState;
 import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.lib.util.Rotation2d;
 
@@ -17,7 +18,7 @@ public class PointTurretAction implements Action {
     @Override
     public boolean isFinished() {
         double error = Math.abs(mSuperstructure.getTurret().getAngle().inverse().rotateBy(mHintAngle).getDegrees());
-        return mIsDone && error < kTolerance;
+        return (mIsDone && error < kTolerance);
     }
 
     @Override

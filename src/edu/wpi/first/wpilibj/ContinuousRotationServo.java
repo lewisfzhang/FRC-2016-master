@@ -11,6 +11,10 @@ public class ContinuousRotationServo extends PWM {
         setBounds(1.0, 1.48, 1.5, 1.52, 2.0);
         enableDeadbandElimination(true);
     }
+    
+    public void setBounds(double min, double dead_min,  double center, double dead_max, double max) {
+        super.setBounds(min, dead_min, center, dead_max, max);
+    }
 
     public void set(double value) {
         setSpeed(value);

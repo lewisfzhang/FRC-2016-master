@@ -91,7 +91,6 @@ public class UtilityArm extends Subsystem {
 
     private Solenoid mArmLiftSolenoid = Constants.makeSolenoidForId(Constants.kArmLiftSolenoidId);
     private Solenoid mAdjustableHardStopSolenoid = Constants.makeSolenoidForId(Constants.kAdjustableHardStopSolenoidId);
-    private Solenoid mCdfFlapSolenoid = Constants.makeSolenoidForId(Constants.kCdfFlapSolenoidId);
     private Solenoid mHookReleaseSolenoid = Constants.makeSolenoidForId(Constants.kHookReleaseSolenoidId);
     private Solenoid mGasSpringReleaseSolenoid = Constants.makeSolenoidForId(Constants.kGasSpringReleaseSolenoidId);
 
@@ -466,7 +465,6 @@ public class UtilityArm extends Subsystem {
             GasSpringReleaseOutput gasSpringReleaseOutput) {
         mArmLiftSolenoid.set(armOutput.value);
         mAdjustableHardStopSolenoid.set(adjustableHardstopOutput.value);
-        mCdfFlapSolenoid.set(cdfFlapOutput.value);
         mHookReleaseSolenoid.set(hookReleaseOutput.value);
         mGasSpringReleaseSolenoid.set(gasSpringReleaseOutput.value);
     }

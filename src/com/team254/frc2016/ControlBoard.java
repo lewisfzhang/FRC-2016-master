@@ -114,4 +114,12 @@ public class ControlBoard {
     public boolean getHoodTuningNegativeButton() {
         return mButtonBoard.getRawButton(2);
     }
+    
+    public boolean getHoodUpButton() {
+        return mButtonBoard.getRawButton(2);
+    }
+    
+    public boolean getHoodDownButton() {
+        return mButtonBoard.getRawButton(3);
+    }
 }

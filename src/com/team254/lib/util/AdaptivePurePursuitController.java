@@ -46,6 +46,7 @@ public class AdaptivePurePursuitController {
         }
 
         double distance_from_path = mPath.update(robot_pose.getTranslation());
+        System.out.println("Remaining path length: " + mPath.getRemainingLength() + ", robot pose " + robot_pose + ", distance from path " + distance_from_path);
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
         Optional<Circle> circle = joinPath(pose, lookahead_point.translation);

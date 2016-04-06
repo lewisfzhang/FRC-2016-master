@@ -22,11 +22,10 @@ public class Constants extends ConstantsBase {
     public static double kCameraDeadband = 0.01;
 
     // Wheels
-    public static double kDriveWheelDiameterInches = 7.12; // Measured on 2/5/16
+    public static double kDriveWheelDiameterInches = 7.07; // Measured on 4/5/2016
     public static double kTrackLengthInches = 8.265;
     public static double kTrackWidthInches = 23.8;
-    public static double kTrackScrubFactor = 1.0
-            / Math.sqrt(1 + (kTrackLengthInches * kTrackLengthInches / kTrackWidthInches * kTrackWidthInches));
+    public static double kTrackScrubFactor = .5;
 
     // Drive constants
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
@@ -58,7 +57,7 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 220.0;
-    public static double kAutoShootMaxDriveSpeed = 3.0;
+    public static double kAutoShootMaxDriveSpeed = 6.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 5;
     public static double kShootActuationTime = 0.75;
     public static double kHoodUnstowToFlywheelSpinTime = 0.75;
@@ -90,12 +89,12 @@ public class Constants extends ConstantsBase {
 
     // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kDriveVelocityKp = 0.6;
-    public static double kDriveVelocityKi = 0;
+    public static double kDriveVelocityKp = 1.0;
+    public static double kDriveVelocityKi = 0.0;
     public static double kDriveVelocityKd = 6.0;
     public static double kDriveVelocityKf = 1.0;
     public static int kDriveVelocityIZone = 0;
-    public static double kDriveVelocityRampRate = 48.0;
+    public static double kDriveVelocityRampRate = 0.0;
     public static int kDriveVelocityAllowableError = 0;
 
     // PID gains for drive base lock loop
@@ -116,7 +115,7 @@ public class Constants extends ConstantsBase {
     public static double kDriveHeadingVeloctyKd = 50.0;
 
     // Path following constants
-    public static double kPathFollowingLookahead = 24.0; // inches
+    public static double kPathFollowingLookahead = 30.0; // inches
     public static double kPathFollowingMaxVel = 84.0; // inches/sec
     public static double kPathFollowingMaxAccel = 84.0; // inches/sec^2
 
@@ -186,7 +185,7 @@ public class Constants extends ConstantsBase {
     public static final int kArmLiftSolenoidId = 5; // PCM 0, Solenoid 5
     public static final int kAdjustableHardStopSolenoidId = 2; // PCM 0,
                                                                // Solenoid 2
-    public static final int kCdfFlapSolenoidId = 3; // PCM 0, Solenoid 3
+    public static final int kBrakeSolenoidId = 3; // PCM 0, Solenoid 3
     public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct
                                                        // solenoid
     public static final int kGasSpringReleaseSolenoidId = 0; // TODO: find the
@@ -214,6 +213,7 @@ public class Constants extends ConstantsBase {
     // PWM
     public static final int kSensorSideServoPWM = 0;
     public static final int kOppositeSideServoPWM = 1;
+    public static final int kSneakyServoPWM = 3;
     public static final int kTestServoPWM = 9;
 
     @Override

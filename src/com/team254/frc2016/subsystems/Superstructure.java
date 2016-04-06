@@ -174,18 +174,6 @@ public class Superstructure extends Subsystem {
                 }
                 mSystemStateForLogging = mSystemState;
                 mHoodRoller.getLoop().onLoop();
-
-                // Update Network Tables
-                /*
-                 * if (mOnTarget && mSeesGoal) {
-                 * mShooterTable.putString("state", "LOCKED"); } else if
-                 * (mSeesGoal) { mShooterTable.putString("state", "AIMING"); }
-                 * else if (mActualSubsystemState == SubsystemState.STOWED) {
-                 * mShooterTable.putString("state", "CAM_STOWED"); } else if
-                 * (!VisionServer.getInstance().isConnected()) {
-                 * mShooterTable.putString("state", "NO_CAM"); } else {
-                 * mShooterTable.putString("state", "LOOKING_FOR_GOAL"); }
-                 */
             }
         }
 
@@ -603,7 +591,7 @@ public class Superstructure extends Subsystem {
 
     private void autoAim(double now, boolean allow_changing_tracks) {
         List<ShooterAimingParameters> aimingParameters = getCurrentAimingParameters(now);
-        if (aimingParameters.isEmpty() && allow_changing_tracks || mTurretManualSetpoint.isPresent()) {
+        if (aimingParameters.isEmpty() && allow_changing_tracks) {
             // Manual search
             if (mTurretManualSetpoint.isPresent()) {
                 System.out.println("Going to manual setpoint");

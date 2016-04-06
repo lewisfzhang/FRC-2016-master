@@ -16,8 +16,10 @@ import com.team254.lib.util.Rotation2d;
 
 import com.team254.lib.util.SynchronousPID;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.ContinuousRotationServo;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PWM.PeriodMultiplier;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +41,9 @@ public class Drive extends Subsystem {
 
     private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
     private final Solenoid shifter_;
+    private final Solenoid brake_;
     private final ADXRS453_Gyro gyro_;
+    private final ContinuousRotationServo sneaky_servo_;
     private DigitalInput lineSensor_;
 
     private DriveControlState driveControlState_;
@@ -51,6 +55,7 @@ public class Drive extends Subsystem {
         @Override
         public void onStart() {
             setOpenLoop(DriveSignal.NEUTRAL);
+            pathFollowingController_ = null;
         }
 
         @Override
@@ -89,10 +94,16 @@ public class Drive extends Subsystem {
         leftSlave_ = new CANTalon(Constants.kLeftDriveSlaveId);
         rightMaster_ = new CANTalon(Constants.kRightDriveMasterId);
         rightSlave_ = new CANTalon(Constants.kRightDriveSlaveId);
+        brake_ = Constants.makeSolenoidForId(Constants.kBrakeSolenoidId);
+        brake_.set(false); // TODO code
         shifter_ = Constants.makeSolenoidForId(Constants.kShifterSolenoidId);
         shifter_.set(false); // high gear
         gyro_ = new ADXRS453_Gyro();
         lineSensor_ = new DigitalInput(Constants.kLineSensorDIO);
+        sneaky_servo_ = new ContinuousRotationServo(Constants.kSneakyServoPWM);
+        sneaky_servo_.setPeriodMultiplier(PeriodMultiplier.k4X);
+        sneaky_servo_.setBounds(1.3, 1.4, 1.5, 1.6, 1.7);
+        sneaky_servo_.set(0.0);
 
         // Get status at 100Hz
         leftMaster_.setStatusFrameRateMs(CANTalon.StatusFrameRate.Feedback, 10);
@@ -154,6 +165,10 @@ public class Drive extends Subsystem {
 
     public Loop getLoop() {
         return mLoop;
+    }
+    
+    public void setSneakyServo(double power) {
+        sneaky_servo_.set(power);
     }
 
     protected synchronized void setLeftRightPower(double left, double right) {
@@ -326,7 +341,8 @@ public class Drive extends Subsystem {
 
     private synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
         if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL
-                || driveControlState_ == DriveControlState.VELOCITY_SETPOINT) {
+                || driveControlState_ == DriveControlState.VELOCITY_SETPOINT
+                || driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL) {
             leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
             rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
         } else {
@@ -352,6 +368,7 @@ public class Drive extends Subsystem {
         Command command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
         Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command.linear_velocity,
                 command.angular_velocity);
+        //System.out.println("Left cmd: " + setpoint.left + ", Right cmd: " + setpoint.right);
         updateVelocitySetpoint(setpoint.left, setpoint.right);
     }
 

@@ -86,8 +86,8 @@ public class SmartDashboardInteractions {
     }
 
     enum AutonLane {
-        LANE_1("Lane 1 (low bar)", 160), LANE_2("Lane 2", 205), LANE_3("Lane 3", 160), LANE_4("Lane 4",
-                155), LANE_5("Lane 5", 220);
+        LANE_1("Lane 1 (low bar)", 170), LANE_2("Lane 2", 230), LANE_3("Lane 3", 160), LANE_4("Lane 4",
+                155), LANE_5("Lane 5", 170);
 
         public final String name;
         public final double distanceToDrive;
@@ -123,7 +123,7 @@ public class SmartDashboardInteractions {
         case GET_LOW_ONE_BALL:
             return new GetLowOneBallMode(false, autonLane.distanceToDrive);
         case CDF_ONE_BALL:
-            return new ShovelTheFriesMode(autonLane.distanceToDrive);
+            return new ShovelTheFriesMode(autonLane.distanceToDrive, true, false); // TODO wire into dashboard
         case TWO_BALL:
             return new TwoBallMode(autonLane.distanceToDrive);
         case STAND_STILL: // fallthrough

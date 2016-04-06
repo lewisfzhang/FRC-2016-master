@@ -6,6 +6,7 @@ import com.team254.frc2016.loops.GyroCalibrator;
 import com.team254.frc2016.loops.Looper;
 import com.team254.frc2016.loops.RobotStateEstimator;
 import com.team254.frc2016.loops.TurretResetter;
+import com.team254.frc2016.loops.VisionProcessor;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.UtilityArm;
@@ -52,22 +53,6 @@ public class Robot extends IterativeRobot {
     public Robot() {
     }
 
-    public class TestReceiver implements VisionUpdateReceiver {
-
-        @Override
-        public void gotUpdate(VisionUpdate update) {
-            mRobotState.addVisionUpdate(update.getCapturedAtTimestamp(), update.getTargets());
-            for (int i = 0; i < update.getTargets().size(); i++) {
-                TargetInfo target = update.getTargets().get(i);
-                if (mLogToSmartdashboard) {
-                    SmartDashboard.putNumber("goal_centroid_x", target.getX());
-                    SmartDashboard.putNumber("goal_centroid_y", target.getY());
-                    SmartDashboard.putNumber("goal_centroid_z", target.getZ());
-                }
-            }
-        }
-    }
-
     public void stopAll() {
         mDrive.stop();
         mSuperstructure.stop();
@@ -98,7 +83,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void robotInit() {
-        mVisionServer.addVisionUpdateReceiver(new TestReceiver());
+        mVisionServer.addVisionUpdateReceiver(VisionProcessor.getInstance());
 
         // Reset all state
         zeroAllSensors();
@@ -107,6 +92,7 @@ public class Robot extends IterativeRobot {
 
         // Configure loopers
         mEnabledLooper.register(new TurretResetter());
+        mEnabledLooper.register(VisionProcessor.getInstance());
         mEnabledLooper.register(RobotStateEstimator.getInstance());
         mEnabledLooper.register(Superstructure.getInstance().getLoop());
         mEnabledLooper.register(mDrive.getLoop());
@@ -229,6 +215,12 @@ public class Robot extends IterativeRobot {
         } else if (mControls.getBatterShot()) {
             mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_BATTER);
             mGetDown = false;
+        } else if (mControls.getHoodUpButton()) {
+            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_IDLE);
+            mGetDown = false;
+        } else if (mControls.getHoodDownButton()) {
+            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_STOW);
+            mGetDown = true;
         } else {
             mSuperstructure.setWantedState(
                     mGetDown ? Superstructure.WantedState.WANT_TO_STOW : Superstructure.WantedState.WANT_TO_IDLE);
