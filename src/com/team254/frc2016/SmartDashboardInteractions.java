@@ -17,9 +17,11 @@ public class SmartDashboardInteractions {
     private static final String SHOULD_RESET_UTILITY_ARM = "Robot in Start Position";
     private static final String AUTON_MODE = "Auton Mode";
     private static final String AUTON_LANE = "Auton Lane";
+    private static final String CDF_LANE = "Auton CDF Comeback";
 
     private SendableChooser mAutonModeChooser;
     private SendableChooser mAutonLaneChooser;
+    private SendableChooser mAutonCDFComeBackLaneChooser;
 
     public void initWithDefaults() {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
@@ -38,6 +40,12 @@ public class SmartDashboardInteractions {
             mAutonLaneChooser.addObject(autonLane.name, autonLane);
         }
         SmartDashboard.putData(AUTON_LANE, mAutonLaneChooser);
+
+        mAutonCDFComeBackLaneChooser = new SendableChooser();
+        for (CDFComeBackLane cdfLane : CDFComeBackLane.values()) {
+            mAutonCDFComeBackLaneChooser.addObject(cdfLane.name, cdfLane);
+        }
+        SmartDashboard.putData(CDF_LANE, mAutonCDFComeBackLaneChooser);
     }
 
     public boolean isInHoodTuningMode() {
@@ -58,7 +66,8 @@ public class SmartDashboardInteractions {
 
     public AutoModeBase getSelectedAutonMode() {
         return createAutoMode((AutonOption) mAutonModeChooser.getSelected(),
-                (AutonLane) mAutonLaneChooser.getSelected());
+                (AutonLane) mAutonLaneChooser.getSelected(),
+                (CDFComeBackLane) mAutonCDFComeBackLaneChooser.getSelected());
     }
 
     /**
@@ -89,7 +98,23 @@ public class SmartDashboardInteractions {
         }
     }
 
-    private AutoModeBase createAutoMode(AutonOption autonOption, AutonLane autonLane) {
+    enum CDFComeBackLane {
+        STOP("CDF - Stop", false, false),
+        LEFT("CDF - Go Left", true, false),
+        RIGHT("CDF - Go Right", false, true);
+
+        public final String name;
+        public boolean goRight;
+        public boolean goLeft;
+
+        CDFComeBackLane(String name, boolean goLeft, boolean goRight) {
+            this.name = name;
+            this.goLeft = goLeft;
+            this.goRight = goRight;
+        }
+    }
+
+    private AutoModeBase createAutoMode(AutonOption autonOption, AutonLane autonLane, CDFComeBackLane cdfLane) {
         switch (autonOption) {
         case STAY_HIGH_ONE_BALL:
             return new StayHighOneBall(false, autonLane.distanceToDrive);
