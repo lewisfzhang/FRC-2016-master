@@ -381,11 +381,16 @@ public class Superstructure extends Subsystem {
         mHoodRoller.stop();
 
         // State transitions
+        boolean isDoneUnstowing = now - stateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
         switch (mWantedState) {
-        case WANT_TO_AIM: // fallthrough
-        case WANT_TO_BATTER: // fallthrough
         case WANT_TO_IDLE:
-            boolean isDoneUnstowing = now - stateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
+            if (!isDoneUnstowing) {
+                return SystemState.UNSTOWING;
+            } else {
+                return SystemState.IDLE;
+            }
+        case WANT_TO_AIM:
+        case WANT_TO_BATTER: // fallthrough
             if (!isDoneUnstowing) {
                 return SystemState.UNSTOWING;
             } else {
@@ -591,7 +596,7 @@ public class Superstructure extends Subsystem {
 
     private void autoAim(double now, boolean allow_changing_tracks) {
         List<ShooterAimingParameters> aimingParameters = getCurrentAimingParameters(now);
-        if (aimingParameters.isEmpty() && allow_changing_tracks) {
+        if ((aimingParameters.isEmpty() && allow_changing_tracks) || mTurretManualSetpoint.isPresent()) {
             // Manual search
             if (mTurretManualSetpoint.isPresent()) {
                 System.out.println("Going to manual setpoint");
