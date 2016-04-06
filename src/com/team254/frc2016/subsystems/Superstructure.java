@@ -605,6 +605,7 @@ public class Superstructure extends Subsystem {
             } else {
                 mHood.setOpenLoop(mHoodManualScanOutput);
             }
+            mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         } else {
             mHoodManualScanOutput = 0.0;
             // System.out.println("Picking a target");
