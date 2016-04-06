@@ -134,7 +134,7 @@ public class AdaptivePurePursuitControllerTest {
         waypoints.add(new Waypoint(new Translation2d(2, -1), 2));
         waypoints.add(new Waypoint(new Translation2d(2, -2), 1, "FinishedTurn"));
         waypoints.add(new Waypoint(new Translation2d(3, -2), 1));
-        waypoints.add(new Waypoint(new Translation2d(4, -2), 1));
+        waypoints.add(new Waypoint(new Translation2d(4, -2), 3));
         waypoints.add(new Waypoint(new Translation2d(5, -2), 1));
         Path path = new Path(waypoints);
 
