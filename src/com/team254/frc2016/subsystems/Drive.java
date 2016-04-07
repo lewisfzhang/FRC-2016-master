@@ -279,6 +279,9 @@ public class Drive extends Subsystem {
     public synchronized void resetEncoders() {
         leftMaster_.setPosition(0);
         rightMaster_.setPosition(0);
+
+        leftMaster_.setEncPosition(0);
+        rightMaster_.setEncPosition(0);
     }
 
     public synchronized DriveControlState getControlState() {
