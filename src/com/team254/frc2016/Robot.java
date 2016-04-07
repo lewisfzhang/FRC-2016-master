@@ -14,6 +14,7 @@ import com.team254.frc2016.vision.VisionServer;
 import com.team254.lib.util.*;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -25,6 +26,7 @@ public class Robot extends IterativeRobot {
     Compressor mCompressor = new Compressor(1);
     RevRoboticsAirPressureSensor mAirPressureSensor = new RevRoboticsAirPressureSensor(3);
     AutoModeExecuter mAutoModeExecuter = null;
+    Servo mDiddlerServo = new Servo(2);
 
     // Other parts of the robot
     CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
@@ -99,6 +101,7 @@ public class Robot extends IterativeRobot {
         mSmartDashboardInteractions.initWithDefaults();
 
         mCompressor.start();
+        mDiddlerServo.set(0);
 
         VisionServer.getInstance().setUseVisionMode();
     }
@@ -146,6 +149,8 @@ public class Robot extends IterativeRobot {
         mAutoModeExecuter = new AutoModeExecuter();
         mAutoModeExecuter.setAutoMode(mSmartDashboardInteractions.getSelectedAutonMode());
         mAutoModeExecuter.start();
+
+        mDiddlerServo.set(0);
     }
 
     @Override
@@ -168,6 +173,8 @@ public class Robot extends IterativeRobot {
         VisionServer.getInstance().setUseVisionMode();
 
         mGetDown = true;
+
+        mDiddlerServo.set(0);
     }
 
     @Override
