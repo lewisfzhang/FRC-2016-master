@@ -141,7 +141,7 @@ public class Constants extends ConstantsBase {
     public static int kFlywheelAllowableError = 0;
 
     // Utility arm time delays, all in seconds
-    public static double kUtilityArmSizeBoxToPortcullisDelay = 1.5; // TODO:
+    public static double kUtilityArmSizeBoxToPortcullisDelay = 0.5; // TODO:
                                                                     // tune this
                                                                     // value
     public static double kUtilityArmLiftForHangToOpenCdfDelay = 2.0; // TODO:
