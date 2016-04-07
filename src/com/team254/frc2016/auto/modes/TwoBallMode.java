@@ -49,7 +49,7 @@ public class TwoBallMode extends AutoModeBase {
         mDrive.setSneakyServo(1.0);
         mSuperstructure.setWantsToRunIntake();
         mSuperstructure.deployIntake();
-        runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(0.25))));
+        runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(0.75))));
         mDrive.setSneakyServo(0.0);
         mSuperstructure.setWantsToStopIntake();
 
