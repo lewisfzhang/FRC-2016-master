@@ -179,18 +179,19 @@ public class Constants extends ConstantsBase {
     public static final int kHoodRollerTalonId = 6;
 
     // SOLENOIDS
-    public static final int kShifterSolenoidId = 7; // PCM 0, Solenoid 7
+    public static final int kShifterSolenoidId = 11; // PCM 1, Solenoid 3
     public static final int kHoodStowSolenoidId = 1; // PCM 0, Solenoid 1
-    public static final int kIntakeSolenoidId = 6; // PCM 0, Solenoid 6
+    public static final int kIntakeSolenoidId = 10; // PCM 1, Solenoid 2
+    public static final int kShooterSolenoidId = 0; // PCM 0, Solenoid 0
 
-    public static final int kArmLiftSolenoidId = 5; // PCM 0, Solenoid 5
+    public static final int kArmLiftSolenoidId = 9; // PCM 1, Solenoid 1
     public static final int kAdjustableHardStopSolenoidId = 2; // PCM 0,
                                                                // Solenoid 2
     public static final int kBrakeSolenoidId = 3; // PCM 0, Solenoid 3
+    public static final int kCdfFlapSolenoidId = 3; // PCM 0, Solenoid 3
     public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct
                                                        // solenoid
-    public static final int kGasSpringReleaseSolenoidId = 0; // TODO: find the
-                                                             // correct solenoid
+    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the correct solenoid
 
     // Analog Inputs
     public static int kHaveBallSensorAnalogId = 1;
