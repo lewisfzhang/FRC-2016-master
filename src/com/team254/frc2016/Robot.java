@@ -105,7 +105,9 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void disabledInit() {
-        mAutoModeExecuter.stop();
+        if (mAutoModeExecuter != null) {
+            mAutoModeExecuter.stop();
+        }
         mAutoModeExecuter = null;
 
         // Configure loopers
@@ -121,7 +123,9 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
-        mAutoModeExecuter.stop();
+        if (mAutoModeExecuter != null) {
+            mAutoModeExecuter.stop();
+        }
         mAutoModeExecuter = null;
 
         VisionServer.getInstance().setUseVisionMode();
@@ -146,7 +150,9 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopInit() {
-        mAutoModeExecuter.stop();
+        if (mAutoModeExecuter != null) {
+            mAutoModeExecuter.stop();
+        }
         mAutoModeExecuter = null;
 
         // Reset drive
