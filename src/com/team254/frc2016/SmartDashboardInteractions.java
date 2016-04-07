@@ -1,6 +1,8 @@
 package com.team254.frc2016;
 
 import com.team254.frc2016.auto.AutoModeBase;
+import com.team254.frc2016.auto.AutoModeEndedException;
+import com.team254.frc2016.auto.actions.DriveStraightAction;
 import com.team254.frc2016.auto.modes.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -73,7 +75,8 @@ public class SmartDashboardInteractions {
         CDF_COME_BACK_LEFT("CDF - Come back left"), //
         CDF_COME_BACK_RIGHT("CDF - Come back right"), //
         TWO_BALL("Two Ball"), //
-        STAND_STILL("Stand Still");
+        STAND_STILL("Stand Still"),
+        DRIVE_1_FOOT("Drive 1 Foot");
 
         public final String name;
 
@@ -114,6 +117,13 @@ public class SmartDashboardInteractions {
             return new ShovelTheFriesMode(autonLane.distanceToDrive, true, true);
         case TWO_BALL:
             return new TwoBallMode(autonLane.distanceToDrive);
+        case DRIVE_1_FOOT:
+            return new AutoModeBase() {
+                @Override
+                protected void routine() throws AutoModeEndedException {
+                    runAction(new DriveStraightAction(12, 6, 0));
+                }
+            };
         case STAND_STILL: // fallthrough
         default:
             System.out.println("ERROR: unexpected auto mode: " + autonOption);
