@@ -263,8 +263,6 @@ public class Robot extends IterativeRobot {
             mUtilityArm.setWantedState(UtilityArm.WantedState.BATTER_CHALLENGE);
         }
 
-        boolean wantSelfieMode = false;
-
         if (mHoodTuningMode) {
             mSuperstructure.setTuningMode(true);
             if (mControls.getHoodTuningPositiveButton()) {
@@ -276,9 +274,9 @@ public class Robot extends IterativeRobot {
             }
         } else {
             mSuperstructure.setTuningMode(false);
-            wantSelfieMode = mControls.getSelfieModeButton();
         }
 
+        boolean wantSelfieMode = false;
         if (mSelfieLatch.update(wantSelfieMode)) {
             VisionServer.getInstance().setUseIntakeMode();
         }
