@@ -85,6 +85,7 @@ public class HoodRoller extends Subsystem {
     @Override
     public void outputToSmartDashboard() {
         SmartDashboard.putNumber("ball_ready_sensor_voltage", mBallReadySensor.getAverageVoltage());
+        SmartDashboard.putBoolean("ball_ready_sensor", isBallPresent());
     }
 
     @Override

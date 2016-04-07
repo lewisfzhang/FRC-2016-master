@@ -189,6 +189,10 @@ public class Robot extends IterativeRobot {
 
         mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
         mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
+        mRobotState.reset(
+                Timer.getFPGATimestamp(),
+                new RigidTransform2d(),
+                mSuperstructure.getTurret().getAngle());
     }
 
     @Override
