@@ -424,7 +424,7 @@ public class UtilityArm extends Subsystem {
                     HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         case CDF:
-            setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.OPEN,
+            setOutputs(ArmOutput.ARM_DOWN, AdjustableHardstopOutput.PREVENT_HANG, CdfFlapOutput.OPEN,
                     HookReleaseOutput.HOOKS_HELD_IN, GasSpringReleaseOutput.STOWED);
             break;
         case BATTER_CHALLENGE: // fallthrough
