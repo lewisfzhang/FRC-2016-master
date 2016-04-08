@@ -421,7 +421,7 @@ public class Superstructure extends Subsystem {
         case WANT_TO_BATTER:
         case WANT_TO_IDLE:
             boolean isDoneLoading = now - stateStartTime > Constants.kLoadingTime;
-            if (isDoneLoading) {
+            if (isDoneLoading || mHoodRoller.isBallPresent()) {
                 mRobotState.resetVision();
                 mCurrentTrackId = -1;
                 if (mWantedState == WantedState.WANT_TO_AIM) {
