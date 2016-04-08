@@ -3,9 +3,15 @@ package com.team254.frc2016;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.DriveStraightAction;
+import com.team254.frc2016.auto.actions.FollowPathAction;
 import com.team254.frc2016.auto.modes.*;
+import com.team254.lib.util.Path;
+import com.team254.lib.util.Path.Waypoint;
+import com.team254.lib.util.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.ArrayList;
 
 /**
  * Controls the interactive elements of smartdashboard.
@@ -121,7 +127,11 @@ public class SmartDashboardInteractions {
             return new AutoModeBase() {
                 @Override
                 protected void routine() throws AutoModeEndedException {
-                    runAction(new DriveStraightAction(12, 6, 0));
+                    ArrayList<Waypoint> path = new ArrayList<>();
+                    path.add(new Waypoint(new Translation2d(0, 0), 12.0));
+                    path.add(new Waypoint(new Translation2d(12, 0), 12.0));
+
+                    runAction(new FollowPathAction(new Path(path), false));
                 }
             };
         case STAND_STILL: // fallthrough
