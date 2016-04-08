@@ -604,10 +604,10 @@ public class Superstructure extends Subsystem {
         if ((aimingParameters.isEmpty() && allow_changing_tracks) || mTurretManualSetpoint.isPresent()) {
             // Manual search
             if (mTurretManualSetpoint.isPresent()) {
-                System.out.println("Going to manual setpoint");
+                // System.out.println("Going to manual setpoint");
                 mTurret.setDesiredAngle(mTurretManualSetpoint.get());
             } else {
-                System.out.println("No targets - Manual scan");
+                // System.out.println("No targets - Manual scan");
                 mTurret.setOpenLoop(mTurretManualScanOutput);
             }
             if (!mTuningMode) {
