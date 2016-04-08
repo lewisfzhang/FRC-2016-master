@@ -61,7 +61,7 @@ public class Constants extends ConstantsBase {
     public static double kAutoShootMaxDriveSpeed = 6.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 5;
     public static double kShootActuationTime = 0.75;
-    public static double kHoodUnstowToFlywheelSpinTime = 0.75;
+    public static double kHoodUnstowToFlywheelSpinTime = 0.4;
     public static double kLoadingTime = 0.5;
     public static double kStowingOverrideTime = 2.0;
 
