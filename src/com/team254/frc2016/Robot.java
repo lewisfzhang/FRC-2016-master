@@ -185,6 +185,8 @@ public class Robot extends IterativeRobot {
         // page 130
         stopAll();
 
+        mDrive.resetEncoders();
+        
         outputAllToSmartDashboard();
 
         mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
