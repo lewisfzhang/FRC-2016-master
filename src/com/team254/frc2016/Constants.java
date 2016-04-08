@@ -174,7 +174,7 @@ public class Constants extends ConstantsBase {
     public static final int kRightDriveSlaveId = 3;
     public static final int kShooterMasterId = 1;
     public static final int kShooterSlaveId = 2;
-    public static final int kIntakeTalonId = 7;
+    public static final int kIntakeTalonId = 13;
     public static final int kFixedRollerTalonId = 8;
     public static final int kHoodRollerTalonId = 6;
 

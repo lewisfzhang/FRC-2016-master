@@ -11,9 +11,12 @@ import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.Rotation2d;
 
+import com.team254.lib.util.TimeDelayedBoolean;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import static com.team254.frc2016.subsystems.Superstructure.WantedIntakeState.WANT_TO_RUN_INTAKE;
 
 public class Superstructure extends Subsystem {
 
@@ -92,6 +95,8 @@ public class Superstructure extends Subsystem {
     HoodRoller mHoodRoller = new HoodRoller();
     Intake mIntake = new Intake();
     RobotState mRobotState = RobotState.getInstance();
+    private final TimeDelayedBoolean mHasBallDelayedBoolean = new TimeDelayedBoolean();
+
 
     // NetworkTables
     NetworkTable mShooterTable = NetworkTable.getTable("shooter");
@@ -289,7 +294,7 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized void setWantsToRunIntake() {
-        mWantedIntakeState = WantedIntakeState.WANT_TO_RUN_INTAKE;
+        mWantedIntakeState = WANT_TO_RUN_INTAKE;
     }
 
     public synchronized void deployIntake() {
@@ -674,12 +679,18 @@ public class Superstructure extends Subsystem {
     }
 
     private void handleIntake(boolean disallow_intaking, boolean loading) {
+        boolean hasBallDelayed = false;
+        if (mWantedIntakeState == WANT_TO_RUN_INTAKE && !disallow_intaking) {
+            hasBallDelayed = mHasBallDelayedBoolean.update(mIntake.hasBall(), 0.125);
+        } else {
+            mHasBallDelayedBoolean.update(false, 0);
+        }
         switch (mWantedIntakeState) {
         case WANT_TO_RUN_INTAKE:
             if (disallow_intaking) {
                 mIntake.setIntakeRoller(0.0, loading ? 1.0 : 0.0);
             } else {
-                mIntake.setIntakeRoller(1.0, 1.0);
+                mIntake.setIntakeRoller(1.0, hasBallDelayed ? 0.0 : 1.0);
             }
             break;
         case WANT_TO_EXHAUST:
