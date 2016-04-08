@@ -43,7 +43,6 @@ public class Drive extends Subsystem {
     private final Solenoid shifter_;
     private final Solenoid brake_;
     private final ADXRS453_Gyro gyro_;
-    private final ContinuousRotationServo sneaky_servo_;
     private DigitalInput lineSensor_;
 
     private DriveControlState driveControlState_;
@@ -100,10 +99,6 @@ public class Drive extends Subsystem {
         shifter_.set(false); // high gear
         gyro_ = new ADXRS453_Gyro();
         lineSensor_ = new DigitalInput(Constants.kLineSensorDIO);
-        sneaky_servo_ = new ContinuousRotationServo(Constants.kSneakyServoPWM);
-        sneaky_servo_.setPeriodMultiplier(PeriodMultiplier.k4X);
-        sneaky_servo_.setBounds(1.3, 1.4, 1.5, 1.6, 1.7);
-        sneaky_servo_.set(0.0);
 
         // Get status at 100Hz
         leftMaster_.setStatusFrameRateMs(CANTalon.StatusFrameRate.Feedback, 10);
@@ -165,10 +160,6 @@ public class Drive extends Subsystem {
 
     public Loop getLoop() {
         return mLoop;
-    }
-
-    public void setSneakyServo(double power) {
-        sneaky_servo_.set(power);
     }
 
     protected synchronized void setLeftRightPower(double left, double right) {
