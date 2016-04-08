@@ -128,8 +128,8 @@ public class SmartDashboardInteractions {
                 @Override
                 protected void routine() throws AutoModeEndedException {
                     ArrayList<Waypoint> path = new ArrayList<>();
-                    path.add(new Waypoint(new Translation2d(0, 0), 12.0));
-                    path.add(new Waypoint(new Translation2d(12, 0), 12.0));
+                    path.add(new Waypoint(new Translation2d(0, 0), 1200.0));
+                    path.add(new Waypoint(new Translation2d(1200, 0), 1200.0));
 
                     runAction(new FollowPathAction(new Path(path), false));
                 }
