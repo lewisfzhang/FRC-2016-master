@@ -224,6 +224,9 @@ function refreshDriverStatusElements() {
   var autoLaneElement = findElementModelOrNull(TABLE, SELECTED_AUTO_LANE_KEY);
   $("#selectedAutoLane").text(
     autoLaneElement == null ? "UNKNOWN" : ("Lane " + autoLaneElement.value));
+
+  var airPressureElement = findElementModelOrNull(TABLE, "Air Pressure psi");
+  $("#airPressureHolder").text(airPressureElement == null ? "UNKNOWN" : airPressureElement.value);
 }
 
 function maybeRefreshAutoOptions() {

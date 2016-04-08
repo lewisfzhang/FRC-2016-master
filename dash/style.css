@@ -1,3 +1,4 @@
+
 body {
 	background-color: #eeeeee;
 	padding: 40px;
@@ -167,6 +168,16 @@ li {
 }
 
 .autoSelector {
+    width: 200px;
+    float: left;
+}
+
+.laneSelector {
+    width: 150px;
+    float: left;
+}
+
+.extraDataNumbers {
     width: 200px;
     float: left;
 }
