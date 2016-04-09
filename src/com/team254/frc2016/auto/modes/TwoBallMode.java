@@ -57,7 +57,7 @@ public class TwoBallMode extends AutoModeBase {
                                 new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"),
                                         new StartAutoAimingAction(),
                                         new PointTurretAction(Rotation2d.fromDegrees(-32.0)))))));
-        runAction(new WaitAction(0.5));
+        runAction(new WaitAction(0.75));
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
         mSuperstructure.setWantsToRunIntake();
@@ -68,7 +68,7 @@ public class TwoBallMode extends AutoModeBase {
                                 new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"),
                                         new StartAutoAimingAction(),
                                         new PointTurretAction(Rotation2d.fromDegrees(-32.0)))))));
-        runAction(new WaitAction(0.5));
+        runAction(new WaitAction(0.75));
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
         mSuperstructure.setWantsToStopIntake();
