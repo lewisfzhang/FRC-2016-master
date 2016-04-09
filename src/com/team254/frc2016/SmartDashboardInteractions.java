@@ -2,9 +2,10 @@ package com.team254.frc2016;
 
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
-import com.team254.frc2016.auto.actions.DriveStraightAction;
 import com.team254.frc2016.auto.actions.FollowPathAction;
 import com.team254.frc2016.auto.modes.*;
+import com.team254.frc2016.subsystems.Superstructure;
+import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.Path.Waypoint;
 import com.team254.lib.util.Translation2d;
@@ -98,7 +99,7 @@ public class SmartDashboardInteractions {
         CDF_COME_BACK_RIGHT("CDF - Come back right"), //
         TWO_BALL("Two Ball"), //
         STAND_STILL("Stand Still"),
-        DRIVE_1_FOOT("Drive 1 Foot");
+        DRIVE_5_FEET("Drive 5 Feet");
 
         public final String name;
 
@@ -139,18 +140,21 @@ public class SmartDashboardInteractions {
             return new ShovelTheFriesMode(autonLane.distanceToDrive, true, true);
         case TWO_BALL:
             return new TwoBallMode(autonLane.distanceToDrive);
-        case DRIVE_1_FOOT:
+        case DRIVE_5_FEET:
             return new AutoModeBase() {
                 @Override
                 protected void routine() throws AutoModeEndedException {
                     ArrayList<Waypoint> path = new ArrayList<>();
-                    path.add(new Waypoint(new Translation2d(0, 0), 1200.0));
-                    path.add(new Waypoint(new Translation2d(1200, 0), 1200.0));
+                    Superstructure.getInstance().getIntake().setDeploy(true);
+                    UtilityArm.getInstance().setWantedState(UtilityArm.WantedState.PORTCULLIS);
+                    path.add(new Waypoint(new Translation2d(0, 0), 84.0));
+                    path.add(new Waypoint(new Translation2d(164, 0), 84.0));
 
                     runAction(new FollowPathAction(new Path(path), false));
                 }
             };
-        case STAND_STILL: // fallthrough
+
+            case STAND_STILL: // fallthrough
         default:
             System.out.println("ERROR: unexpected auto mode: " + autonOption);
             return new StandStillMode();
