@@ -325,6 +325,10 @@ public class Superstructure extends Subsystem {
         mTuningMode = tuning_on;
     }
 
+    public Intake getIntake() {
+        return mIntake;
+    }
+
     private synchronized SystemState handleReenabled() {
         if (!mHood.hasHomed()) {
             // We assume that this only happens when we are first enabled

@@ -12,10 +12,7 @@ import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.frc2016.vision.VisionServer;
 import com.team254.lib.util.*;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
@@ -27,6 +24,7 @@ public class Robot extends IterativeRobot {
     RevRoboticsAirPressureSensor mAirPressureSensor = new RevRoboticsAirPressureSensor(3);
     AutoModeExecuter mAutoModeExecuter = null;
     Servo mDiddlerServo = new Servo(2);
+    DigitalOutput mHasBallLightOutput = new DigitalOutput(0);
 
     // Other parts of the robot
     CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
@@ -195,6 +193,8 @@ public class Robot extends IterativeRobot {
                 Timer.getFPGATimestamp(),
                 new RigidTransform2d(),
                 mSuperstructure.getTurret().getAngle());
+
+        updateHasBallLight();
     }
 
     @Override
@@ -295,11 +295,13 @@ public class Robot extends IterativeRobot {
         }
 
         outputAllToSmartDashboard();
+        updateHasBallLight();
     }
 
     @Override
     public void autonomousPeriodic() {
         outputAllToSmartDashboard();
+        updateHasBallLight();
     }
 
     private void maybeResetUtilityArmState() {
@@ -307,5 +309,9 @@ public class Robot extends IterativeRobot {
             mUtilityArm.setWantedState(UtilityArm.WantedState.STAY_IN_SIZE_BOX);
         }
         mSmartDashboardInteractions.clearUtilityArmResetState();
+    }
+
+    private void updateHasBallLight() {
+        mHasBallLightOutput.set(mSuperstructure.getIntake().hasBall());
     }
 }
