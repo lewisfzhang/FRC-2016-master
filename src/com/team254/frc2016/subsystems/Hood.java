@@ -135,6 +135,10 @@ public class Hood extends Subsystem {
     public synchronized boolean hasHomed() {
         return has_homed_;
     }
+    
+    public synchronized double getSetpoint() {
+        return pid_.getSetpoint();
+    }
 
     public synchronized boolean isOnTarget() {
         return (has_homed_ && control_mode_ == ControlMode.POSITION

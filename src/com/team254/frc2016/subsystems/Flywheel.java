@@ -54,10 +54,14 @@ public class Flywheel extends Subsystem {
         master_talon_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         master_talon_.set(speed);
     }
+    
+    public synchronized double getSetpoint() {
+        return master_talon_.getSetpoint();
+    }
 
     public synchronized boolean isOnTarget() {
         return (master_talon_.getControlMode() == CANTalon.TalonControlMode.Speed
-                && Math.abs(getRpm() - master_talon_.getSetpoint()) < Constants.kFlywheelOnTargetTolerance);
+                && Math.abs(getRpm() - getSetpoint()) < Constants.kFlywheelOnTargetTolerance);
     }
 
     @Override

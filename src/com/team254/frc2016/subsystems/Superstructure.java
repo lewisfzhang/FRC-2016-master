@@ -97,7 +97,6 @@ public class Superstructure extends Subsystem {
     RobotState mRobotState = RobotState.getInstance();
     private final TimeDelayedBoolean mHasBallDelayedBoolean = new TimeDelayedBoolean();
 
-
     // NetworkTables
     NetworkTable mShooterTable = NetworkTable.getTable("shooter");
 
@@ -462,6 +461,11 @@ public class Superstructure extends Subsystem {
             if (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_NOW
                     || (mWantedFiringState == WantedFiringState.WANT_TO_FIRE_WHEN_READY
                             && readyToFire(SystemState.SPINNING_AIM, now))) {
+                System.out.println("FIRING BALL " + (mNumShotsFired + 1) + "\nAngle to Goal: " + mCurrentAngleForLogging
+                        + ", Distance to Goal: " + mCurrentRangeForLogging + "\nHood Angle (desired): "
+                        + mHood.getSetpoint() + ", (actual): " + mHood.getAngle() + "\nTurret Angle (desired): "
+                        + mTurret.getSetpoint() + ", (actual): " + mTurret.getAngle() + "\nFlywheel RPM (desired): "
+                        + mFlywheel.getSetpoint() + ", (actual): " + mFlywheel.getRpm());
                 return SystemState.FIRING_AIM;
             } else {
                 return SystemState.SPINNING_AIM;

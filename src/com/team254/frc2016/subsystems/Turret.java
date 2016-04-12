@@ -62,9 +62,13 @@ public class Turret extends Subsystem {
     public synchronized boolean getReverseLimitSwitch() {
         return talon_.isRevLimitSwitchClosed();
     }
+    
+    public synchronized double getSetpoint() {
+        return talon_.getSetpoint() * Constants.kTurretRotationsPerTick * 360.0;
+    }
 
     private synchronized double getError() {
-        return getAngle().getDegrees() - talon_.getSetpoint() * Constants.kTurretRotationsPerTick * 360.0;
+        return getAngle().getDegrees() - getSetpoint();
     }
 
     public synchronized boolean isOnTarget() {
@@ -86,7 +90,7 @@ public class Turret extends Subsystem {
     public void outputToSmartDashboard() {
         SmartDashboard.putNumber("turret_error", getError());
         SmartDashboard.putNumber("turret_angle", getAngle().getDegrees());
-        SmartDashboard.putNumber("turret_setpoint", talon_.getSetpoint() * Constants.kTurretRotationsPerTick * 360.0);
+        SmartDashboard.putNumber("turret_setpoint", getSetpoint());
         SmartDashboard.putBoolean("turret_fwd_limit", getForwardLimitSwitch());
         SmartDashboard.putBoolean("turret_rev_limit", getReverseLimitSwitch());
         SmartDashboard.putBoolean("turret_on_target", isOnTarget());
