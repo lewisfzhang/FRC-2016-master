@@ -54,7 +54,7 @@ public class Flywheel extends Subsystem {
         master_talon_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
         master_talon_.set(speed);
     }
-    
+
     public synchronized double getSetpoint() {
         return master_talon_.getSetpoint();
     }

@@ -184,15 +184,12 @@ public class Robot extends IterativeRobot {
         stopAll();
 
         mDrive.resetEncoders();
-        
+
         outputAllToSmartDashboard();
 
         mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
         mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
-        mRobotState.reset(
-                Timer.getFPGATimestamp(),
-                new RigidTransform2d(),
-                mSuperstructure.getTurret().getAngle());
+        mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), mSuperstructure.getTurret().getAngle());
 
         updateHasBallLight();
     }

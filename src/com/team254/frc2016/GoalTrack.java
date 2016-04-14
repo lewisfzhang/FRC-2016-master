@@ -20,7 +20,8 @@ public class GoalTrack {
         GoalTrack rv = new GoalTrack();
         rv.mObservedPositions.put(timestamp, first_observation);
         rv.mSmoothedPosition = first_observation;
-        // System.out.println("Set smoothed position to " + first_observation.toString());
+        // System.out.println("Set smoothed position to " +
+        // first_observation.toString());
         rv.mId = id;
         return rv;
     }

@@ -4,9 +4,26 @@ import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
+/**
+ * Provides forward and inverse kinematics equations for the robot modeling the
+ * wheelbase as a differential drive (with a corrective factor to account for
+ * the inherent skidding of the center 4 wheels quasi-kinematically).
+ */
 public class Kinematics {
     private static final double kEpsilon = 1E-9;
 
+    // Forward kinematics using only encoders, rotation is implicit (less
+    // accurate than below, but useful for predicting motion)
+    public static RigidTransform2d forwardKinematics(double left_encoder_delta_distance,
+            double right_encoder_delta_distance) {
+        double linear_velocity = (left_encoder_delta_distance + right_encoder_delta_distance) / 2;
+        double delta_v = (right_encoder_delta_distance - left_encoder_delta_distance) / 2;
+        double delta_rotation = delta_v * 2 * Constants.kTrackScrubFactor / Constants.kTrackEffectiveDiameter;
+        return new RigidTransform2d(new Translation2d(linear_velocity, 0), Rotation2d.fromRadians(delta_rotation));
+    }
+
+    // Forward kinematics using encoders and explictly measured rotation (ex.
+    // from gyro)
     public static RigidTransform2d forwardKinematics(double left_encoder_delta_distance,
             double right_encoder_delta_distance, Rotation2d delta_rotation) {
         return new RigidTransform2d(
@@ -35,14 +52,7 @@ public class Kinematics {
         }
         // From linear velocity and curvature, compute left velocity, right
         // velocity, and heading velocity.
-        double delta_v = Constants.kTrackWidthInches / 2 * angular_velocity / Constants.kTrackScrubFactor;
-
-        // Adjust linear velocity if either side is moving too fast
-        if (linear_velocity - delta_v < -Constants.kPathFollowingMaxVel) {
-            linear_velocity = -Constants.kPathFollowingMaxVel + delta_v;
-        } else if (linear_velocity + delta_v > Constants.kPathFollowingMaxVel) {
-            linear_velocity = Constants.kPathFollowingMaxVel - delta_v;
-        }
+        double delta_v = Constants.kTrackEffectiveDiameter * angular_velocity / (2 * Constants.kTrackScrubFactor);
         return new DriveVelocity(linear_velocity - delta_v, linear_velocity + delta_v);
     }
 }

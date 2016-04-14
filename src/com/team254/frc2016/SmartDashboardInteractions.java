@@ -33,7 +33,6 @@ public class SmartDashboardInteractions {
     private static final AutonOption DEFAULT_MODE = AutonOption.STAY_HIGH_ONE_BALL;
     private static final AutonLane DEFAULT_LANE = AutonLane.LANE_4;
 
-
     public void initWithDefaults() {
         SmartDashboard.putBoolean(HOOD_TUNING_MODE, false);
         SmartDashboard.putBoolean(OUTPUT_TO_SMART_DASHBOARD, true);
@@ -74,8 +73,7 @@ public class SmartDashboardInteractions {
             }
         }
 
-        String autoLaneString =
-                SmartDashboard.getString(SELECTED_AUTO_LANE, DEFAULT_LANE.numberString);
+        String autoLaneString = SmartDashboard.getString(SELECTED_AUTO_LANE, DEFAULT_LANE.numberString);
         AutonLane selectedLane = DEFAULT_LANE;
         for (AutonLane autonLane : AutonLane.values()) {
             if (autonLane.numberString.equals(autoLaneString)) {
@@ -98,8 +96,7 @@ public class SmartDashboardInteractions {
         CDF_COME_BACK_LEFT("CDF - Come back left"), //
         CDF_COME_BACK_RIGHT("CDF - Come back right"), //
         TWO_BALL("Two Ball"), //
-        STAND_STILL("Stand Still"),
-        DRIVE_5_FEET("Drive 5 Feet");
+        STAND_STILL("Stand Still"), DRIVE_5_FEET("Drive 5 Feet");
 
         public final String name;
 
@@ -109,11 +106,7 @@ public class SmartDashboardInteractions {
     }
 
     enum AutonLane {
-        LANE_1(160, "1"),
-        LANE_2(205, "2"),
-        LANE_3(160, "3"),
-        LANE_4(155, "4"),
-        LANE_5(220, "5");
+        LANE_1(160, "1"), LANE_2(205, "2"), LANE_3(160, "3"), LANE_4(155, "4"), LANE_5(220, "5");
 
         public final double distanceToDrive;
         public final String numberString;
@@ -154,7 +147,7 @@ public class SmartDashboardInteractions {
                 }
             };
 
-            case STAND_STILL: // fallthrough
+        case STAND_STILL: // fallthrough
         default:
             System.out.println("ERROR: unexpected auto mode: " + autonOption);
             return new StandStillMode();

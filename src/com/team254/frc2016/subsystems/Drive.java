@@ -16,10 +16,8 @@ import com.team254.lib.util.Rotation2d;
 
 import com.team254.lib.util.SynchronousPID;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.ContinuousRotationServo;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PWM.PeriodMultiplier;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -362,8 +360,14 @@ public class Drive extends Subsystem {
         Command command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
         Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command.linear_velocity,
                 command.angular_velocity);
-        // System.out.println("Left cmd: " + setpoint.left + ", Right cmd: " +
-        // setpoint.right);
+        // Scale the command to respect the max velocity limits
+        double max_vel = 0.0;
+        max_vel = Math.max(max_vel, Math.abs(setpoint.left));
+        max_vel = Math.max(max_vel, Math.abs(setpoint.right));
+        if (max_vel > Constants.kPathFollowingMaxVel) {
+            double scaling = Constants.kPathFollowingMaxVel / max_vel;
+            setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
+        }
         updateVelocitySetpoint(setpoint.left, setpoint.right);
     }
 

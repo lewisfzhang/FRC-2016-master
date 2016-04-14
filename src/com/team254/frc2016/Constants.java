@@ -26,7 +26,10 @@ public class Constants extends ConstantsBase {
                                                            // 4/5/2016
     public static double kTrackLengthInches = 8.265;
     public static double kTrackWidthInches = 23.8;
-    public static double kTrackScrubFactor = .5;
+    public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
+            + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
+    public static double kTrackScrubFactor = .5; // Should be <= 1.0...tune
+                                                 // experimentally
 
     // Drive constants
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
@@ -55,7 +58,6 @@ public class Constants extends ConstantsBase {
     public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
-    public static double kAutoAimRangeHysteresis = 100.0;
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 220.0;
     public static double kAutoShootMaxDriveSpeed = 6.0;
@@ -191,7 +193,8 @@ public class Constants extends ConstantsBase {
     public static final int kCdfFlapSolenoidId = 3; // PCM 0, Solenoid 3
     public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct
                                                        // solenoid
-    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the correct solenoid
+    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the
+                                                             // correct solenoid
 
     // Analog Inputs
     public static int kHaveBallSensorAnalogId = 1;

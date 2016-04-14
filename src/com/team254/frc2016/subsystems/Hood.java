@@ -135,7 +135,7 @@ public class Hood extends Subsystem {
     public synchronized boolean hasHomed() {
         return has_homed_;
     }
-    
+
     public synchronized double getSetpoint() {
         return pid_.getSetpoint();
     }

@@ -62,7 +62,7 @@ public class Turret extends Subsystem {
     public synchronized boolean getReverseLimitSwitch() {
         return talon_.isRevLimitSwitchClosed();
     }
-    
+
     public synchronized double getSetpoint() {
         return talon_.getSetpoint() * Constants.kTurretRotationsPerTick * 360.0;
     }
