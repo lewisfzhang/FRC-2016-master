@@ -8,7 +8,6 @@ import com.team254.frc2016.RobotState;
 import com.team254.frc2016.loops.Loop;
 import com.team254.lib.util.ADXRS453_Gyro;
 import com.team254.lib.util.AdaptivePurePursuitController;
-import com.team254.lib.util.AdaptivePurePursuitController.Command;
 import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.RigidTransform2d;
@@ -357,9 +356,8 @@ public class Drive extends Subsystem {
 
     private void updatePathFollower() {
         RigidTransform2d robot_pose = RobotState.getInstance().getLatestOdometricToVehicle().getValue();
-        Command command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
-        Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command.linear_velocity,
-                command.angular_velocity);
+        RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
+        Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
         // Scale the command to respect the max velocity limits
         double max_vel = 0.0;
         max_vel = Math.max(max_vel, Math.abs(setpoint.left));

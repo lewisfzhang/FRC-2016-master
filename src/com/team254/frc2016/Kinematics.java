@@ -2,7 +2,6 @@ package com.team254.frc2016;
 
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
-import com.team254.lib.util.Translation2d;
 
 /**
  * Provides forward and inverse kinematics equations for the robot modeling the
@@ -14,26 +13,25 @@ public class Kinematics {
 
     // Forward kinematics using only encoders, rotation is implicit (less
     // accurate than below, but useful for predicting motion)
-    public static RigidTransform2d forwardKinematics(double left_encoder_delta_distance,
-            double right_encoder_delta_distance) {
-        double linear_velocity = (left_encoder_delta_distance + right_encoder_delta_distance) / 2;
-        double delta_v = (right_encoder_delta_distance - left_encoder_delta_distance) / 2;
+    public static RigidTransform2d.Delta forwardKinematics(double left_wheel_delta, double right_wheel_delta) {
+        double linear_velocity = (left_wheel_delta + right_wheel_delta) / 2;
+        double delta_v = (right_wheel_delta - left_wheel_delta) / 2;
         double delta_rotation = delta_v * 2 * Constants.kTrackScrubFactor / Constants.kTrackEffectiveDiameter;
-        return new RigidTransform2d(new Translation2d(linear_velocity, 0), Rotation2d.fromRadians(delta_rotation));
+        return new RigidTransform2d.Delta(linear_velocity, 0, delta_rotation);
     }
 
     // Forward kinematics using encoders and explictly measured rotation (ex.
     // from gyro)
-    public static RigidTransform2d forwardKinematics(double left_encoder_delta_distance,
-            double right_encoder_delta_distance, Rotation2d delta_rotation) {
-        return new RigidTransform2d(
-                new Translation2d((left_encoder_delta_distance + right_encoder_delta_distance) / 2, 0), delta_rotation);
+    public static RigidTransform2d.Delta forwardKinematics(double left_wheel_delta, double right_wheel_delta,
+            double delta_rotation_rads) {
+        return new RigidTransform2d.Delta((left_wheel_delta + right_wheel_delta) / 2, 0, delta_rotation_rads);
     }
 
-    public static RigidTransform2d integrateForwardKinematics(RigidTransform2d current_pose,
-            double left_encoder_delta_distance, double right_encoder_delta_distance, Rotation2d current_heading) {
-        return current_pose.transformBy(forwardKinematics(left_encoder_delta_distance, right_encoder_delta_distance,
-                current_pose.getRotation().inverse().rotateBy(current_heading)));
+    // Append the result of forward kinematics to a previous pose.
+    public static RigidTransform2d integrateForwardKinematics(RigidTransform2d current_pose, double left_wheel_delta,
+            double right_wheel_delta, Rotation2d current_heading) {
+        return current_pose.transformBy(RigidTransform2d.fromVelocity(forwardKinematics(left_wheel_delta,
+                right_wheel_delta, current_pose.getRotation().inverse().rotateBy(current_heading).getRadians())));
     }
 
     public static class DriveVelocity {
@@ -46,13 +44,13 @@ public class Kinematics {
         }
     }
 
-    public static DriveVelocity inverseKinematics(double linear_velocity, double angular_velocity) {
-        if (Math.abs(angular_velocity) < kEpsilon) {
-            return new DriveVelocity(linear_velocity, linear_velocity);
+    public static DriveVelocity inverseKinematics(RigidTransform2d.Delta velocity) {
+        if (Math.abs(velocity.dtheta) < kEpsilon) {
+            return new DriveVelocity(velocity.dx, velocity.dx);
         }
         // From linear velocity and curvature, compute left velocity, right
         // velocity, and heading velocity.
-        double delta_v = Constants.kTrackEffectiveDiameter * angular_velocity / (2 * Constants.kTrackScrubFactor);
-        return new DriveVelocity(linear_velocity - delta_v, linear_velocity + delta_v);
+        double delta_v = Constants.kTrackEffectiveDiameter * velocity.dtheta / (2 * Constants.kTrackScrubFactor);
+        return new DriveVelocity(velocity.dx - delta_v, velocity.dx + delta_v);
     }
 }

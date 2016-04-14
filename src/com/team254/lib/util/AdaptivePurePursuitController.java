@@ -8,7 +8,7 @@ public class AdaptivePurePursuitController {
 
     double mFixedLookahead;
     Path mPath;
-    Command mLastCommand;
+    RigidTransform2d.Delta mLastCommand;
     double mLastTime;
     double mMaxAccel;
     double mDt;
@@ -30,17 +30,7 @@ public class AdaptivePurePursuitController {
         return remainingLength == 0;
     }
 
-    public static class Command {
-        public final double linear_velocity;
-        public final double angular_velocity;
-
-        public Command(double linear_velocity, double angular_velocity) {
-            this.linear_velocity = linear_velocity;
-            this.angular_velocity = angular_velocity;
-        }
-    }
-
-    public Command update(RigidTransform2d robot_pose, double now) {
+    public RigidTransform2d.Delta update(RigidTransform2d robot_pose, double now) {
         RigidTransform2d pose = robot_pose;
         if (mReversed) {
             pose = new RigidTransform2d(robot_pose.getTranslation(),
@@ -63,14 +53,14 @@ public class AdaptivePurePursuitController {
         // Ensure we don't accelerate too fast from the previous command
         double dt = now - mLastTime;
         if (mLastCommand == null) {
-            mLastCommand = new Command(0, 0);
+            mLastCommand = new RigidTransform2d.Delta(0, 0, 0);
             dt = mDt;
         }
-        double accel = (speed - mLastCommand.linear_velocity) / dt;
+        double accel = (speed - mLastCommand.dx) / dt;
         if (accel < -mMaxAccel) {
-            speed = mLastCommand.linear_velocity - mMaxAccel * dt;
+            speed = mLastCommand.dx - mMaxAccel * dt;
         } else if (accel > mMaxAccel) {
-            speed = mLastCommand.linear_velocity + mMaxAccel * dt;
+            speed = mLastCommand.dx + mMaxAccel * dt;
         }
 
         // Ensure we slow down in time to stop
@@ -82,11 +72,11 @@ public class AdaptivePurePursuitController {
             speed = max_allowed_speed * Math.signum(speed);
         }
 
-        Command rv;
+        RigidTransform2d.Delta rv;
         if (circle.isPresent()) {
-            rv = new Command(speed, (circle.get().turn_right ? -1 : 1) * Math.abs(speed) / circle.get().radius);
+            rv = new RigidTransform2d.Delta(speed, 0, (circle.get().turn_right ? -1 : 1) * Math.abs(speed) / circle.get().radius);
         } else {
-            rv = new Command(speed, 0.0);
+            rv = new RigidTransform2d.Delta(speed, 0, 0);
         }
         mLastTime = now;
         mLastCommand = rv;

@@ -11,7 +11,6 @@ import org.junit.Test;
 import com.team254.lib.util.AdaptivePurePursuitController;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.AdaptivePurePursuitController.Circle;
-import com.team254.lib.util.AdaptivePurePursuitController.Command;
 import com.team254.lib.util.Path.Waypoint;
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
@@ -112,12 +111,12 @@ public class AdaptivePurePursuitControllerTest {
         double t = 0;
         while (!controller.isDone() && t < 10) {
             // Follow the path
-            Command command = controller.update(robot_pose, t);
-            robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.linear_velocity * dt, 0),
-                    Rotation2d.fromRadians(command.angular_velocity * dt)));
+            RigidTransform2d.Delta command = controller.update(robot_pose, t);
+            robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.dx * dt, 0),
+                    Rotation2d.fromRadians(command.dtheta * dt)));
 
-            System.out.println("t = " + t + ", lin vel " + command.linear_velocity + ", ang vel "
-                    + command.angular_velocity + ", pose " + robot_pose);
+            System.out.println("t = " + t + ", lin vel " + command.dx + ", ang vel "
+                    + command.dtheta + ", pose " + robot_pose);
             t += dt;
         }
         assertTrue(controller.isDone());
@@ -145,13 +144,12 @@ public class AdaptivePurePursuitControllerTest {
         double t = 0;
         while (!controller.isDone() && t < 10) {
             // Follow the path
-            Command command = controller.update(robot_pose, t);
-            robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.linear_velocity * dt, 0),
-                    Rotation2d.fromRadians(command.angular_velocity * dt)));
+            RigidTransform2d.Delta command = controller.update(robot_pose, t);
+            robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.dx * dt, 0),
+                    Rotation2d.fromRadians(command.dtheta * dt)));
 
-            System.out.println(
-                    "t = " + t + ", lin vel " + command.linear_velocity + ", ang vel " + command.angular_velocity
-                            + ", pose " + robot_pose + ", markers finished " + controller.getMarkersCrossed());
+            System.out.println("t = " + t + ", lin vel " + command.dx + ", ang vel "
+                    + command.dtheta + ", pose " + robot_pose);
             t += dt;
         }
         assertTrue(controller.isDone());
