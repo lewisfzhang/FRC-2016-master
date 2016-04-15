@@ -9,7 +9,7 @@ import com.team254.lib.util.RigidTransform2d;
 
 public class KinematicsTest {
     private static final double kEps = 1E-9;
-    
+
     @Test
     public void test() {
         double left_diff = 10.0;

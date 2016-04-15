@@ -74,7 +74,8 @@ public class AdaptivePurePursuitController {
 
         RigidTransform2d.Delta rv;
         if (circle.isPresent()) {
-            rv = new RigidTransform2d.Delta(speed, 0, (circle.get().turn_right ? -1 : 1) * Math.abs(speed) / circle.get().radius);
+            rv = new RigidTransform2d.Delta(speed, 0,
+                    (circle.get().turn_right ? -1 : 1) * Math.abs(speed) / circle.get().radius);
         } else {
             rv = new RigidTransform2d.Delta(speed, 0, 0);
         }

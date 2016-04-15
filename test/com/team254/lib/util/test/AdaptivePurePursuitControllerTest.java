@@ -115,8 +115,8 @@ public class AdaptivePurePursuitControllerTest {
             robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.dx * dt, 0),
                     Rotation2d.fromRadians(command.dtheta * dt)));
 
-            System.out.println("t = " + t + ", lin vel " + command.dx + ", ang vel "
-                    + command.dtheta + ", pose " + robot_pose);
+            System.out.println(
+                    "t = " + t + ", lin vel " + command.dx + ", ang vel " + command.dtheta + ", pose " + robot_pose);
             t += dt;
         }
         assertTrue(controller.isDone());
@@ -148,8 +148,8 @@ public class AdaptivePurePursuitControllerTest {
             robot_pose = robot_pose.transformBy(new RigidTransform2d(new Translation2d(command.dx * dt, 0),
                     Rotation2d.fromRadians(command.dtheta * dt)));
 
-            System.out.println("t = " + t + ", lin vel " + command.dx + ", ang vel "
-                    + command.dtheta + ", pose " + robot_pose);
+            System.out.println(
+                    "t = " + t + ", lin vel " + command.dx + ", ang vel " + command.dtheta + ", pose " + robot_pose);
             t += dt;
         }
         assertTrue(controller.isDone());

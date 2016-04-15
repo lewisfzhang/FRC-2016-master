@@ -79,8 +79,6 @@ public class RobotState {
     protected InterpolatingTreeMap<InterpolatingDouble, RigidTransform2d> odometric_to_vehicle_;
     protected InterpolatingTreeMap<InterpolatingDouble, Rotation2d> turret_rotation_;
     protected GoalTracker goal_tracker_;
-    protected double latest_camera_to_goals_detected_timestamp_;
-    protected double latest_camera_to_goals_undetected_timestamp_;
     protected Rotation2d camera_pitch_correction_;
     protected Rotation2d camera_yaw_correction_;
     protected double differential_height_;
@@ -96,8 +94,6 @@ public class RobotState {
         turret_rotation_ = new InterpolatingTreeMap<>(kObservationBufferSize);
         turret_rotation_.put(new InterpolatingDouble(start_time), initial_turret_rotation);
         goal_tracker_ = new GoalTracker();
-        latest_camera_to_goals_detected_timestamp_ = 0;
-        latest_camera_to_goals_undetected_timestamp_ = start_time;
         camera_pitch_correction_ = Rotation2d.fromDegrees(-Constants.kCameraPitchAngleDegrees);
         camera_yaw_correction_ = Rotation2d.fromDegrees(-Constants.kCameraYawAngleDegrees);
         differential_height_ = Constants.kCenterOfTargetHeight - Constants.kCameraZOffset;
@@ -140,9 +136,6 @@ public class RobotState {
     public synchronized List<ShooterAimingParameters> getAimingParameters(double current_timestamp,
             Comparator<TrackReport> comparator) {
         List<ShooterAimingParameters> rv = new ArrayList<>();
-        if (current_timestamp - latest_camera_to_goals_detected_timestamp_ > kMaxTargetAge) {
-            return rv;
-        }
         List<TrackReport> reports = goal_tracker_.getTracks();
         Collections.sort(reports, comparator);
 
@@ -151,6 +144,9 @@ public class RobotState {
                 .transformBy(kVehicleToTurretFixed).inverse();
 
         for (TrackReport report : reports) {
+            if (current_timestamp - report.latest_timestamp > kMaxTargetAge) {
+                continue;
+            }
             // turret fixed (latest) -> vehicle (latest) -> odometric -> goals
             RigidTransform2d latest_turret_fixed_to_goal = latest_turret_fixed_to_odometric
                     .transformBy(RigidTransform2d.fromTranslation(report.odometric_to_goal));
@@ -214,23 +210,13 @@ public class RobotState {
             }
         }
         synchronized (this) {
-            if (vision_update == null || vision_update.isEmpty()) {
-                latest_camera_to_goals_undetected_timestamp_ = timestamp;
-            } else {
-                latest_camera_to_goals_detected_timestamp_ = timestamp;
-            }
             goal_tracker_.update(timestamp, odometric_to_goals);
         }
         // System.out.println("Done addVisionUpdate at " +
         // Timer.getFPGATimestamp());
     }
 
-    public synchronized boolean seesGoal() {
-        return latest_camera_to_goals_detected_timestamp_ > latest_camera_to_goals_undetected_timestamp_;
-    }
-
     public synchronized void resetVision() {
-        latest_camera_to_goals_detected_timestamp_ = 0;
         goal_tracker_.reset();
     }
 
