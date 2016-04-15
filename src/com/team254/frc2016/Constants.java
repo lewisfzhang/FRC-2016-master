@@ -113,9 +113,9 @@ public class Constants extends ConstantsBase {
     // PID gains for constant heading velocity control
     // Units: Error is degrees. Output is inches/second difference to
     // left/right.
-    public static double kDriveHeadingVeloctyKp = 4.0; // 6.0;
-    public static double kDriveHeadingVeloctyKi = 0.0;
-    public static double kDriveHeadingVeloctyKd = 50.0;
+    public static double kDriveHeadingVelocityKp = 4.0; // 6.0;
+    public static double kDriveHeadingVelocityKi = 0.0;
+    public static double kDriveHeadingVelocityKd = 50.0;
 
     // Path following constants
     public static double kPathFollowingLookahead = 30.0; // inches
@@ -125,7 +125,7 @@ public class Constants extends ConstantsBase {
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     public static double kTurretKp = 0.7;
-    public static double kTurretKi = 0.0;// 0.02;
+    public static double kTurretKi = 0.0;
     public static double kTurretKd = 30.0;
     public static double kTurretKf = 0;
     public static int kTurretIZone = (int) (1023.0 / kTurretKp);
@@ -143,14 +143,8 @@ public class Constants extends ConstantsBase {
     public static int kFlywheelAllowableError = 0;
 
     // Utility arm time delays, all in seconds
-    public static double kUtilityArmSizeBoxToPortcullisDelay = 0.5; // TODO:
-                                                                    // tune this
-                                                                    // value
-    public static double kUtilityArmLiftForHangToOpenCdfDelay = 2.0; // TODO:
-                                                                     // tune
-                                                                     // this
-                                                                     // value
-
+    public static double kUtilityArmSizeBoxToPortcullisDelay = 0.5;
+    public static double kUtilityArmLiftForHangToOpenCdfDelay = 2.0;
     public static double kUtilityArmCdfToDrivingDelay = 0.2;
     public static double kUtilityArmOpenCdfToDeployHooksDelay = 0.7;
     public static double kUtilityArmDriveToPortcullisDelay = 0.4;
