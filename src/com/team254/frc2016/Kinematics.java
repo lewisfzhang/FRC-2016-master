@@ -3,6 +3,8 @@ package com.team254.frc2016;
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * Provides forward and inverse kinematics equations for the robot modeling the
  * wheelbase as a differential drive (with a corrective factor to account for
@@ -30,8 +32,9 @@ public class Kinematics {
     // Append the result of forward kinematics to a previous pose.
     public static RigidTransform2d integrateForwardKinematics(RigidTransform2d current_pose, double left_wheel_delta,
             double right_wheel_delta, Rotation2d current_heading) {
-        return current_pose.transformBy(RigidTransform2d.fromVelocity(forwardKinematics(left_wheel_delta,
-                right_wheel_delta, current_pose.getRotation().inverse().rotateBy(current_heading).getRadians())));
+        RigidTransform2d.Delta with_gyro = forwardKinematics(left_wheel_delta,
+                right_wheel_delta, current_pose.getRotation().inverse().rotateBy(current_heading).getRadians());
+        return current_pose.transformBy(RigidTransform2d.fromVelocity(with_gyro));
     }
 
     public static class DriveVelocity {

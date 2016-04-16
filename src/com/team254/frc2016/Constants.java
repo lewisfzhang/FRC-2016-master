@@ -53,15 +53,15 @@ public class Constants extends ConstantsBase {
     public static double kTurretRotationsPerTick = 14.0 / 50.0 * 14.0 / 322.0;
 
     // Flywheel constants
-    public static double kFlywheelOnTargetTolerance = 150.0;
+    public static double kFlywheelOnTargetTolerance = 80.0;
     public static double kFlywheelGoodBallRpmSetpoint = 5800.0;
     public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 220.0;
-    public static double kAutoShootMaxDriveSpeed = 6.0;
-    public static int kAutoAimMinConsecutiveCyclesOnTarget = 5;
+    public static double kAutoShootMaxDriveSpeed = 12.0;
+    public static int kAutoAimMinConsecutiveCyclesOnTarget = 3;
     public static double kShootActuationTime = 0.75;
     public static double kHoodUnstowToFlywheelSpinTime = 0.4;
     public static double kLoadingTime = 0.5;
@@ -69,7 +69,7 @@ public class Constants extends ConstantsBase {
 
     // Goal tracker constants
     public static double kMaxGoalTrackAge = 0.3;
-    public static double kMaxTrackerDistance = 12.0;
+    public static double kMaxTrackerDistance = 18.0;
     public static double kCameraFrameRate = 30.0;
     public static double kTrackReportComparatorStablityWeight = 1.0;
     public static double kTrackReportComparatorAgeWeight = 1.0;
