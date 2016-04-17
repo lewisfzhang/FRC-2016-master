@@ -62,6 +62,7 @@ public class Robot extends IterativeRobot {
             mSuperstructure.outputToSmartDashboard();
             mRobotState.outputToSmartDashboard();
             mUtilityArm.outputToSmartDashboard();
+            mEnabledLooper.outputToSmartDashboard();
         }
         // TODO: rate limit this
         SmartDashboard.putNumber("Air Pressure psi", mAirPressureSensor.getAirPressurePsi());
@@ -252,14 +253,22 @@ public class Robot extends IterativeRobot {
         if (mControls.getPortcullisButton()) {
             mSuperstructure.deployIntake();
             mGetDown = true;
-            mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
+            mUtilityArm.setWantedState(UtilityArm.WantedState.LOW_BAR);
         } else if (mControls.getCdfButton()) {
-            mUtilityArm.setWantedState(UtilityArm.WantedState.CDF);
+            mUtilityArm.setWantedState(UtilityArm.WantedState.LOW_BAR);
         } else if (mControls.getBailButton()) {
             mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
-        } else if (mControls.getBatterChallengeButton()) {
+        } else if (mControls.getDeployHangerButton()) {
             mSuperstructure.stowIntake();
-            mUtilityArm.setWantedState(UtilityArm.WantedState.BATTER_CHALLENGE);
+            mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
+        }
+        
+        if (mUtilityArm.isAllowedToHang()) {
+            if (mControls.getHang()) {
+                mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
+            } else {
+                mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
+            }
         }
 
         if (mHoodTuningMode) {

@@ -139,7 +139,7 @@ public class SmartDashboardInteractions {
                 protected void routine() throws AutoModeEndedException {
                     ArrayList<Waypoint> path = new ArrayList<>();
                     Superstructure.getInstance().getIntake().setDeploy(true);
-                    UtilityArm.getInstance().setWantedState(UtilityArm.WantedState.PORTCULLIS);
+                    UtilityArm.getInstance().setWantedState(UtilityArm.WantedState.LOW_BAR);
                     path.add(new Waypoint(new Translation2d(0, 0), 84.0));
                     path.add(new Waypoint(new Translation2d(164, 0), 84.0));
 

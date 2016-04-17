@@ -1,5 +1,7 @@
 package com.team254.frc2016.loops;
 
+import com.team254.frc2016.Constants;
+import com.team254.frc2016.Kinematics;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Superstructure;
@@ -40,7 +42,9 @@ public class RobotStateEstimator implements Loop {
         Rotation2d turret_angle = turret_.getAngle();
         RigidTransform2d odometry = robot_state_.generateOdometryFromSensors(
                 left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
-        robot_state_.addObservations(time, odometry, turret_angle);
+        RigidTransform2d.Delta velocity = Kinematics.forwardKinematics(drive_.getLeftVelocityInchesPerSec(),
+                drive_.getRightVelocityInchesPerSec());
+        robot_state_.addObservations(time, odometry, turret_angle, velocity);
         left_encoder_prev_distance_ = left_distance;
         right_encoder_prev_distance_ = right_distance;
     }

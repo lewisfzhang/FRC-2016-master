@@ -74,6 +74,8 @@ public class Flywheel extends Subsystem {
         SmartDashboard.putNumber("flywheel_rpm", getRpm());
         SmartDashboard.putNumber("flywheel_setpoint", master_talon_.getSetpoint());
         SmartDashboard.putBoolean("flywheel_on_target", isOnTarget());
+        SmartDashboard.putNumber("flywheel_master_current", master_talon_.getOutputCurrent());
+        SmartDashboard.putNumber("flywheel_slave_current", slave_talon_.getOutputCurrent());
     }
 
     @Override

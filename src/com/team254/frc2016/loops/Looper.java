@@ -6,6 +6,8 @@ import java.util.List;
 import com.team254.frc2016.Constants;
 
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Looper {
     public final double kPeriod = Constants.kLooperDt;
@@ -15,17 +17,19 @@ public class Looper {
     private final Notifier notifier_;
     private final List<Loop> loops_;
     private final Object taskRunningLock_ = new Object();
+    private double timestamp_ = 0;
+    private double dt_ = 0;
     private final Runnable runnable_ = new Runnable() {
         @Override
         public void run() {
             synchronized (taskRunningLock_) {
                 if (running_) {
-                    // double now = Timer.getFPGATimestamp();
+                    double now = Timer.getFPGATimestamp();
                     for (Loop loop : loops_) {
                         loop.onLoop();
                     }
-                    // System.out.println("Looper took " +
-                    // (Timer.getFPGATimestamp() - now) + " seconds");
+                    dt_ = now - timestamp_;
+                    timestamp_ = now;
                 }
             }
         }
@@ -47,6 +51,7 @@ public class Looper {
         if (!running_) {
             System.out.println("Starting loops");
             synchronized (taskRunningLock_) {
+                timestamp_ = Timer.getFPGATimestamp();
                 for (Loop loop : loops_) {
                     loop.onStart();
                 }
@@ -68,5 +73,9 @@ public class Looper {
                 }
             }
         }
+    }
+
+    public void outputToSmartDashboard() {
+        SmartDashboard.putNumber("looper_dt", dt_);
     }
 }

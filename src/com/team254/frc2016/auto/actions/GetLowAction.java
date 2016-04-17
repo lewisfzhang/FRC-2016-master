@@ -16,7 +16,7 @@ public class GetLowAction implements Action {
 
     @Override
     public void start() {
-        mUtilityArm.setWantedState(UtilityArm.WantedState.PORTCULLIS);
+        mUtilityArm.setWantedState(UtilityArm.WantedState.LOW_BAR);
     }
 
     @Override

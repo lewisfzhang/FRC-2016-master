@@ -53,14 +53,16 @@ public class Constants extends ConstantsBase {
     public static double kTurretRotationsPerTick = 14.0 / 50.0 * 14.0 / 322.0;
 
     // Flywheel constants
-    public static double kFlywheelOnTargetTolerance = 80.0;
+    public static double kFlywheelOnTargetTolerance = 100.0;
     public static double kFlywheelGoodBallRpmSetpoint = 5800.0;
     public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 220.0;
-    public static double kAutoShootMaxDriveSpeed = 12.0;
+    public static double kAutoShootMaxDriveSpeed = 18.0;
+    public static double kAutoAimPredictionTime = 0.25;
+    public static double kShooterVelocityInchesPerSec = 576.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 3;
     public static double kShootActuationTime = 0.75;
     public static double kHoodUnstowToFlywheelSpinTime = 0.4;
@@ -134,27 +136,18 @@ public class Constants extends ConstantsBase {
 
     // PID gains for flywheel velocity loop
     // Units: error is (4096 counts/rev)/100ms. Max output is +/- 1023 units.
-    public static double kFlywheelKp = 0.1;
+    public static double kFlywheelKp = 0.12;
     public static double kFlywheelKi = 0.0;
     public static double kFlywheelKd = 0.5;
-    public static double kFlywheelKf = 0.015;
-    public static int kFlywheelIZone = 0;
+    public static double kFlywheelKf = 0.014;
+    public static int kFlywheelIZone = (int) (1023.0 / kFlywheelKp);
     public static double kFlywheelRampRate = 0;
     public static int kFlywheelAllowableError = 0;
 
     // Utility arm time delays, all in seconds
-    public static double kUtilityArmSizeBoxToPortcullisDelay = 0.5;
-    public static double kUtilityArmLiftForHangToOpenCdfDelay = 2.0;
-    public static double kUtilityArmCdfToDrivingDelay = 0.2;
-    public static double kUtilityArmOpenCdfToDeployHooksDelay = 0.7;
-    public static double kUtilityArmDriveToPortcullisDelay = 0.4;
-    public static double kIntakeDeploySettlingDelay = 0.2;
+    public static double kUtilityArmDropTime = 0.7;
+    public static double kUtilityArmRaiseTime = 1.0;
     public static double kUtilityArmHardStopsMoveForRaiseArmDelay = 0.5;
-
-    // Hanging Constants
-    // Warning, Timer.getMatchTime could be inaccurate
-    public static double kHangerAutoTriggerTime = 149.5; // TODO: tune this
-                                                         // value
 
     // Do not change anything after this line!
     // Port assignments should match up with the spreadsheet here:
@@ -173,6 +166,8 @@ public class Constants extends ConstantsBase {
     public static final int kIntakeTalonId = 13;
     public static final int kFixedRollerTalonId = 14;
     public static final int kHoodRollerTalonId = 6;
+    public static final int kHangerMasterTalonId = 5;
+    public static final int kHangerSlaveTalonId = 7;
 
     // SOLENOIDS
     public static final int kShifterSolenoidId = 11; // PCM 1, Solenoid 3
@@ -184,11 +179,7 @@ public class Constants extends ConstantsBase {
     public static final int kAdjustableHardStopSolenoidId = 2; // PCM 0,
                                                                // Solenoid 2
     public static final int kBrakeSolenoidId = 3; // PCM 0, Solenoid 3
-    public static final int kCdfFlapSolenoidId = 3; // PCM 0, Solenoid 3
-    public static final int kHookReleaseSolenoidId = 4;// TODO: find the correct
-                                                       // solenoid
-    public static final int kGasSpringReleaseSolenoidId = 5; // TODO: find the
-                                                             // correct solenoid
+    public static final int kHookReleaseSolenoidId = 4; // PCM 0, Solenoid 4
 
     // Analog Inputs
     public static int kHaveBallSensorAnalogId = 1;

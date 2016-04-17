@@ -299,6 +299,8 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("right_distance", getRightDistanceInches());
         SmartDashboard.putNumber("left_velocity", getLeftVelocityInchesPerSec());
         SmartDashboard.putNumber("right_velocity", getRightVelocityInchesPerSec());
+        SmartDashboard.putNumber("left_error", leftMaster_.getClosedLoopError());
+        SmartDashboard.putNumber("right_error", leftMaster_.getClosedLoopError());
         SmartDashboard.putNumber("gyro_angle", getGyro().getAngle());
         SmartDashboard.putNumber("gyro_center", getGyro().getCenter());
         SmartDashboard.putNumber("heading_error", mLastHeadingErrorDegrees);

@@ -77,6 +77,7 @@ public class RobotState {
 
     // FPGATimestamp -> RigidTransform2d or Rotation2d
     protected InterpolatingTreeMap<InterpolatingDouble, RigidTransform2d> odometric_to_vehicle_;
+    protected RigidTransform2d.Delta vehicle_velocity_;
     protected InterpolatingTreeMap<InterpolatingDouble, Rotation2d> turret_rotation_;
     protected GoalTracker goal_tracker_;
     protected Rotation2d camera_pitch_correction_;
@@ -91,6 +92,7 @@ public class RobotState {
             Rotation2d initial_turret_rotation) {
         odometric_to_vehicle_ = new InterpolatingTreeMap<>(kObservationBufferSize);
         odometric_to_vehicle_.put(new InterpolatingDouble(start_time), initial_odometric_to_vehicle);
+        vehicle_velocity_ = new RigidTransform2d.Delta(0, 0, 0);
         turret_rotation_ = new InterpolatingTreeMap<>(kObservationBufferSize);
         turret_rotation_.put(new InterpolatingDouble(start_time), initial_turret_rotation);
         goal_tracker_ = new GoalTracker();
@@ -105,6 +107,12 @@ public class RobotState {
 
     public synchronized Map.Entry<InterpolatingDouble, RigidTransform2d> getLatestOdometricToVehicle() {
         return odometric_to_vehicle_.lastEntry();
+    }
+
+    public synchronized RigidTransform2d getPredictedOdometricToVehicle(double lookahead_time) {
+        return getLatestOdometricToVehicle().getValue().transformBy(
+                RigidTransform2d.fromVelocity(new RigidTransform2d.Delta(vehicle_velocity_.dx * lookahead_time,
+                        vehicle_velocity_.dy * lookahead_time, vehicle_velocity_.dtheta * lookahead_time)));
     }
 
     public synchronized Rotation2d getTurretRotation(double timestamp) {
@@ -140,7 +148,7 @@ public class RobotState {
         Collections.sort(reports, comparator);
 
         // turret fixed (latest) -> vehicle (latest) -> odometric
-        RigidTransform2d latest_turret_fixed_to_odometric = getLatestOdometricToVehicle().getValue()
+        RigidTransform2d latest_turret_fixed_to_odometric = getPredictedOdometricToVehicle(Constants.kAutoAimPredictionTime)
                 .transformBy(kVehicleToTurretFixed).inverse();
 
         for (TrackReport report : reports) {
@@ -172,9 +180,10 @@ public class RobotState {
     }
 
     public synchronized void addObservations(double timestamp, RigidTransform2d odometric_to_vehicle,
-            Rotation2d turret_rotation) {
+            Rotation2d turret_rotation, RigidTransform2d.Delta velocity) {
         addOdometricToVehicleObservation(timestamp, odometric_to_vehicle);
         addTurretRotationObservation(timestamp, turret_rotation);
+        vehicle_velocity_ = velocity;
     }
 
     public void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {

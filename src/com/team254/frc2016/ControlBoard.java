@@ -53,7 +53,7 @@ public class ControlBoard {
         return mButtonBoard.getRawButton(7);
     }
 
-    public boolean getBatterChallengeButton() {
+    public boolean getDeployHangerButton() {
         return mButtonBoard.getRawButton(8);
     }
 

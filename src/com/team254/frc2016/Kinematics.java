@@ -32,8 +32,8 @@ public class Kinematics {
     // Append the result of forward kinematics to a previous pose.
     public static RigidTransform2d integrateForwardKinematics(RigidTransform2d current_pose, double left_wheel_delta,
             double right_wheel_delta, Rotation2d current_heading) {
-        RigidTransform2d.Delta with_gyro = forwardKinematics(left_wheel_delta,
-                right_wheel_delta, current_pose.getRotation().inverse().rotateBy(current_heading).getRadians());
+        RigidTransform2d.Delta with_gyro = forwardKinematics(left_wheel_delta, right_wheel_delta,
+                current_pose.getRotation().inverse().rotateBy(current_heading).getRadians());
         return current_pose.transformBy(RigidTransform2d.fromVelocity(with_gyro));
     }
 
