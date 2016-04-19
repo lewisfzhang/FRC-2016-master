@@ -225,6 +225,8 @@ public class Robot extends IterativeRobot {
             mSuperstructure.setWantsToStopIntake();
         }
 
+        Superstructure.WantedState idle_state = mControls.getKeepWheelRunning()
+                ? Superstructure.WantedState.WANT_TO_KEEP_SPINNING : Superstructure.WantedState.WANT_TO_IDLE;
         if (mControls.getAutoAim()) {
             mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
             mGetDown = false;
@@ -232,14 +234,13 @@ public class Robot extends IterativeRobot {
             mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_BATTER);
             mGetDown = false;
         } else if (mControls.getHoodUpButton()) {
-            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_IDLE);
+            mSuperstructure.setWantedState(idle_state);
             mGetDown = false;
         } else if (mControls.getHoodDownButton()) {
             mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_STOW);
             mGetDown = true;
         } else {
-            mSuperstructure.setWantedState(
-                    mGetDown ? Superstructure.WantedState.WANT_TO_STOW : Superstructure.WantedState.WANT_TO_IDLE);
+            mSuperstructure.setWantedState(mGetDown ? Superstructure.WantedState.WANT_TO_STOW : idle_state);
         }
 
         mSuperstructure.setTurretManualScanOutput(mControls.getTurretManual() * .66);

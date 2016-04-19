@@ -45,7 +45,7 @@ public class ControlBoard {
     }
 
     // OPERATOR CONTROLS
-    public boolean getAutoHangEnabled() {
+    public boolean getKeepWheelRunning() {
         return mButtonBoard.getRawAxis(3) > 0.1;
     }
 
