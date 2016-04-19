@@ -148,8 +148,8 @@ public class RobotState {
         Collections.sort(reports, comparator);
 
         // turret fixed (latest) -> vehicle (latest) -> odometric
-        RigidTransform2d latest_turret_fixed_to_odometric = getPredictedOdometricToVehicle(Constants.kAutoAimPredictionTime)
-                .transformBy(kVehicleToTurretFixed).inverse();
+        RigidTransform2d latest_turret_fixed_to_odometric = getPredictedOdometricToVehicle(
+                Constants.kAutoAimPredictionTime).transformBy(kVehicleToTurretFixed).inverse();
 
         for (TrackReport report : reports) {
             if (current_timestamp - report.latest_timestamp > kMaxTargetAge) {

@@ -3,8 +3,6 @@ package com.team254.frc2016;
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Rotation2d;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  * Provides forward and inverse kinematics equations for the robot modeling the
  * wheelbase as a differential drive (with a corrective factor to account for

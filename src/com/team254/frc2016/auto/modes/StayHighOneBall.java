@@ -40,10 +40,11 @@ public class StayHighOneBall extends AutoModeBase {
         return_path.add(new Waypoint(new Translation2d(12, 0), 48.0));
 
         runAction(
-                new ParallelAction(Arrays.asList(new FollowPathAction(new Path(first_path), false),
-                        new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("DropArm"),
-                                new SetArmModeAction(UtilityArm.WantedState.LOW_BAR),
-                                new StartAutoAimingAction())))));
+                new ParallelAction(
+                        Arrays.asList(new FollowPathAction(new Path(first_path), false),
+                                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("DropArm"),
+                                        new SetArmModeAction(UtilityArm.WantedState.LOW_BAR),
+                                        new StartAutoAimingAction())))));
 
         runAction(new WaitAction(1));
         runAction(new ShootWhenReadyAction());

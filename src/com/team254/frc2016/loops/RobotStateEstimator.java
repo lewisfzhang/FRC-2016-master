@@ -1,6 +1,5 @@
 package com.team254.frc2016.loops;
 
-import com.team254.frc2016.Constants;
 import com.team254.frc2016.Kinematics;
 import com.team254.frc2016.RobotState;
 import com.team254.frc2016.subsystems.Drive;

@@ -262,7 +262,7 @@ public class Robot extends IterativeRobot {
             mSuperstructure.stowIntake();
             mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
         }
-        
+
         if (mUtilityArm.isAllowedToHang()) {
             if (mControls.getHang()) {
                 mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
