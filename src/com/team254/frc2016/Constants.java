@@ -18,7 +18,7 @@ public class Constants extends ConstantsBase {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 19.75;
     public static double kCameraPitchAngleDegrees = 33.67;
-    public static double kCameraYawAngleDegrees = -0.25;
+    public static double kCameraYawAngleDegrees = -0.5;
     public static double kCameraDeadband = 0.01;
 
     // Wheels
@@ -122,7 +122,7 @@ public class Constants extends ConstantsBase {
     // Path following constants
     public static double kPathFollowingLookahead = 30.0; // inches
     public static double kPathFollowingMaxVel = 84.0; // inches/sec
-    public static double kPathFollowingMaxAccel = 84.0; // inches/sec^2
+    public static double kPathFollowingMaxAccel = 65.0; // inches/sec^2
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.

@@ -25,6 +25,6 @@ public class ShootWhenReadyAction implements Action {
 
     @Override
     public void done() {
-        mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_IDLE);
+        mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_DEPLOY);
     }
 }
