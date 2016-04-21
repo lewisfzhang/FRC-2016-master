@@ -339,12 +339,13 @@ public class Superstructure extends Subsystem {
             return handleDeployedAndHomingHood();
         }
         mTurret.setDesiredAngle(new Rotation2d());
+        mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
         mHoodRoller.stop();
         mFlywheel.stop();
 
         if (mTurret.isSafe() && mHood.isSafe()) {
-            return handleStowedOrStowing();
+            return handleDeployed();
         } else {
             double now = Timer.getFPGATimestamp();
             return handleReturningToSafe(now, now);
