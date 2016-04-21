@@ -172,11 +172,11 @@ public class Hood extends Subsystem {
     }
 
     public boolean isStowed() {
-        return !stow_solenoid_.get();
+        return stow_solenoid_.get();
     }
 
     void setStowed(boolean stow) {
-        stow_solenoid_.set(!stow);
+        stow_solenoid_.set(stow);
     }
 
     public void setTestServoSpeed(double speed) {

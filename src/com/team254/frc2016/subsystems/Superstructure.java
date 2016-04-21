@@ -32,7 +32,7 @@ public class Superstructure extends Subsystem {
     private enum SystemState {
         REENABLED, // The shooter has just been enabled (and may have previously
                    // been disabled from any state)
-        STOWED_AND_HOMING_HOOD, // The shooter is stowed and the hood is homing
+        DEPLOYED_AND_HOMING_HOOD, // The shooter is deployed and the hood is homing
         STOWED_OR_STOWING, // The shooter is stowed (or stowing)
         UNSTOWING, // The shooter is in the process of unstowing
         LOADING, // The shooter is bringing in the ball
@@ -40,16 +40,16 @@ public class Superstructure extends Subsystem {
         SPINNING_BATTER, // The shooter is in batter mode
         FIRING_AIM, // The shooter is firing in auto aim mode
         FIRING_BATTER, // The shooter is firing in batter mode
-        IDLE, // The shooter is deployed but idle
+        DEPLOYED, // The shooter is deployed but idle
         KEEP_SPINNING, // The shooter is deployed and running but not aiming
-        UNSTOWED_RETURNING_TO_SAFE // The shooter is preparing to stow
+        DEPLOYED_RETURNING_TO_SAFE // The shooter is preparing to stow
     }
 
     /**
      * Drives state changes. Outputs should not be decided based on this enum.
      */
     public enum WantedState {
-        WANT_TO_IDLE, // The user is okay with leaving the hood up
+        WANT_TO_DEPLOY, // The user is okay with leaving the hood up
         WANT_TO_STOW, // The user wants to stow the shooter
         WANT_TO_AIM, // The user wants to auto aim
         WANT_TO_BATTER, // The user wants to use batter mode
@@ -73,7 +73,7 @@ public class Superstructure extends Subsystem {
         WANT_TO_EXHAUST // The user wants to exhaust balls
     }
 
-    private WantedState mWantedState = WantedState.WANT_TO_STOW;
+    private WantedState mWantedState = WantedState.WANT_TO_DEPLOY;
     private WantedFiringState mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
     private WantedIntakeState mWantedIntakeState = WantedIntakeState.WANT_TO_STOP_INTAKE;
 
@@ -117,7 +117,7 @@ public class Superstructure extends Subsystem {
             synchronized (Superstructure.this) {
                 mHood.getLoop().onStart();
                 mHoodRoller.getLoop().onStart();
-                mWantedState = WantedState.WANT_TO_STOW;
+                mWantedState = WantedState.WANT_TO_DEPLOY;
                 mWantedFiringState = WantedFiringState.WANT_TO_HOLD_FIRE;
                 mWantedIntakeState = WantedIntakeState.WANT_TO_STOP_INTAKE;
                 mCurrentStateStartTime = Timer.getFPGATimestamp();
@@ -137,8 +137,8 @@ public class Superstructure extends Subsystem {
                 case REENABLED:
                     newState = handleReenabled();
                     break;
-                case STOWED_AND_HOMING_HOOD:
-                    newState = handleStowedAndHomingHood();
+                case DEPLOYED_AND_HOMING_HOOD:
+                    newState = handleDeployedAndHomingHood();
                     break;
                 case STOWED_OR_STOWING:
                     newState = handleStowedOrStowing();
@@ -159,18 +159,18 @@ public class Superstructure extends Subsystem {
                 case FIRING_BATTER:
                     newState = handleShooting(mSystemState, now, mCurrentStateStartTime);
                     break;
-                case IDLE:
-                    newState = handleIdle();
+                case DEPLOYED:
+                    newState = handleDeployed();
                     break;
                 case KEEP_SPINNING:
                     newState = handleKeepSpinning();
                     break;
-                case UNSTOWED_RETURNING_TO_SAFE:
+                case DEPLOYED_RETURNING_TO_SAFE:
                     newState = handleReturningToSafe(now, mCurrentStateStartTime);
                     break;
                 default:
                     System.out.println("Unexpected shooter state: " + mSystemState);
-                    newState = SystemState.UNSTOWED_RETURNING_TO_SAFE;
+                    newState = SystemState.DEPLOYED_RETURNING_TO_SAFE;
                 }
 
                 if (newState != mSystemState) {
@@ -336,7 +336,7 @@ public class Superstructure extends Subsystem {
     private synchronized SystemState handleReenabled() {
         if (!mHood.hasHomed()) {
             // We assume that this only happens when we are first enabled
-            return handleStowedAndHomingHood();
+            return handleDeployedAndHomingHood();
         }
         mTurret.setDesiredAngle(new Rotation2d());
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
@@ -351,14 +351,14 @@ public class Superstructure extends Subsystem {
         }
     }
 
-    private synchronized SystemState handleStowedAndHomingHood() {
+    private synchronized SystemState handleDeployedAndHomingHood() {
         handleIntake(false, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
-        mHood.setStowed(true);
+        mHood.setStowed(false);
         mHoodRoller.stop();
 
-        return mHood.hasHomed() ? SystemState.STOWED_OR_STOWING : SystemState.STOWED_AND_HOMING_HOOD;
+        return mHood.hasHomed() ? SystemState.DEPLOYED : SystemState.DEPLOYED_AND_HOMING_HOOD;
     }
 
     private synchronized SystemState handleStowedOrStowing() {
@@ -376,7 +376,7 @@ public class Superstructure extends Subsystem {
         switch (mWantedState) {
         case WANT_TO_AIM: // fallthrough
         case WANT_TO_BATTER:
-        case WANT_TO_IDLE:
+        case WANT_TO_DEPLOY:
         case WANT_TO_KEEP_SPINNING:
             return SystemState.UNSTOWING;
         case WANT_TO_STOW: // fallthrough
@@ -397,11 +397,11 @@ public class Superstructure extends Subsystem {
         // State transitions
         boolean isDoneUnstowing = now - stateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
         switch (mWantedState) {
-        case WANT_TO_IDLE:
+        case WANT_TO_DEPLOY:
             if (!isDoneUnstowing) {
                 return SystemState.UNSTOWING;
             } else {
-                return SystemState.IDLE;
+                return SystemState.DEPLOYED;
             }
         case WANT_TO_KEEP_SPINNING:
             if (!isDoneUnstowing) {
@@ -434,7 +434,7 @@ public class Superstructure extends Subsystem {
         switch (mWantedState) {
         case WANT_TO_AIM: // fallthrough
         case WANT_TO_BATTER:
-        case WANT_TO_IDLE:
+        case WANT_TO_DEPLOY:
         case WANT_TO_KEEP_SPINNING:
             boolean isDoneLoading = now - stateStartTime > Constants.kLoadingTime;
             if (isDoneLoading || mHoodRoller.isBallPresent()) {
@@ -447,14 +447,14 @@ public class Superstructure extends Subsystem {
                 } else if (mWantedState == WantedState.WANT_TO_KEEP_SPINNING) {
                     return SystemState.KEEP_SPINNING;
                 } else {
-                    return SystemState.IDLE;
+                    return SystemState.DEPLOYED;
                 }
             } else {
                 return SystemState.LOADING;
             }
         case WANT_TO_STOW:
         default:
-            return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+            return SystemState.DEPLOYED_RETURNING_TO_SAFE;
         }
     }
 
@@ -487,13 +487,13 @@ public class Superstructure extends Subsystem {
             }
         case WANT_TO_BATTER:
             return SystemState.SPINNING_BATTER;
-        case WANT_TO_IDLE:
-            return SystemState.IDLE;
+        case WANT_TO_DEPLOY:
+            return SystemState.DEPLOYED;
         case WANT_TO_KEEP_SPINNING:
             return SystemState.KEEP_SPINNING;
         case WANT_TO_STOW: // fallthrough
         default:
-            return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+            return SystemState.DEPLOYED_RETURNING_TO_SAFE;
         }
     }
 
@@ -517,13 +517,13 @@ public class Superstructure extends Subsystem {
             } else {
                 return SystemState.SPINNING_BATTER;
             }
-        case WANT_TO_IDLE:
-            return SystemState.IDLE;
+        case WANT_TO_DEPLOY:
+            return SystemState.DEPLOYED;
         case WANT_TO_KEEP_SPINNING:
             return SystemState.KEEP_SPINNING;
         case WANT_TO_STOW: // fallthrough
         default:
-            return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+            return SystemState.DEPLOYED_RETURNING_TO_SAFE;
         }
     }
 
@@ -544,18 +544,18 @@ public class Superstructure extends Subsystem {
                 return SystemState.SPINNING_AIM;
             case WANT_TO_BATTER:
                 return SystemState.SPINNING_BATTER;
-            case WANT_TO_IDLE:
-                return SystemState.IDLE;
+            case WANT_TO_DEPLOY:
+                return SystemState.DEPLOYED;
             case WANT_TO_KEEP_SPINNING:
                 return SystemState.KEEP_SPINNING;
             case WANT_TO_STOW: // fallthrough
             default:
-                return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+                return SystemState.DEPLOYED_RETURNING_TO_SAFE;
             }
         }
     }
 
-    private synchronized SystemState handleIdle() {
+    private synchronized SystemState handleDeployed() {
         mTurret.setDesiredAngle(new Rotation2d());
 
         handleIntake(!mTurret.isSafe(), false);
@@ -572,13 +572,13 @@ public class Superstructure extends Subsystem {
         case WANT_TO_AIM: // fallthrough
         case WANT_TO_BATTER:
             return SystemState.LOADING;
-        case WANT_TO_IDLE:
-            return SystemState.IDLE;
+        case WANT_TO_DEPLOY:
+            return SystemState.DEPLOYED;
         case WANT_TO_KEEP_SPINNING:
             return SystemState.KEEP_SPINNING;
         case WANT_TO_STOW: // fallthrough
         default:
-            return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+            return SystemState.DEPLOYED_RETURNING_TO_SAFE;
         }
     }
     
@@ -599,13 +599,13 @@ public class Superstructure extends Subsystem {
         case WANT_TO_AIM: // fallthrough
         case WANT_TO_BATTER:
             return SystemState.LOADING;
-        case WANT_TO_IDLE:
-            return SystemState.IDLE;
+        case WANT_TO_DEPLOY:
+            return SystemState.DEPLOYED;
         case WANT_TO_KEEP_SPINNING:
             return SystemState.KEEP_SPINNING;
         case WANT_TO_STOW: // fallthrough
         default:
-            return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+            return SystemState.DEPLOYED_RETURNING_TO_SAFE;
         } 
     }
 
@@ -622,8 +622,8 @@ public class Superstructure extends Subsystem {
             return SystemState.SPINNING_AIM;
         case WANT_TO_BATTER:
             return SystemState.SPINNING_BATTER;
-        case WANT_TO_IDLE:
-            return SystemState.IDLE;
+        case WANT_TO_DEPLOY:
+            return SystemState.DEPLOYED;
         case WANT_TO_KEEP_SPINNING:
             return SystemState.KEEP_SPINNING;
         default:
@@ -631,7 +631,7 @@ public class Superstructure extends Subsystem {
                 mHood.startHoming();
                 return SystemState.STOWED_OR_STOWING;
             } else {
-                return SystemState.UNSTOWED_RETURNING_TO_SAFE;
+                return SystemState.DEPLOYED_RETURNING_TO_SAFE;
             }
         }
     }

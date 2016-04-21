@@ -42,7 +42,7 @@ public class Robot extends IterativeRobot {
     boolean mLogToSmartdashboard = true;
     boolean mHoodTuningMode = false;
 
-    boolean mGetDown = true;
+    boolean mGetDown = false;
 
     private LatchedBoolean mSelfieLatch = new LatchedBoolean();
     private LatchedBoolean mVisionLatch = new LatchedBoolean();
@@ -171,7 +171,7 @@ public class Robot extends IterativeRobot {
 
         VisionServer.getInstance().setUseVisionMode();
 
-        mGetDown = true;
+        mGetDown = false;
 
         mDiddlerServo.set(0);
     }
@@ -226,7 +226,7 @@ public class Robot extends IterativeRobot {
         }
 
         Superstructure.WantedState idle_state = mControls.getKeepWheelRunning()
-                ? Superstructure.WantedState.WANT_TO_KEEP_SPINNING : Superstructure.WantedState.WANT_TO_IDLE;
+                ? Superstructure.WantedState.WANT_TO_KEEP_SPINNING : Superstructure.WantedState.WANT_TO_DEPLOY;
         if (mControls.getAutoAim()) {
             mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
             mGetDown = false;

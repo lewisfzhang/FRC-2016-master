@@ -107,7 +107,7 @@ public class AdaptivePurePursuitControllerTest {
         double dt = .01;
         AdaptivePurePursuitController controller = new AdaptivePurePursuitController(0.25, 1.0, dt, path, false);
 
-        RigidTransform2d robot_pose = new RigidTransform2d();
+        RigidTransform2d robot_pose = new RigidTransform2d(new Translation2d(-0.1, 0.1), Rotation2d.fromDegrees(45));
         double t = 0;
         while (!controller.isDone() && t < 10) {
             // Follow the path
