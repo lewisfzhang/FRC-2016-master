@@ -16,8 +16,11 @@ public abstract class AutoModeBase {
             System.out.println("Auto mode done, ended early");
             return;
         }
+        done();
         System.out.println("Auto mode done");
     }
+
+    public void done() {}
 
     public void stop() {
         m_active = false;
