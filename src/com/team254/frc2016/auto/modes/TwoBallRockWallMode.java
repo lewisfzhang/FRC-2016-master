@@ -12,7 +12,6 @@ import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Translation2d;
 import edu.wpi.first.wpilibj.InterruptHandlerFunction;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +26,8 @@ public class TwoBallRockWallMode extends AutoModeBase {
 
     public static final double DISTANCE_TO_DROP_ARM = 70;
     public static final double DISTANCE_TO_SLOW_OVER_BUMP = 95;
-    public double mDistanceToDrive = 150;
+    public static final double DISTANCE_TO_SPEED_UP_AGAIN = 110;
+    public double mDistanceToDrive = 162;
 
     boolean mUseIsr = false;
     boolean mLookingForLine = false;
@@ -107,10 +107,11 @@ public class TwoBallRockWallMode extends AutoModeBase {
         first_path.add(new Path.Waypoint(new Translation2d(45, 0), 52.0));
         first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_DROP_ARM, 0), 52.0, "DropArm"));
         first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_SLOW_OVER_BUMP, 0), 36.0));
-        first_path.add(new Path.Waypoint(new Translation2d(mDistanceToDrive, 0), 48.0));
+        first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_SPEED_UP_AGAIN, 0), 80.0));
+        first_path.add(new Path.Waypoint(new Translation2d(mDistanceToDrive, 0), 80.0));
 
         List<Path.Waypoint> return_path = new ArrayList<>();
-        return_path.add(new Path.Waypoint(new Translation2d(mDistanceToDrive, 0), 54.0));
+        return_path.add(new Path.Waypoint(new Translation2d(mDistanceToDrive, 0), 55.0));
         return_path.add(new Path.Waypoint(new Translation2d(15, 0), 54.0, "WatchLine"));
         return_path.add(new Path.Waypoint(new Translation2d(6, 0), 25.0));
         return_path.add(new Path.Waypoint(new Translation2d(-100, 0), 25.0));
@@ -126,7 +127,7 @@ public class TwoBallRockWallMode extends AutoModeBase {
                                         new StartAutoAimingAction())))));
 
         // Shoot ball
-        runAction(new WaitAction(.75));
+        runAction(new WaitAction(.5));
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_KEEP_SPINNING);
         runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));
@@ -136,7 +137,7 @@ public class TwoBallRockWallMode extends AutoModeBase {
                 new ParallelAction(
                         Arrays.asList(new InterruptableFollowPath(new Path(return_path), true),
                                 new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("WatchLine"), new SetLookingForLineAction()))
-                                )));
+                        )));
 
 
         // Creep off the line
@@ -148,26 +149,25 @@ public class TwoBallRockWallMode extends AutoModeBase {
         creep_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 20.0));
         creep_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mCreepDistance, 0), 20.0));
 
-        System.out.println("About to creep");
-
         // intake ball
         mSuperstructure.setWantsToRunIntake();
         mSuperstructure.deployIntake();
         runAction(new FollowPathAction(new Path(creep_path), false));
 
-        System.out.println("About to intake");
-        runAction(new WaitAction(0.25));
-        System.out.println("About to drive 2");
-
         // Go over defenses again
         List<Path.Waypoint> second_shot_path = new ArrayList<>();
         second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), mCreepDistance), 85.0));
+        second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive - 15, 0), 85.0, "START_AIM"));
         second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive, 0), 85.0));
-        runAction(new FollowPathAction(new Path(second_shot_path), false));
+
+        runAction(new ParallelAction(
+                Arrays.asList(new FollowPathAction(new Path(second_shot_path), false),
+                        new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("START_AIM"), new StartAutoAimingAction()))))
+        );
+
 
         // Shoot 2nd ball
-        runAction(new StartAutoAimingAction());
-        runAction(new WaitAction(.6));
+        runAction(new WaitAction(.5));
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantsToStopIntake();
 
