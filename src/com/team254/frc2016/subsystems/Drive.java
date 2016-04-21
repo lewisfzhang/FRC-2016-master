@@ -37,6 +37,7 @@ public class Drive extends Subsystem {
     }
 
     private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
+    private boolean isHighGear_ = false;
     private final Solenoid shifter_;
     private final Solenoid brake_;
     private final ADXRS453_Gyro gyro_;
@@ -93,7 +94,7 @@ public class Drive extends Subsystem {
         brake_ = Constants.makeSolenoidForId(Constants.kBrakeSolenoidId);
         brake_.set(true);
         shifter_ = Constants.makeSolenoidForId(Constants.kShifterSolenoidId);
-        shifter_.set(false); // high gear
+        shifter_.set(false); // low gear
         gyro_ = new ADXRS453_Gyro();
         lineSensor_ = new DigitalInput(Constants.kLineSensorDIO);
 
@@ -110,10 +111,10 @@ public class Drive extends Subsystem {
         rightMaster_.set(0);
         rightSlave_.changeControlMode(CANTalon.TalonControlMode.Follower);
         rightSlave_.set(Constants.kRightDriveMasterId);
-        leftMaster_.enableBrakeMode(false);
-        leftSlave_.enableBrakeMode(false);
-        rightMaster_.enableBrakeMode(false);
-        rightSlave_.enableBrakeMode(false);
+        leftMaster_.enableBrakeMode(true);
+        leftSlave_.enableBrakeMode(true);
+        rightMaster_.enableBrakeMode(true);
+        rightSlave_.enableBrakeMode(true);
 
         // Set up the encoders
         leftMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
@@ -259,8 +260,20 @@ public class Drive extends Subsystem {
     public synchronized Rotation2d getGyroAngle() {
         return Rotation2d.fromDegrees(gyro_.getAngle());
     }
+    
+    public boolean isHighGear() {
+        return shifter_.get();
+    }
 
     public void setHighGear(boolean high_gear) {
+        if (high_gear != isHighGear_) {
+            // Brake mode in low gear
+            leftMaster_.enableBrakeMode(!high_gear);
+            leftSlave_.enableBrakeMode(!high_gear);
+            rightMaster_.enableBrakeMode(!high_gear);
+            rightSlave_.enableBrakeMode(!high_gear);
+        }
+        isHighGear_ = high_gear;
         shifter_.set(high_gear);
     }
 

@@ -30,7 +30,7 @@ public class FollowPathAction implements Action {
 
     @Override
     public void done() {
-        mDrive.setVelocitySetpoint(0, 0);
+        mDrive.stop();
     }
 
     @Override
