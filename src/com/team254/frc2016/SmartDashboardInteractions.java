@@ -95,8 +95,10 @@ public class SmartDashboardInteractions {
         CDF_ONE_BALL("CDF - Stop"), //
         CDF_COME_BACK_LEFT("CDF - Come back left"), //
         CDF_COME_BACK_RIGHT("CDF - Come back right"), //
-        TWO_BALL("Two Ball"), //
-        STAND_STILL("Stand Still"), DRIVE_5_FEET("Drive 5 Feet");
+        TWO_BALL("Two Ball Low Bar"), //
+        STAND_STILL("Stand Still"),
+        DRIVE_5_FEET("Drive 5 Feet"),
+        TWO_BALL_ROCK_WALL_MODE("Two Ball Rock Wall");
 
         public final String name;
 
@@ -133,6 +135,8 @@ public class SmartDashboardInteractions {
             return new ShovelTheFriesMode(autonLane.distanceToDrive, true, true);
         case TWO_BALL:
             return new TwoBallMode(autonLane.distanceToDrive);
+        case TWO_BALL_ROCK_WALL_MODE:
+            return new TwoBallRockWallMode();
         case DRIVE_5_FEET:
             return new AutoModeBase() {
                 @Override
