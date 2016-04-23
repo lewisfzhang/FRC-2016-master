@@ -218,16 +218,6 @@ function refreshDriverStatusElements() {
     $("#haveBallBox"),
     getBooleanElementValue(TABLE, "have_ball"));
 
-  var hood = getBooleanElementValue(TABLE, "hood_on_target");
-  setBooleanBoxStyle($("#hoodOnTargetBox"), hood);
-  var flywheel = getBooleanElementValue(TABLE, "flywheel_on_target");
-  setBooleanBoxStyle($("#flywheelOnTargetBox"), flywheel);
-  var turret = getBooleanElementValue(TABLE, "turret_on_target");
-  setBooleanBoxStyle($("#turretOnTargetBox"), turret);
-  // TODO: drive on target
-
-  setBooleanBoxStyle($("#onTargetBox"), hood && flywheel && turret);
-
   maybeRefreshAutoOptions();
   refreshAutoMode();
 
