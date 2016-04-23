@@ -15,6 +15,7 @@ import com.team254.lib.util.Rotation2d;
 
 import com.team254.lib.util.SynchronousPID;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -38,10 +39,16 @@ public class Drive extends Subsystem {
 
     private final CANTalon leftMaster_, leftSlave_, rightMaster_, rightSlave_;
     private boolean isHighGear_ = false;
+    private boolean isBrakeMode_ = true;
     private final Solenoid shifter_;
     private final Solenoid brake_;
     private final ADXRS453_Gyro gyro_;
-    private DigitalInput lineSensor_;
+    private DigitalInput lineSensor1_;
+    private DigitalInput lineSensor2_;
+    private Counter lineSensorCounter1_;
+    private Counter lineSensorCounter2_;
+    private int lastSeesLineCount_ = 0;
+    private boolean stopOnNextCount_ = false;
 
     private DriveControlState driveControlState_;
     private VelocityHeadingSetpoint velocityHeadingSetpoint_;
@@ -53,12 +60,18 @@ public class Drive extends Subsystem {
         public void onStart() {
             setOpenLoop(DriveSignal.NEUTRAL);
             pathFollowingController_ = null;
+            setBrakeMode(false);
+            stopOnNextCount_ = false;
         }
 
         @Override
         public void onLoop() {
             synchronized (Drive.this) {
                 // System.out.println("State " + driveControlState_);
+                if (stopOnNextCount_ && getSeesLineCount() > lastSeesLineCount_) {
+                    stopOnNextCount_ = false;
+                    stop();
+                }
                 switch (driveControlState_) {
                 case OPEN_LOOP:
                     return;
@@ -94,9 +107,12 @@ public class Drive extends Subsystem {
         brake_ = Constants.makeSolenoidForId(Constants.kBrakeSolenoidId);
         brake_.set(true);
         shifter_ = Constants.makeSolenoidForId(Constants.kShifterSolenoidId);
-        shifter_.set(false); // low gear
+        setHighGear(true);
         gyro_ = new ADXRS453_Gyro();
-        lineSensor_ = new DigitalInput(Constants.kLineSensorDIO);
+        lineSensor1_ = new DigitalInput(Constants.kLineSensor1DIO);
+        lineSensor2_ = new DigitalInput(Constants.kLineSensor1DIO);
+        lineSensorCounter1_ = new Counter(lineSensor1_);
+        lineSensorCounter2_ = new Counter(lineSensor2_);
 
         // Get status at 100Hz
         leftMaster_.setStatusFrameRateMs(CANTalon.StatusFrameRate.Feedback, 10);
@@ -111,10 +127,7 @@ public class Drive extends Subsystem {
         rightMaster_.set(0);
         rightSlave_.changeControlMode(CANTalon.TalonControlMode.Follower);
         rightSlave_.set(Constants.kRightDriveMasterId);
-        leftMaster_.enableBrakeMode(true);
-        leftSlave_.enableBrakeMode(true);
-        rightMaster_.enableBrakeMode(true);
-        rightSlave_.enableBrakeMode(true);
+        setBrakeMode(false);
 
         // Set up the encoders
         leftMaster_.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
@@ -168,11 +181,7 @@ public class Drive extends Subsystem {
     public synchronized void setOpenLoop(DriveSignal signal) {
         if (driveControlState_ != DriveControlState.OPEN_LOOP) {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-            leftMaster_.enableBrakeMode(signal.breakMode);
-            leftSlave_.enableBrakeMode(signal.breakMode);
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-            rightMaster_.enableBrakeMode(signal.breakMode);
-            rightSlave_.enableBrakeMode(signal.breakMode);
             driveControlState_ = DriveControlState.OPEN_LOOP;
         }
         setLeftRightPower(signal.leftMotor, signal.rightMotor);
@@ -183,16 +192,13 @@ public class Drive extends Subsystem {
             leftMaster_.setProfile(kBaseLockControlSlot);
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             leftMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
-            leftMaster_.enableBrakeMode(true);
-            leftSlave_.enableBrakeMode(true);
             leftMaster_.set(leftMaster_.getPosition());
             rightMaster_.setProfile(kBaseLockControlSlot);
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.Position);
             rightMaster_.setAllowableClosedLoopErr(Constants.kDriveBaseLockAllowableError);
-            rightMaster_.enableBrakeMode(true);
-            rightSlave_.enableBrakeMode(true);
             rightMaster_.set(rightMaster_.getPosition());
             driveControlState_ = DriveControlState.BASE_LOCKED;
+            setBrakeMode(true);
         }
         setHighGear(false);
     }
@@ -226,7 +232,8 @@ public class Drive extends Subsystem {
     }
 
     public synchronized boolean isFinishedPath() {
-        return (driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL && pathFollowingController_.isDone());
+        return (driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL && pathFollowingController_.isDone())
+                || driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL;
     }
 
     public synchronized Set<String> getPathMarkersCrossed() {
@@ -260,21 +267,14 @@ public class Drive extends Subsystem {
     public synchronized Rotation2d getGyroAngle() {
         return Rotation2d.fromDegrees(gyro_.getAngle());
     }
-    
+
     public boolean isHighGear() {
-        return shifter_.get();
+        return isHighGear_;
     }
 
     public void setHighGear(boolean high_gear) {
-        if (high_gear != isHighGear_) {
-            // Brake mode in low gear
-            leftMaster_.enableBrakeMode(!high_gear);
-            leftSlave_.enableBrakeMode(!high_gear);
-            rightMaster_.enableBrakeMode(!high_gear);
-            rightSlave_.enableBrakeMode(!high_gear);
-        }
         isHighGear_ = high_gear;
-        shifter_.set(high_gear);
+        shifter_.set(!high_gear);
     }
 
     public synchronized void resetEncoders() {
@@ -298,14 +298,6 @@ public class Drive extends Subsystem {
         setOpenLoop(DriveSignal.NEUTRAL);
     }
 
-    public boolean getLineSensorTriggered() {
-        return lineSensor_.get();
-    }
-
-    public DigitalInput getLineSensor() {
-        return lineSensor_;
-    }
-
     @Override
     public void outputToSmartDashboard() {
         SmartDashboard.putNumber("left_distance", getLeftDistanceInches());
@@ -317,7 +309,8 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("gyro_angle", getGyro().getAngle());
         SmartDashboard.putNumber("gyro_center", getGyro().getCenter());
         SmartDashboard.putNumber("heading_error", mLastHeadingErrorDegrees);
-        SmartDashboard.putBoolean("line_sensor", getLineSensorTriggered());
+        SmartDashboard.putBoolean("line_sensor1", lineSensor1_.get());
+        SmartDashboard.putBoolean("line_sensor2", lineSensor2_.get());
     }
 
     @Override
@@ -333,15 +326,11 @@ public class Drive extends Subsystem {
             leftMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             leftMaster_.setProfile(kVelocityControlSlot);
             leftMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
-            leftMaster_.enableBrakeMode(true);
-            leftSlave_.enableBrakeMode(true);
-            setHighGear(false);
             rightMaster_.changeControlMode(CANTalon.TalonControlMode.Speed);
             rightMaster_.setProfile(kVelocityControlSlot);
             rightMaster_.setAllowableClosedLoopErr(Constants.kDriveVelocityAllowableError);
-            rightMaster_.enableBrakeMode(true);
-            rightSlave_.enableBrakeMode(true);
-            setHighGear(false);
+            setHighGear(true);
+            setBrakeMode(true);
         }
     }
 
@@ -384,6 +373,15 @@ public class Drive extends Subsystem {
         updateVelocitySetpoint(setpoint.left, setpoint.right);
     }
 
+    private int getSeesLineCount() {
+        return lineSensorCounter1_.get() + lineSensorCounter2_.get();
+    }
+
+    public synchronized void setStopOnNextLine() {
+        stopOnNextCount_ = true;
+        lastSeesLineCount_ = getSeesLineCount();
+    }
+
     private static double rotationsToInches(double rotations) {
         return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
     }
@@ -398,6 +396,16 @@ public class Drive extends Subsystem {
 
     private static double inchesPerSecondToRpm(double inches_per_second) {
         return inchesToRotations(inches_per_second) * 60;
+    }
+
+    public void setBrakeMode(boolean on) {
+        if (isBrakeMode_ != on) {
+            leftMaster_.enableBrakeMode(on);
+            leftSlave_.enableBrakeMode(on);
+            rightMaster_.enableBrakeMode(on);
+            rightSlave_.enableBrakeMode(on);
+            isBrakeMode_ = on;
+        }
     }
 
     public static class VelocityHeadingSetpoint {

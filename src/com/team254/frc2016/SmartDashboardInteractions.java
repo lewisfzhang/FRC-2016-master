@@ -96,9 +96,7 @@ public class SmartDashboardInteractions {
         CDF_COME_BACK_LEFT("CDF - Come back left"), //
         CDF_COME_BACK_RIGHT("CDF - Come back right"), //
         TWO_BALL("Two Ball Low Bar"), //
-        STAND_STILL("Stand Still"),
-        DRIVE_5_FEET("Drive 5 Feet"),
-        TWO_BALL_ROCK_WALL_MODE("Two Ball Rock Wall");
+        STAND_STILL("Stand Still"), DRIVE_5_FEET("Drive 5 Feet"), TWO_BALL_ROCK_WALL_MODE("Two Ball Rock Wall");
 
         public final String name;
 

@@ -10,8 +10,6 @@ import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.RigidTransform2d;
 import com.team254.lib.util.Translation2d;
-import edu.wpi.first.wpilibj.InterruptHandlerFunction;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,72 +26,6 @@ public class TwoBallRockWallMode extends AutoModeBase {
     public static final double DISTANCE_TO_SLOW_OVER_BUMP = 95;
     public static final double DISTANCE_TO_SPEED_UP_AGAIN = 110;
     public double mDistanceToDrive = 162;
-
-    boolean mUseIsr = false;
-    boolean mLookingForLine = false;
-    public boolean mSawLine = false;
-
-    class InterruptableFollowPath extends FollowPathAction {
-
-        public InterruptableFollowPath(Path path, boolean reversed) {
-            super(path, reversed);
-        }
-
-        @Override
-        public boolean isFinished() {
-            return super.isFinished() || mSawLine;
-        }
-    }
-
-    class SetLookingForLineAction implements Action {
-
-        @Override
-        public boolean isFinished() {
-            return true;
-        }
-
-        @Override
-        public void update() {}
-
-        @Override
-        public void done() {}
-
-        @Override
-        public void start() {
-            mLookingForLine = true;
-        }
-    }
-
-    class LineISR extends InterruptHandlerFunction<Object> {
-        @Override
-        public void interruptFired(int interruptAssertedMask, Object param) {
-            if (mLookingForLine) {
-                mSawLine = true;
-                System.out.println("Got an interrupt! " + mLookingForLine + " : " + getCurrentDistance());
-            }
-        }
-    }
-
-    private void enableIsr() {
-        if (!mUseIsr) {
-            mDrive.getLineSensor().requestInterrupts(new LineISR());
-            mDrive.getLineSensor().enableInterrupts();
-            mUseIsr = true;
-        }
-    }
-
-    @Override
-    public void done() {
-        super.done();
-        if (mUseIsr) {
-            disableIsr();
-        }
-    }
-
-    private void disableIsr() {
-        mUseIsr = false;
-        mDrive.getLineSensor().cancelInterrupts();
-    }
 
     @Override
     protected void routine() throws AutoModeEndedException {
@@ -117,8 +49,6 @@ public class TwoBallRockWallMode extends AutoModeBase {
         return_path.add(new Path.Waypoint(new Translation2d(-100, 0), 25.0));
 
         // Start robot actions
-        enableIsr();
-
         runAction(
                 new ParallelAction(
                         Arrays.asList(new FollowPathAction(new Path(first_path), false),
@@ -133,12 +63,8 @@ public class TwoBallRockWallMode extends AutoModeBase {
         runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));
 
         // Drive back to center line
-        runAction(
-                new ParallelAction(
-                        Arrays.asList(new InterruptableFollowPath(new Path(return_path), true),
-                                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("WatchLine"), new SetLookingForLineAction()))
-                        )));
-
+        runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(return_path), true),
+                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("WatchLine"), new WaitUntilLineAction())))));
 
         // Creep off the line
         RigidTransform2d lineRobotPose = RobotState.getInstance().getLatestOdometricToVehicle().getValue();
@@ -147,7 +73,8 @@ public class TwoBallRockWallMode extends AutoModeBase {
 
         List<Path.Waypoint> creep_path = new ArrayList<>();
         creep_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 20.0));
-        creep_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mCreepDistance, 0), 20.0));
+        creep_path.add(
+                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mCreepDistance, 0), 20.0));
 
         // intake ball
         mSuperstructure.setWantsToRunIntake();
@@ -156,25 +83,21 @@ public class TwoBallRockWallMode extends AutoModeBase {
 
         // Go over defenses again
         List<Path.Waypoint> second_shot_path = new ArrayList<>();
-        second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), mCreepDistance), 85.0));
-        second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive - 15, 0), 85.0, "START_AIM"));
-        second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive, 0), 85.0));
+        second_shot_path
+                .add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), mCreepDistance), 85.0));
+        second_shot_path.add(
+                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive - 15, 0),
+                        85.0, "START_AIM"));
+        second_shot_path.add(new Path.Waypoint(
+                new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive, 0), 85.0));
 
         runAction(new ParallelAction(
-                Arrays.asList(new FollowPathAction(new Path(second_shot_path), false),
-                        new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("START_AIM"), new StartAutoAimingAction()))))
-        );
-
+                Arrays.asList(new FollowPathAction(new Path(second_shot_path), false), new SeriesAction(
+                        Arrays.asList(new WaitForPathMarkerAction("START_AIM"), new StartAutoAimingAction())))));
 
         // Shoot 2nd ball
         runAction(new WaitAction(.5));
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantsToStopIntake();
-
-        disableIsr();
-    }
-
-    private double getCurrentDistance() {
-        return (mDrive.getLeftDistanceInches() + mDrive.getRightDistanceInches()) / 2;
     }
 }

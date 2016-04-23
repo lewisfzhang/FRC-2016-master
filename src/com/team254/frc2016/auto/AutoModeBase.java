@@ -20,7 +20,8 @@ public abstract class AutoModeBase {
         System.out.println("Auto mode done");
     }
 
-    public void done() {}
+    public void done() {
+    }
 
     public void stop() {
         m_active = false;
@@ -44,7 +45,6 @@ public abstract class AutoModeBase {
             action.update();
             long waitTime = (long) (m_update_rate * 1000.0);
             try {
-
                 Thread.sleep(waitTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();

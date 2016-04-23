@@ -32,7 +32,8 @@ public class Superstructure extends Subsystem {
     private enum SystemState {
         REENABLED, // The shooter has just been enabled (and may have previously
                    // been disabled from any state)
-        DEPLOYED_AND_HOMING_HOOD, // The shooter is deployed and the hood is homing
+        DEPLOYED_AND_HOMING_HOOD, // The shooter is deployed and the hood is
+                                  // homing
         STOWED_OR_STOWING, // The shooter is stowed (or stowing)
         UNSTOWING, // The shooter is in the process of unstowing
         LOADING, // The shooter is bringing in the ball
@@ -53,7 +54,7 @@ public class Superstructure extends Subsystem {
         WANT_TO_STOW, // The user wants to stow the shooter
         WANT_TO_AIM, // The user wants to auto aim
         WANT_TO_BATTER, // The user wants to use batter mode
-        WANT_TO_KEEP_SPINNING  // The user wants to keep the wheel spinning
+        WANT_TO_KEEP_SPINNING // The user wants to keep the wheel spinning
     }
 
     /**
@@ -582,7 +583,7 @@ public class Superstructure extends Subsystem {
             return SystemState.DEPLOYED_RETURNING_TO_SAFE;
         }
     }
-    
+
     private synchronized SystemState handleKeepSpinning() {
         mTurret.setDesiredAngle(new Rotation2d());
 
@@ -607,7 +608,7 @@ public class Superstructure extends Subsystem {
         case WANT_TO_STOW: // fallthrough
         default:
             return SystemState.DEPLOYED_RETURNING_TO_SAFE;
-        } 
+        }
     }
 
     private synchronized SystemState handleReturningToSafe(double now, double start_time) {

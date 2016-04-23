@@ -94,17 +94,17 @@ public class Constants extends ConstantsBase {
 
     // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kDriveVelocityKp = 1.0;
+    public static double kDriveVelocityKp = 0.5;
     public static double kDriveVelocityKi = 0.0;
-    public static double kDriveVelocityKd = 6.0;
-    public static double kDriveVelocityKf = 1.0;
+    public static double kDriveVelocityKd = 3.0;
+    public static double kDriveVelocityKf = 0.5;
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0.0;
     public static int kDriveVelocityAllowableError = 0;
 
     // PID gains for drive base lock loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kDriveBaseLockKp = 1.0;
+    public static double kDriveBaseLockKp = 0.5;
     public static double kDriveBaseLockKi = 0;
     public static double kDriveBaseLockKd = 0;
     public static double kDriveBaseLockKf = 0;
@@ -198,7 +198,8 @@ public class Constants extends ConstantsBase {
 
     // DIGITAL IO
     public static final int kHoodEncoderDIO = 9;
-    public static final int kLineSensorDIO = 1;
+    public static final int kLineSensor1DIO = 1;
+    public static final int kLineSensor2DIO = 2;
 
     // PWM
     public static final int kSensorSideServoPWM = 0;
