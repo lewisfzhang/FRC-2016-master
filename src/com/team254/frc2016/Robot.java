@@ -209,6 +209,7 @@ public class Robot extends IterativeRobot {
                             * Constants.kDriveLowGearMaxSpeedInchesPerSec,
                     heading_setpoint);
         } else {
+            mDrive.setBrakeMode(false);
             mDrive.setHighGear(!mControls.getLowGear());
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
         }
