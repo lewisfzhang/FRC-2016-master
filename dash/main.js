@@ -10,6 +10,9 @@ var MIN_PLOT_UPDATE_TIME_MILLIS = 50;
 var TABLE = "/SmartDashboard";
 var SELECTED_AUTO_MODE_KEY = "selected_auto_mode";
 var SELECTED_AUTO_LANE_KEY = "selected_auto_lane";
+var HOOD_TUNING_MODE_KEY = "Hood Tuning Mode";
+var TYPE_STRING = "string";
+var TYPE_BOOL = "bool";
 
 $(document).ready(function() {
 
@@ -19,14 +22,21 @@ $(document).ready(function() {
   initAutoLaneButton($("#autoLane4"), "4");
   initAutoLaneButton($("#autoLane5"), "5");
 
+  $("#enableHoodTuningMode").click(function() { setHoodTuningMode(true); });
+  $("#disableHoodTuningMode").click(function() { setHoodTuningMode(false); });
+  
   kickWebSocket();
   setInterval(kickWebSocket, 1000);
 });
 
 function initAutoLaneButton(autoLaneButton, stringValue) {
   autoLaneButton.click(function() {
-    sendValueUpdate(TABLE, SELECTED_AUTO_LANE_KEY, stringValue);
+    sendValueUpdate(TABLE, SELECTED_AUTO_LANE_KEY, stringValue, TYPE_STRING);
   });
+}
+
+function setHoodTuningMode(enableHoodTuning) {
+  sendValueUpdate(TABLE, HOOD_TUNING_MODE_KEY, enableHoodTuning, TYPE_BOOL);
 }
 
 function kickWebSocket() {
@@ -227,6 +237,10 @@ function refreshDriverStatusElements() {
 
   var airPressureElement = findElementModelOrNull(TABLE, "Air Pressure psi");
   $("#airPressureHolder").text(airPressureElement == null ? "UNKNOWN" : airPressureElement.value);
+
+  var hoodTuningModeElement = findElementModelOrNull(TABLE, HOOD_TUNING_MODE_KEY);
+  $("#hoodTuningModeHolder").text(
+    hoodTuningModeElement == null ? "UNKNOWN" : hoodTuningModeElement.value);
 }
 
 function maybeRefreshAutoOptions() {
@@ -247,7 +261,7 @@ function maybeRefreshAutoOptions() {
     var button = $("<button type='button'>" + options[i] + "</button>");
     (function (mode) {
       button.click(function() {
-        sendValueUpdate(TABLE, SELECTED_AUTO_MODE_KEY, mode);
+        sendValueUpdate(TABLE, SELECTED_AUTO_MODE_KEY, mode, TYPE_STRING);
       });
     })(options[i]);
 
@@ -258,12 +272,12 @@ function maybeRefreshAutoOptions() {
   model.curAutoOptions = options;
 }
 
-function sendValueUpdate(tableName, key, value) {
+function sendValueUpdate(tableName, key, value, type) {
   if (webSocket == null || webSocket.readyState != WebSocket.OPEN) {
     console.error("Can't send update to " + tableName + ", " + key);
     return;
   }
-  webSocket.send(JSON.stringify({"table": tableName, "key": key, "value": value}));
+  webSocket.send(JSON.stringify({"table": tableName, "key": key, "value": value, type: type}));
 }
 
 function arraysEqual(a, b) {
