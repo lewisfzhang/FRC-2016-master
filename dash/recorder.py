@@ -20,15 +20,15 @@ VALUES (?, ?, ?, ?, ?)
 """
 
 SELECT_OLDEST_SEQUENCE_ID_SINCE_SQL = """
-SELECT MIN(sequence_id)
+SELECT MAX(sequence_id)
 FROM logs
-WHERE wall_time_ms >= ? AND table_name = ? AND key = ?
+WHERE wall_time_ms < ? AND table_name = ? AND key = ?
 """
 
 SELECT_LOG_POINTS_SQL = """
 SELECT sequence_id, wall_time_ms, value
 FROM logs
-WHERE sequence_id >= ? AND table_name = ? AND key = ?
+WHERE sequence_id > ? AND table_name = ? AND key = ?
 ORDER BY sequence_id ASC
 """
 
@@ -59,19 +59,16 @@ class RecorderDb:
             (tableName, key, wallTimeMs, valueType, str(value)))
         self._connection.commit()
 
-    def genNumberLogPointsSinceTime(self, startTimeMs, tableName, key):
+    def getStartSequenceIdForTime(self, startTimeMs, tableName, key):
         cursor = self._connection.cursor()
         cursor.execute(
             SELECT_OLDEST_SEQUENCE_ID_SINCE_SQL,
             (startTimeMs, tableName, key))
-        startSequenceId = cursor.fetchone()[0] or 0
-        return self.genNumberLogPointsSinceSequenceId(
-            startSequenceId, tableName, key)
+        return cursor.fetchone()[0] or 0
 
-    def genNumberLogPointsSinceSequenceId(
-            self, startSequenceId, tableName, key):
+    def genNumberLogPoints(self, prevSequenceId, tableName, key):
         cursor = self._connection.cursor()
-        cursor.execute(SELECT_LOG_POINTS_SQL, (startSequenceId, tableName, key))
+        cursor.execute(SELECT_LOG_POINTS_SQL, (prevSequenceId, tableName, key))
         for row in cursor:
             logPoint = LogPoint()
             logPoint.sequenceId = int(row[0])

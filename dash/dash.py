@@ -68,11 +68,9 @@ class DashboardWebSocket(WebSocket):
                     (time.time() - minutesHistory * 60) * 1000
                 activeCharts.add(self)
                 # get all the history the client wants
-                self.sequenceId = 0
-                for logPoint in db.genNumberLogPointsSinceTime(
-                        backfillStartTimestampMs, self.tableName, self.keyName):
-                    self.sequenceId = logPoint.sequenceId
-                    self._sendChartValue(logPoint)
+                self.prevSequenceId = db.getStartSequenceIdForTime(
+                    backfillStartTimestampMs, self.tableName, self.keyName)
+                self.drainChartHistory()
                 print("Opened Chart, table: %s key: %s" % (self.tableName, self.keyName))
         except:
             traceback.print_exc()
@@ -91,15 +89,17 @@ class DashboardWebSocket(WebSocket):
                 table.putString(jsonPayload["key"], jsonPayload["value"])
             elif jsonPayload["type"] == "bool":
                 table.putBoolean(jsonPayload["key"], jsonPayload["value"])
-        except Exception as e:
-            print e
+        except:
+            traceback.print_exc()
 
     def handleClose(self):
         if self.socketType is BRIDGE_TYPE:
-            print("Bridge Closed", self.address)
             activeBridges.remove(self)
+            print("Bridge Closed", self.address)
         elif self.socketType is CHART_TYPE:
+            activeCharts.remove(self)
             print("Chart closed", self.address)
+
 
     def sendBridgeValue(self, tableName, key, value):
         if self.socketType is not BRIDGE_TYPE:
@@ -112,13 +112,20 @@ class DashboardWebSocket(WebSocket):
         jsonString = u"" + json.dumps(jsonPayload)
         self.sendMessage(jsonString)
 
-    def _sendChartValue(self, logPoint):
-        jsonPayload = {}
-        jsonPayload["wall_time_ms"] = logPoint.wallTimeMs
-        jsonPayload["value"] = logPoint.value
-        jsonPayload["sequence_id"] = logPoint.sequenceId
-        jsonString = u"" + json.dumps(jsonPayload)
-        self.sendMessage(jsonString)
+    def drainChartHistory(self):
+        if self.socketType is not CHART_TYPE:
+            print "ignoring drainChartHistory"
+            return
+
+        for logPoint in db.genNumberLogPoints(
+                self.prevSequenceId, self.tableName, self.keyName):
+            self.prevSequenceId = logPoint.sequenceId
+            jsonPayload = {}
+            jsonPayload["wall_time_ms"] = logPoint.wallTimeMs
+            jsonPayload["value"] = logPoint.value
+            jsonPayload["sequence_id"] = logPoint.sequenceId
+            jsonString = u"" + json.dumps(jsonPayload)
+            self.sendMessage(jsonString)
 
 def valueChanged(table, key, value, isNew):
     try:
@@ -126,8 +133,11 @@ def valueChanged(table, key, value, isNew):
         for bridge in activeBridges:
             bridge.sendBridgeValue(table.path, key, value)
         db.addLogPoint(table.path, key, value)
-    except Exception as e:
-        print e
+        for chart in activeCharts:
+            if chart.tableName == table.path and chart.keyName == key:
+                chart.drainChartHistory()
+    except:
+        traceback.print_exc()
 
 
 table.addTableListener(valueChanged)
