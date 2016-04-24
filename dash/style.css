@@ -181,3 +181,8 @@ li {
     width: 200px;
     float: left;
 }
+
+#chartHolder {
+    width: 100%;
+    height: 100%;
+}

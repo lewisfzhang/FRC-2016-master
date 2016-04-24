@@ -139,7 +139,7 @@ function openChartForKey(tableName, key) {
   window.open(
     "chart.html?table=" + encodeURIComponent(tableName)
       + "&key=" + encodeURIComponent(key)
-      + "&history_minutes=10");
+      + "&history_minutes=4");
 }
 
 /**
