@@ -71,6 +71,9 @@ class RecorderDb:
         cursor.execute(SELECT_LOG_POINTS_SQL, (prevSequenceId, tableName, key))
         for row in cursor:
             logPoint = LogPoint()
+            # TODO: I have no idea how the fuck this happens sometimes
+            if len(row) < 3:
+                continue
             logPoint.sequenceId = int(row[0])
             logPoint.wallTimeMs = int(row[1])
             logPoint.value = row[2]

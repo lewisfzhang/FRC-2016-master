@@ -43,6 +43,7 @@ function kickWebSocket() {
       + encodeURIComponent(TABLE) + "/"
       + encodeURIComponent(KEY) + "/"
       + encodeURIComponent(HISTORY_MINUTES) + "/");
+  dataPoints.splice(0);
   webSocket.onmessage = function(evt) {
     console.log(evt.data);
     handlePayloadFromWebSocket(evt.data);
