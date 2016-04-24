@@ -56,3 +56,9 @@ body {
     width: 200px;
     float: left;
 }
+
+button.active {
+    background-color: green;
+    color:white;
+    border-style: none;
+}
