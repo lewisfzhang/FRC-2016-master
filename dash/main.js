@@ -7,9 +7,13 @@ var model = {
 
 var MIN_PLOT_UPDATE_TIME_MILLIS = 50;
 var TABLE = "/SmartDashboard";
+
 var SELECTED_AUTO_MODE_KEY = "selected_auto_mode";
 var SELECTED_AUTO_LANE_KEY = "selected_auto_lane";
 var HOOD_TUNING_MODE_KEY = "Hood Tuning Mode";
+var COLOR_BOX_COLOR_KEY = "color_box_color";
+var COLOR_BOX_TEXT_KEY = "color_box_text";
+
 var TYPE_STRING = "string";
 var TYPE_BOOL = "bool";
 
@@ -146,6 +150,12 @@ function openChartForKey(tableName, key) {
  * Update for the hard-coded keys which we want to show in the driver UI
  */
 function refreshDriverStatusElements() {
+  var colorBoxColorElement = findElementModelOrNull(TABLE, COLOR_BOX_COLOR_KEY);
+  var colorBoxTextElement = findElementModelOrNull(TABLE, COLOR_BOX_TEXT_KEY);
+  $("#colorStateBox")
+    .text(colorBoxTextElement == null ? "UNKNOWN" : colorBoxTextElement.value)
+    .css("background-color", colorBoxColorElement == null ? "orange" : colorBoxColorElement.value);
+
   setBooleanBoxStyle(
     $("#haveBallBox"),
     getBooleanElementValue(TABLE, "have_ball"));

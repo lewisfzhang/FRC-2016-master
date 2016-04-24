@@ -63,7 +63,7 @@ class DashboardWebSocket(WebSocket):
                     return
                 self.tableName = urllib.unquote(m.group(1))
                 self.keyName = urllib.unquote(m.group(2))
-                minutesHistory = int(urllib.unquote(m.group(3)))
+                minutesHistory = float(urllib.unquote(m.group(3)))
                 backfillStartTimestampMs = \
                     (time.time() - minutesHistory * 60) * 1000
                 activeCharts.add(self)

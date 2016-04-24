@@ -17,12 +17,12 @@ body {
 }
 
 .firstPersonViewDiv {
-    width: 500px;
+    height: 375px;
     float: left;
 }
 
 .firstPersonViewImg {
-    width: 100%;
+    height: 100%;
 }
 
 .hudBoxes {
@@ -30,8 +30,8 @@ body {
     float: left;
 }
 
-#haveBallBox {
-    height: 45%;
+#colorBox {
+    height: 375px;
 }
 
 .boolBoxPadding {
@@ -55,9 +55,4 @@ body {
 .extraDataNumbers {
     width: 200px;
     float: left;
-}
-
-#chartHolder {
-    width: 100%;
-    height: 100%;
 }
