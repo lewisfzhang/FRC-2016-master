@@ -192,7 +192,7 @@ public class Robot extends IterativeRobot {
         mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
         mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), mSuperstructure.getTurret().getAngle());
 
-        updateHasBallLight();
+        updateDriverFeedback();
     }
 
     @Override
@@ -302,13 +302,13 @@ public class Robot extends IterativeRobot {
         }
 
         outputAllToSmartDashboard();
-        updateHasBallLight();
+        updateDriverFeedback();
     }
 
     @Override
     public void autonomousPeriodic() {
         outputAllToSmartDashboard();
-        updateHasBallLight();
+        updateDriverFeedback();
     }
 
     private void maybeResetUtilityArmState() {
@@ -318,7 +318,18 @@ public class Robot extends IterativeRobot {
         mSmartDashboardInteractions.clearUtilityArmResetState();
     }
 
-    private void updateHasBallLight() {
-        mHasBallLightOutput.set(mSuperstructure.getIntake().hasBall());
+    private static final String COLOR_BOX_COLOR_KEY = "color_box_color";
+    private static final String COLOR_BOX_TEXT_KEY = "color_box_text";
+
+    private void updateDriverFeedback() {
+        boolean hasBall = mSuperstructure.getIntake().hasBall();
+        mHasBallLightOutput.set(hasBall);
+        if (hasBall) {
+            SmartDashboard.putString(COLOR_BOX_COLOR_KEY, "#00ff00");
+            SmartDashboard.putString(COLOR_BOX_TEXT_KEY, "HAVE BALL");
+        } else {
+            SmartDashboard.putString(COLOR_BOX_COLOR_KEY, "#ff0000");
+            SmartDashboard.putString(COLOR_BOX_TEXT_KEY, "NO BALL");
+        }
     }
 }

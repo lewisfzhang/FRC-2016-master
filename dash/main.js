@@ -152,7 +152,7 @@ function openChartForKey(tableName, key) {
 function refreshDriverStatusElements() {
   var colorBoxColorElement = findElementModelOrNull(TABLE, COLOR_BOX_COLOR_KEY);
   var colorBoxTextElement = findElementModelOrNull(TABLE, COLOR_BOX_TEXT_KEY);
-  $("#colorStateBox")
+  $("#colorBox")
     .text(colorBoxTextElement == null ? "UNKNOWN" : colorBoxTextElement.value)
     .css("background-color", colorBoxColorElement == null ? "orange" : colorBoxColorElement.value);
 
