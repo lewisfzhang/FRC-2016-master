@@ -134,9 +134,8 @@ def valueChanged(table, key, value, isNew):
         clientInitMessages[(table, key)] = (table.path, key, value)
         for bridge in activeBridges:
             bridge.sendBridgeValue(table.path, key, value)
-        if table.writerDb is None:
-            table.writerDb = recorder.RecorderDb()
-        table.writerDb.addLogPoint(table.path, key, value)
+        db = recorder.RecorderDb()
+        db.addLogPoint(table.path, key, value)
         for chart in activeCharts:
             if chart.tableName == table.path and chart.keyName == key:
                 chart.drainChartHistory()
