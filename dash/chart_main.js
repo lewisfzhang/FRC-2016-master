@@ -7,7 +7,7 @@ var HISTORY_MINUTES;
 $(document).ready(function() {
   TABLE = url("?table");
   KEY = url("?key");
-  HISTORY_MINUTES = url("?history") || "0";
+  HISTORY_MINUTES = url("?history_minutes") || "0";
 
   kickWebSocket();
   setInterval(kickWebSocket, 1000);
