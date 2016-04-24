@@ -2,6 +2,7 @@ import signal
 import sys
 import time
 import json
+import recorder
 
 sys.path.append("pynetworktables-2015.3.2-py2.7.egg")
 from networktables import NetworkTable
@@ -12,6 +13,9 @@ from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 if len(sys.argv) != 2:
     print("Error: specify a Network Table IP to connect to!")
     exit(-1)
+
+print "Opening recorder"
+db = recorder.RecorderDb()
 
 ip = sys.argv[1]
 print("Connecting to ip: %s" % ip)
@@ -68,9 +72,13 @@ class BridgeServer(WebSocket):
         self.sendMessage(jsonString)
 
 def valueChanged(table, key, value, isNew):
-    clientInitMessages[(table, key)] = (table.path, key, value)
-    for bridge in activeBridges:
-        bridge.sendValue(table.path, key, value)
+    try:
+        clientInitMessages[(table, key)] = (table.path, key, value)
+        for bridge in activeBridges:
+            bridge.sendValue(table.path, key, value)
+        db.addLogPoint(table.path, key, value)
+    except Exception as e:
+        print e
 
 
 table.addTableListener(valueChanged)
