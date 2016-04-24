@@ -167,6 +167,16 @@ function refreshDriverStatusElements() {
   $("#selectedAutoLane").text(
     autoLaneElement == null ? "UNKNOWN" : ("Lane " + autoLaneElement.value));
 
+  $(".laneSelector div button").each(function(){
+    if (this.id == "autoLane" + autoLaneElement.value) {
+      this.className = "active"
+    } else {
+      this.className = ""
+    }
+  })
+
+
+
   var airPressureElement = findElementModelOrNull(TABLE, "Air Pressure psi");
   $("#airPressureHolder").text(airPressureElement == null ? "UNKNOWN" : airPressureElement.value);
 
@@ -227,8 +237,20 @@ function arraysEqual(a, b) {
 function refreshAutoMode() {
   var selectedModeElement = findElementModelOrNull(TABLE, SELECTED_AUTO_MODE_KEY);
 
+  var didFindAutoInList = false;
+  var buttons = $("#autoSelectorContainer div button")
+  for (button in buttons) {
+    if (buttons[button].innerHTML == selectedModeElement.value) {
+      buttons[button].className = "active"
+      didFindAutoInList = true;
+    } else {
+      buttons[button].className = ""
+    }
+  }
+
   $("#selectedAutoMode").text(
-    selectedModeElement == null ? "UNKNOWN" : selectedModeElement.value);
+    selectedModeElement == null ? "UNKNOWN" : ((didFindAutoInList)? selectedModeElement.value : "<span color=\"red\">" + selectedModeElement.value + "</span>"));
+
 }
 
 function getBooleanElementValue(table, key) {
