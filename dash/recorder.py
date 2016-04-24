@@ -40,11 +40,12 @@ class LogPoint:
     None
 
 class RecorderDb:
-    def __init__(self):
-        self._connection = sqlite3.connect(DB_FILENAME, check_same_thread=False)
-        cursor = self._connection.cursor()
-        cursor.execute(CREATE_TABLE_SQL)
-        self._connection.commit()
+    def __init__(self, ensureTable=False):
+        self._connection = sqlite3.connect(DB_FILENAME, check_same_thread=True)
+        if ensureTable:
+            cursor = self._connection.cursor()
+            cursor.execute(CREATE_TABLE_SQL)
+            self._connection.commit()
 
     def addLogPoint(self, tableName, key, value):
         wallTimeMs = int(time.time() * 1000)
@@ -64,7 +65,7 @@ class RecorderDb:
         cursor.execute(
             SELECT_OLDEST_SEQUENCE_ID_SINCE_SQL,
             (startTimeMs, tableName, key))
-        return cursor.fetchone()[0] or 0
+        return int(cursor.fetchone()[0]) or 0
 
     def genNumberLogPoints(self, prevSequenceId, tableName, key):
         cursor = self._connection.cursor()

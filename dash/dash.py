@@ -18,11 +18,10 @@ if len(sys.argv) != 2:
     print("Error: specify a Network Table IP to connect to!")
     exit(-1)
 
-print "Opening recorder"
-db = recorder.RecorderDb()
-
 ip = sys.argv[1]
 print("Connecting to ip: %s" % ip)
+
+ensureDb = recorder.RecorderDb(True)
 
 NetworkTable.setClientMode()
 NetworkTable.setIPAddress(ip)
@@ -68,8 +67,11 @@ class DashboardWebSocket(WebSocket):
                     (time.time() - minutesHistory * 60) * 1000
                 activeCharts.add(self)
                 # get all the history the client wants
-                self.prevSequenceId = db.getStartSequenceIdForTime(
-                    backfillStartTimestampMs, self.tableName, self.keyName)
+                self.prevSequenceId = \
+                    recorder.RecorderDb().getStartSequenceIdForTime(
+                        backfillStartTimestampMs,
+                        self.tableName,
+                        self.keyName)
                 self.drainChartHistory()
                 print("Opened Chart, table: %s key: %s" % (self.tableName, self.keyName))
         except:
@@ -117,7 +119,7 @@ class DashboardWebSocket(WebSocket):
             print "ignoring drainChartHistory"
             return
 
-        for logPoint in db.genNumberLogPoints(
+        for logPoint in recorder.RecorderDb().genNumberLogPoints(
                 self.prevSequenceId, self.tableName, self.keyName):
             self.prevSequenceId = logPoint.sequenceId
             jsonPayload = {}
@@ -132,14 +134,16 @@ def valueChanged(table, key, value, isNew):
         clientInitMessages[(table, key)] = (table.path, key, value)
         for bridge in activeBridges:
             bridge.sendBridgeValue(table.path, key, value)
-        db.addLogPoint(table.path, key, value)
+        if table.writerDb is None:
+            table.writerDb = recorder.RecorderDb()
+        table.writerDb.addLogPoint(table.path, key, value)
         for chart in activeCharts:
             if chart.tableName == table.path and chart.keyName == key:
                 chart.drainChartHistory()
     except:
         traceback.print_exc()
 
-
+table.writerDb = None
 table.addTableListener(valueChanged)
 
 server = SimpleWebSocketServer("", 8000, DashboardWebSocket)
