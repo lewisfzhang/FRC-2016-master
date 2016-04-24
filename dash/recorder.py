@@ -36,6 +36,9 @@ TYPE_NAME_BOOL = "bool"
 TYPE_NAME_NUMBER = "number"
 TYPE_NAME_STRING = "string"
 
+class LogPoint:
+    None
+
 class RecorderDb:
     def __init__(self):
         self._connection = sqlite3.connect(DB_FILENAME, check_same_thread=False)
@@ -61,8 +64,8 @@ class RecorderDb:
         cursor.execute(
             SELECT_OLDEST_SEQUENCE_ID_SINCE_SQL,
             (startTimeMs, tableName, key))
-        startSequenceId = cursor()[0]
-        return genNumberLogPointsSinceSequenceId(
+        startSequenceId = cursor.fetchone()[0] or 0
+        return self.genNumberLogPointsSinceSequenceId(
             startSequenceId, tableName, key)
 
     def genNumberLogPointsSinceSequenceId(
@@ -70,8 +73,8 @@ class RecorderDb:
         cursor = self._connection.cursor()
         cursor.execute(SELECT_LOG_POINTS_SQL, (startSequenceId, tableName, key))
         for row in cursor:
-            logPoint = {}
-            logPoint["sequence_id"] = row[0]
-            logPoint["wall_time_ms"] = row[1]
-            logPoint["value"] = row[2]
+            logPoint = LogPoint()
+            logPoint.sequenceId = int(row[0])
+            logPoint.wallTimeMs = int(row[1])
+            logPoint.value = row[2]
             yield logPoint

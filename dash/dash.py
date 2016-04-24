@@ -3,6 +3,10 @@ import sys
 import time
 import json
 import recorder
+import re
+import urllib
+import time
+import traceback
 
 sys.path.append("pynetworktables-2015.3.2-py2.7.egg")
 from networktables import NetworkTable
@@ -37,16 +41,47 @@ tableConnectionListener = TableConnectionListener()
 table.addConnectionListener(tableConnectionListener)
 
 activeBridges = set()
+activeCharts = set()
 clientInitMessages = {}
-class BridgeServer(WebSocket):
+BRIDGE_TYPE = 'bridge'
+CHART_TYPE = 'chart'
+class DashboardWebSocket(WebSocket):
     def handleConnected(self):
-        print("Connected", self.address)
-        activeBridges.add(self)
-        for _, (tableName, key, value) in clientInitMessages.iteritems():
-            self.sendValue(tableName, key, value)
+        try:
+            print("Connected", self.address, self.request.path)
+            if self.request.path == '/':
+                self.socketType = BRIDGE_TYPE
+                activeBridges.add(self)
+                for _, (tableName, key, value) in clientInitMessages.iteritems():
+                    self.sendBridgeValue(tableName, key, value)
+            elif self.request.path.startswith('/chart/'):
+                self.socketType = CHART_TYPE
+                m = re.match(
+                    r"^/chart/(.+)/(.+)/(.+)/$", self.request.path)
+                if not m:
+                    print("Invalid chart uri: ", self.request.path)
+                    return
+                self.tableName = urllib.unquote(m.group(1))
+                self.keyName = urllib.unquote(m.group(2))
+                minutesHistory = int(urllib.unquote(m.group(3)))
+                backfillStartTimestampMs = \
+                    (time.time() - minutesHistory * 60) * 1000
+                activeCharts.add(self)
+                # get all the history the client wants
+                self.sequenceId = 0
+                for logPoint in db.genNumberLogPointsSinceTime(
+                        backfillStartTimestampMs, self.tableName, self.keyName):
+                    self.sequenceId = logPoint.sequenceId
+                    self._sendChartValue(logPoint)
+                print("Opened Chart, table: %s key: %s" % (self.tableName, self.keyName))
+        except:
+            traceback.print_exc()
 
     def handleMessage(self):
         print("Got Message:", self.data)
+        if self.socketType is not BRIDGE_TYPE:
+            print "ignoring message"
+            return
         try:
             jsonPayload = json.loads(self.data)
             if jsonPayload["table"] != table.path:
@@ -60,10 +95,16 @@ class BridgeServer(WebSocket):
             print e
 
     def handleClose(self):
-        print("Closed", self.address)
-        activeBridges.remove(self)
+        if self.socketType is BRIDGE_TYPE:
+            print("Bridge Closed", self.address)
+            activeBridges.remove(self)
+        elif self.socketType is CHART_TYPE:
+            print("Chart closed", self.address)
 
-    def sendValue(self, tableName, key, value):
+    def sendBridgeValue(self, tableName, key, value):
+        if self.socketType is not BRIDGE_TYPE:
+            print "ignoring sendBridgeValue"
+            return
         jsonPayload = {}
         jsonPayload["table"] = tableName
         jsonPayload["key"] = key
@@ -71,11 +112,19 @@ class BridgeServer(WebSocket):
         jsonString = u"" + json.dumps(jsonPayload)
         self.sendMessage(jsonString)
 
+    def _sendChartValue(self, logPoint):
+        jsonPayload = {}
+        jsonPayload["wall_time_ms"] = logPoint.wallTimeMs
+        jsonPayload["value"] = logPoint.value
+        jsonPayload["sequence_id"] = logPoint.sequenceId
+        jsonString = u"" + json.dumps(jsonPayload)
+        self.sendMessage(jsonString)
+
 def valueChanged(table, key, value, isNew):
     try:
         clientInitMessages[(table, key)] = (table.path, key, value)
         for bridge in activeBridges:
-            bridge.sendValue(table.path, key, value)
+            bridge.sendBridgeValue(table.path, key, value)
         db.addLogPoint(table.path, key, value)
     except Exception as e:
         print e
@@ -83,7 +132,7 @@ def valueChanged(table, key, value, isNew):
 
 table.addTableListener(valueChanged)
 
-server = SimpleWebSocketServer("", 8000, BridgeServer)
+server = SimpleWebSocketServer("", 8000, DashboardWebSocket)
 
 def close_sig_handler(signal, frame):
     server.close()
