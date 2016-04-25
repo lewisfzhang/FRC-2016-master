@@ -41,10 +41,6 @@ public class AdaptivePurePursuitController {
         if (this.isDone()) {
             return new RigidTransform2d.Delta(0, 0, 0);
         }
-        System.out.println(
-         "Remaining path length: " + mPath.getRemainingLength()
-         + ", robot pose " + robot_pose
-         + ", distance from path " + distance_from_path);
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
         Optional<Circle> circle = joinPath(pose, lookahead_point.translation);
