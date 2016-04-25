@@ -17,19 +17,19 @@ public class Constants extends ConstantsBase {
     public static double kCameraXOffset = -6.454;
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 19.75;
-    public static double kCameraPitchAngleDegrees = 33.67;
-    public static double kCameraYawAngleDegrees = -0.5;
+    public static double kCameraPitchAngleDegrees = 35.75; // calibrated 4/22
+    public static double kCameraYawAngleDegrees = -1.0;
     public static double kCameraDeadband = 0.01;
 
     // Wheels
-    public static double kDriveWheelDiameterInches = 7.07; // Measured on
-                                                           // 4/5/2016
+    public static double kDriveWheelDiameterInches = 7.3; // Measured on
+                                                          // 4/23/2016
     public static double kTrackLengthInches = 8.265;
     public static double kTrackWidthInches = 23.8;
     public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
             + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
-    public static double kTrackScrubFactor = .5; // Should be <= 1.0...tune
-                                                 // experimentally
+    public static double kTrackScrubFactor = 0.5; // Should be <= 1.0...tune
+                                                  // experimentally
 
     // Drive constants
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
@@ -54,7 +54,7 @@ public class Constants extends ConstantsBase {
 
     // Flywheel constants
     public static double kFlywheelOnTargetTolerance = 100.0;
-    public static double kFlywheelGoodBallRpmSetpoint = 5800.0;
+    public static double kFlywheelGoodBallRpmSetpoint = 6200.0;
     public static double kFlywheelBadBallRpmSetpoint = kFlywheelGoodBallRpmSetpoint;
 
     // Auto aiming/shooter constants
@@ -94,9 +94,9 @@ public class Constants extends ConstantsBase {
 
     // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kDriveVelocityKp = 0.5;
+    public static double kDriveVelocityKp = 1.0;
     public static double kDriveVelocityKi = 0.0;
-    public static double kDriveVelocityKd = 3.0;
+    public static double kDriveVelocityKd = 6.0;
     public static double kDriveVelocityKf = 0.5;
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0.0;
@@ -120,9 +120,9 @@ public class Constants extends ConstantsBase {
     public static double kDriveHeadingVelocityKd = 50.0;
 
     // Path following constants
-    public static double kPathFollowingLookahead = 30.0; // inches
-    public static double kPathFollowingMaxVel = 84.0; // inches/sec
-    public static double kPathFollowingMaxAccel = 65.0; // inches/sec^2
+    public static double kPathFollowingLookahead = 24.0; // inches
+    public static double kPathFollowingMaxVel = 120.0; // inches/sec
+    public static double kPathFollowingMaxAccel = 80.0; // inches/sec^2
 
     // PID gains for turret position loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
@@ -133,6 +133,17 @@ public class Constants extends ConstantsBase {
     public static int kTurretIZone = (int) (1023.0 / kTurretKp);
     public static double kTurretRampRate = 0;
     public static int kTurretAllowableError = 100;
+
+    // PID gains for intake current loop
+    // Units: error is mA. Max output is +/- 1023 units.
+    public static double kIntakeTargetCurrent = 20.0; // Amps
+    public static double kIntakeKp = 0.04;
+    public static double kIntakeKi = 0.0;
+    public static double kIntakeKd = 0.0;
+    public static double kIntakeKf = 0.0175;
+    public static int kIntakeIZone = (int) (1023.0 / kIntakeKp);
+    public static double kIntakeRampRate = 0;
+    public static int kIntakeAllowableError = 0;
 
     // PID gains for flywheel velocity loop
     // Units: error is (4096 counts/rev)/100ms. Max output is +/- 1023 units.
@@ -216,23 +227,54 @@ public class Constants extends ConstantsBase {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
-        kHoodAutoAimMap.put(new InterpolatingDouble(62.0), new InterpolatingDouble(42.5));
-        kHoodAutoAimMap.put(new InterpolatingDouble(67.0), new InterpolatingDouble(42.5));
-        kHoodAutoAimMap.put(new InterpolatingDouble(77.0), new InterpolatingDouble(44.8));
-        kHoodAutoAimMap.put(new InterpolatingDouble(85.0), new InterpolatingDouble(48.0));
-        kHoodAutoAimMap.put(new InterpolatingDouble(92.0), new InterpolatingDouble(50.0));
-        kHoodAutoAimMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(51.0));
-        kHoodAutoAimMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(53.0));
-        kHoodAutoAimMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(54.5));
-        kHoodAutoAimMap.put(new InterpolatingDouble(140.0), new InterpolatingDouble(56.0));
-        kHoodAutoAimMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(57.0));
-        kHoodAutoAimMap.put(new InterpolatingDouble(168.0), new InterpolatingDouble(57.5));
+        /*
+         * Tune 4/23 with 5600 rpm setpoint at 75 and above, 5800 at 70 and
+         * below kHoodAutoAimMap.put(new InterpolatingDouble(70.0), new
+         * InterpolatingDouble(42.5)); kHoodAutoAimMap.put(new
+         * InterpolatingDouble(75.0), new InterpolatingDouble(43.5));
+         * kHoodAutoAimMap.put(new InterpolatingDouble(80.0), new
+         * InterpolatingDouble(45.0)); kHoodAutoAimMap.put(new
+         * InterpolatingDouble(85.0), new InterpolatingDouble(46.5));
+         * kHoodAutoAimMap.put(new InterpolatingDouble(90.0), new
+         * InterpolatingDouble(48.5)); kHoodAutoAimMap.put(new
+         * InterpolatingDouble(100.0), new InterpolatingDouble(50.0));
+         * kHoodAutoAimMap.put(new InterpolatingDouble(110.0), new
+         * InterpolatingDouble(52.0)); kHoodAutoAimMap.put(new
+         * InterpolatingDouble(120.0), new InterpolatingDouble(53.25));
+         * kHoodAutoAimMap.put(new InterpolatingDouble(130.0), new
+         * InterpolatingDouble(54.0)); kHoodAutoAimMap.put(new
+         * InterpolatingDouble(140.0), new InterpolatingDouble(54.25));
+         * kHoodAutoAimMap.put(new InterpolatingDouble(150.0), new
+         * InterpolatingDouble(54.5)); kHoodAutoAimMap.put(new
+         * InterpolatingDouble(160.0), new InterpolatingDouble(55.0));
+         */
+
+        /* Tune 4/23 with 6200 rpm setpoint */
+        kHoodAutoAimMap.put(new InterpolatingDouble(60.0), new InterpolatingDouble(42.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(70.0), new InterpolatingDouble(44.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(75.0), new InterpolatingDouble(46.8));
+        kHoodAutoAimMap.put(new InterpolatingDouble(80.0), new InterpolatingDouble(48.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(85.0), new InterpolatingDouble(49.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(90.0), new InterpolatingDouble(50.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(52.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(54.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(120.0), new InterpolatingDouble(56.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(57.8));
+        kHoodAutoAimMap.put(new InterpolatingDouble(140.0), new InterpolatingDouble(59.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(150.0), new InterpolatingDouble(59.8));
+        kHoodAutoAimMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(60.5));
+        kHoodAutoAimMap.put(new InterpolatingDouble(170.0), new InterpolatingDouble(61.0));
+        kHoodAutoAimMap.put(new InterpolatingDouble(180.0), new InterpolatingDouble(61.5));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
-        kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMinRange),
+        /*
+         * kFlywheelAutoAimMap.put(new InterpolatingDouble(70.0), new
+         * InterpolatingDouble(5800.0));
+         */
+        kFlywheelAutoAimMap.put(new InterpolatingDouble(75.0),
                 new InterpolatingDouble(Constants.kFlywheelGoodBallRpmSetpoint));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMaxRange),
                 new InterpolatingDouble(Constants.kFlywheelGoodBallRpmSetpoint));

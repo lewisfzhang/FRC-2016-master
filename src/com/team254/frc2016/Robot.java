@@ -119,6 +119,7 @@ public class Robot extends IterativeRobot {
         VisionServer.getInstance().setUseVisionMode();
 
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+        mDrive.setBrakeMode(true);
         // Stop all actuators
         stopAll();
     }
@@ -135,8 +136,9 @@ public class Robot extends IterativeRobot {
         // Reset all sensors
         zeroAllSensors();
 
-        // Shift to low
-        mDrive.setHighGear(false);
+        // Shift to high
+        mDrive.setHighGear(true);
+        mDrive.setBrakeMode(true);
         mSuperstructure.setTuningMode(false);
 
         maybeResetUtilityArmState();
@@ -168,10 +170,13 @@ public class Robot extends IterativeRobot {
         mDisabledLooper.stop();
         mEnabledLooper.start();
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+        mDrive.setBrakeMode(false);
 
         VisionServer.getInstance().setUseVisionMode();
 
         mGetDown = false;
+        mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_DEPLOY);
+        mSuperstructure.stowIntake();
 
         mDiddlerServo.set(0);
     }
@@ -276,9 +281,9 @@ public class Robot extends IterativeRobot {
         if (mHoodTuningMode) {
             mSuperstructure.setTuningMode(true);
             if (mControls.getHoodTuningPositiveButton()) {
-                mSuperstructure.setHoodManualScanOutput(0.1);
+                mSuperstructure.setHoodManualScanOutput(0.05);
             } else if (mControls.getHoodTuningNegativeButton()) {
-                mSuperstructure.setHoodManualScanOutput(-0.1);
+                mSuperstructure.setHoodManualScanOutput(-0.05);
             } else {
                 mSuperstructure.setHoodManualScanOutput(0.0);
             }

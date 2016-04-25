@@ -16,8 +16,16 @@ public class Intake extends Subsystem {
 
     Intake() {
         intake_talon_ = new CANTalon(Constants.kIntakeTalonId);
-        intake_talon_.changeControlMode(TalonControlMode.PercentVbus);
+        // intake_talon_.changeControlMode(TalonControlMode.PercentVbus);
         intake_talon_.enableBrakeMode(false);
+
+        intake_talon_.setPID(Constants.kIntakeKp, Constants.kIntakeKi, Constants.kIntakeKd, Constants.kIntakeKf,
+                Constants.kIntakeIZone, Constants.kIntakeRampRate, 0);
+        intake_talon_.setProfile(0);
+        intake_talon_.reverseSensor(false);
+        intake_talon_.reverseOutput(false);
+        intake_talon_.changeControlMode(TalonControlMode.Current);
+
         fixed_talon_ = new CANTalon(Constants.kFixedRollerTalonId);
         fixed_talon_.changeControlMode(TalonControlMode.PercentVbus);
         fixed_talon_.enableBrakeMode(false);
@@ -29,9 +37,9 @@ public class Intake extends Subsystem {
     public synchronized void setIntakeRoller(double outer_power, double fixed_power) {
         boolean has_ball = hasBall();
         if (has_ball) {
-            intake_talon_.set(Math.max(-outer_power, 0));
+            intake_talon_.set(Math.max(-outer_power * Constants.kIntakeTargetCurrent, 0));
         } else {
-            intake_talon_.set(-outer_power);
+            intake_talon_.set(-outer_power * Constants.kIntakeTargetCurrent);
         }
         fixed_talon_.set(-fixed_power);
     }
@@ -55,6 +63,7 @@ public class Intake extends Subsystem {
         double voltage = have_ball_sensor_.getAverageVoltage();
         SmartDashboard.putBoolean("have_ball", hasBall());
         SmartDashboard.putNumber("have_ball_voltage", voltage);
+        SmartDashboard.putNumber("intake_current", intake_talon_.getOutputCurrent());
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.frc2016.subsystems.Superstructure;
+import com.team254.frc2016.subsystems.Superstructure.WantedState;
 import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.RigidTransform2d;
@@ -22,39 +23,34 @@ public class TwoBallRockWallMode extends AutoModeBase {
     Drive mDrive = Drive.getInstance();
     Superstructure mSuperstructure = Superstructure.getInstance();
 
-    public static final double DISTANCE_TO_DROP_ARM = 70;
-    public static final double DISTANCE_TO_SLOW_OVER_BUMP = 95;
-    public static final double DISTANCE_TO_SPEED_UP_AGAIN = 110;
-    public double mDistanceToDrive = 162;
+    public static final double DISTANCE_TO_DROP_ARM = 130;
+    public static final double DISTANCE_TO_SLOW_DOWN = 40;
+    public static final double DISTANCE_TO_START_AIMING = 150;
+    public static final double TOTAL_DISTANCE_TO_DRIVE = 170;
 
     @Override
     protected void routine() throws AutoModeEndedException {
         // Make paths
-        List<Path.Waypoint> go_to_line_path = new ArrayList<>();
-        go_to_line_path.add(new Path.Waypoint(new Translation2d(0, 0), 25.0));
-        go_to_line_path.add(new Path.Waypoint(new Translation2d(-50, 0), 25.0));
-
         List<Path.Waypoint> first_path = new ArrayList<>();
-        first_path.add(new Path.Waypoint(new Translation2d(0, 0), 84.0));
-        first_path.add(new Path.Waypoint(new Translation2d(45, 0), 52.0));
-        first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_DROP_ARM, 0), 52.0, "DropArm"));
-        first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_SLOW_OVER_BUMP, 0), 36.0));
-        first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_SPEED_UP_AGAIN, 0), 80.0));
-        first_path.add(new Path.Waypoint(new Translation2d(mDistanceToDrive, 0), 80.0));
+        first_path.add(new Path.Waypoint(new Translation2d(0, 0), 120.0));
+        first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_SLOW_DOWN, 0), 60.0));
+        first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_DROP_ARM, 0), 120.0, "DropArm"));
+        first_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_START_AIMING, 0), 120.0, "START_AIM"));
+        first_path.add(new Path.Waypoint(new Translation2d(TOTAL_DISTANCE_TO_DRIVE, 0), 120.0));
 
         List<Path.Waypoint> return_path = new ArrayList<>();
-        return_path.add(new Path.Waypoint(new Translation2d(mDistanceToDrive, 0), 55.0));
-        return_path.add(new Path.Waypoint(new Translation2d(15, 0), 54.0, "WatchLine"));
-        return_path.add(new Path.Waypoint(new Translation2d(6, 0), 25.0));
+        return_path.add(new Path.Waypoint(new Translation2d(TOTAL_DISTANCE_TO_DRIVE, 0), 120.0));
+        return_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_DROP_ARM + 10, 0), 60.0));
+        return_path.add(new Path.Waypoint(new Translation2d(48, 0), 60.0, "WatchLine"));
+        return_path.add(new Path.Waypoint(new Translation2d(24, 0), 25.0));
         return_path.add(new Path.Waypoint(new Translation2d(-100, 0), 25.0));
 
         // Start robot actions
-        runAction(
-                new ParallelAction(
-                        Arrays.asList(new FollowPathAction(new Path(first_path), false),
-                                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("DropArm"),
-                                        new SetArmModeAction(UtilityArm.WantedState.LOW_BAR),
-                                        new StartAutoAimingAction())))));
+        mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_KEEP_SPINNING);
+        runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(first_path), false),
+                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("DropArm"),
+                        new SetArmModeAction(UtilityArm.WantedState.LOW_BAR), new WaitForPathMarkerAction("START_AIM"),
+                        new StartAutoAimingAction())))));
 
         // Shoot ball
         runAction(new WaitAction(.5));
@@ -83,13 +79,17 @@ public class TwoBallRockWallMode extends AutoModeBase {
 
         // Go over defenses again
         List<Path.Waypoint> second_shot_path = new ArrayList<>();
-        second_shot_path
-                .add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), mCreepDistance), 85.0));
         second_shot_path.add(
-                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive - 15, 0),
-                        85.0, "START_AIM"));
+                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mCreepDistance, 0), 120.0));
         second_shot_path.add(new Path.Waypoint(
-                new Translation2d(lineRobotPose.getTranslation().getX() + mDistanceToDrive, 0), 85.0));
+                new Translation2d(DISTANCE_TO_SLOW_DOWN + lineRobotPose.getTranslation().getX(), 0), 60.0));
+        second_shot_path.add(new Path.Waypoint(
+                new Translation2d(DISTANCE_TO_DROP_ARM + lineRobotPose.getTranslation().getX(), 0), 120.0, "DropArm"));
+        second_shot_path.add(new Path.Waypoint(
+                new Translation2d(DISTANCE_TO_START_AIMING + lineRobotPose.getTranslation().getX(), 0), 120.0,
+                "START_AIM"));
+        second_shot_path.add(new Path.Waypoint(
+                new Translation2d(TOTAL_DISTANCE_TO_DRIVE + lineRobotPose.getTranslation().getX(), 0), 120.0));
 
         runAction(new ParallelAction(
                 Arrays.asList(new FollowPathAction(new Path(second_shot_path), false), new SeriesAction(
@@ -98,6 +98,7 @@ public class TwoBallRockWallMode extends AutoModeBase {
         // Shoot 2nd ball
         runAction(new WaitAction(.5));
         runAction(new ShootWhenReadyAction());
+        mSuperstructure.setWantedState(WantedState.WANT_TO_DEPLOY);
         mSuperstructure.setWantsToStopIntake();
     }
 }

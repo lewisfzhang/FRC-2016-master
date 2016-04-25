@@ -9,15 +9,17 @@ public class FollowPathAction implements Action {
 
     private Path mPath;
     private boolean mReversed;
+    private boolean mHasStarted;
 
     public FollowPathAction(Path path, boolean reversed) {
         mPath = path;
         mReversed = reversed;
+        mHasStarted = false;
     }
 
     @Override
     public boolean isFinished() {
-        boolean done = mDrive.isFinishedPath();
+        boolean done = mDrive.isFinishedPath() && mHasStarted;
         if (done) {
             System.out.println("Finished path");
         }
@@ -26,6 +28,7 @@ public class FollowPathAction implements Action {
 
     @Override
     public void update() {
+        mHasStarted = true;
     }
 
     @Override

@@ -85,6 +85,9 @@ public class Drive extends Subsystem {
                     return;
                 case PATH_FOLLOWING_CONTROL:
                     updatePathFollower();
+                    if (isFinishedPath()) {
+                        stop();
+                    }
                     break;
                 default:
                     System.out.println("WTF: unexpected drive control state: " + driveControlState_);
@@ -110,7 +113,7 @@ public class Drive extends Subsystem {
         setHighGear(true);
         gyro_ = new ADXRS453_Gyro();
         lineSensor1_ = new DigitalInput(Constants.kLineSensor1DIO);
-        lineSensor2_ = new DigitalInput(Constants.kLineSensor1DIO);
+        lineSensor2_ = new DigitalInput(Constants.kLineSensor2DIO);
         lineSensorCounter1_ = new Counter(lineSensor1_);
         lineSensorCounter2_ = new Counter(lineSensor2_);
 

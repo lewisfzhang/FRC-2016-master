@@ -3,10 +3,15 @@ package com.team254.frc2016;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.FollowPathAction;
+import com.team254.frc2016.auto.actions.GetLowAction;
+import com.team254.frc2016.auto.actions.ParallelAction;
+import com.team254.frc2016.auto.actions.WaitAction;
 import com.team254.frc2016.auto.modes.*;
+import com.team254.frc2016.subsystems.ShooterAimingParameters;
 import com.team254.frc2016.subsystems.Superstructure;
-import com.team254.frc2016.subsystems.UtilityArm;
+import com.team254.frc2016.subsystems.Superstructure.WantedState;
 import com.team254.lib.util.Path;
+import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Path.Waypoint;
 import com.team254.lib.util.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -14,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.json.simple.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Controls the interactive elements of smartdashboard.
@@ -91,12 +97,16 @@ public class SmartDashboardInteractions {
     enum AutonOption {
         STAY_HIGH_ONE_BALL_DRIVE_BACK("No Drop Drive Back"), //
         STAY_HIGH_ONE_BALL("No Drop Stay"), //
-        GET_LOW_ONE_BALL("Portcullis"), //
+        GET_LOW_ONE_BALL("Portcullis - STOP"), //
+        GET_LOW_COME_BACK_LEFT("Portcullis - Come back left"), //
+        GET_LOW_COME_BACK_RIGHT("Portcullis - Come back right"), //
         CDF_ONE_BALL("CDF - Stop"), //
         CDF_COME_BACK_LEFT("CDF - Come back left"), //
         CDF_COME_BACK_RIGHT("CDF - Come back right"), //
-        TWO_BALL("Two Ball Low Bar"), //
-        STAND_STILL("Stand Still"), DRIVE_5_FEET("Drive 5 Feet"), TWO_BALL_ROCK_WALL_MODE("Two Ball Rock Wall");
+        TWO_BALL("Low Bar - Two Ball"), //
+        TWO_BALL_ROCK_WALL_MODE("Class B/D - Two Ball"), //
+        STAND_STILL("Stand Still"), //
+        TEST_DRIVE("TEST ONLY Driving");
 
         public final String name;
 
@@ -117,35 +127,97 @@ public class SmartDashboardInteractions {
         }
     }
 
+    private ShooterAimingParameters getAimingHintForLane(AutonLane lane) {
+        if (lane == AutonLane.LANE_1) {
+            return new ShooterAimingParameters(160.0, Rotation2d.fromDegrees(-45), -1);
+        } else if (lane == AutonLane.LANE_2) {
+            return new ShooterAimingParameters(150.0, Rotation2d.fromDegrees(-30), -1);
+        } else if (lane == AutonLane.LANE_3) {
+            return new ShooterAimingParameters(140.0, Rotation2d.fromDegrees(-15), -1);
+        } else if (lane == AutonLane.LANE_4) {
+            return new ShooterAimingParameters(140.0, Rotation2d.fromDegrees(10), -1);
+        } else { /* if (lane == AutonLane.LANE_5) */
+            return new ShooterAimingParameters(140.0, Rotation2d.fromDegrees(25), -1);
+        }
+    }
+
     private AutoModeBase createAutoMode(AutonOption autonOption, AutonLane autonLane) {
         switch (autonOption) {
         case STAY_HIGH_ONE_BALL:
-            return new StayHighOneBall(false, autonLane.distanceToDrive);
+            return new StayHighOneBall(getAimingHintForLane(autonLane), false);
         case STAY_HIGH_ONE_BALL_DRIVE_BACK:
-            return new StayHighOneBall(true, autonLane.distanceToDrive);
+            return new StayHighOneBall(getAimingHintForLane(autonLane), true);
         case GET_LOW_ONE_BALL:
-            return new GetLowOneBallMode(false, autonLane.distanceToDrive);
+            return new GetLowOneBallMode(getAimingHintForLane(autonLane), false, false);
+        case GET_LOW_COME_BACK_LEFT:
+            return new GetLowOneBallMode(getAimingHintForLane(autonLane), true, false);
+        case GET_LOW_COME_BACK_RIGHT:
+            return new GetLowOneBallMode(getAimingHintForLane(autonLane), true, true);
         case CDF_ONE_BALL:
-            return new ShovelTheFriesMode(autonLane.distanceToDrive, false, false);
+            return new ShovelTheFriesMode(getAimingHintForLane(autonLane), false, false);
         case CDF_COME_BACK_LEFT:
-            return new ShovelTheFriesMode(autonLane.distanceToDrive, true, false);
+            return new ShovelTheFriesMode(getAimingHintForLane(autonLane), true, false);
         case CDF_COME_BACK_RIGHT:
-            return new ShovelTheFriesMode(autonLane.distanceToDrive, true, true);
+            return new ShovelTheFriesMode(getAimingHintForLane(autonLane), true, true);
         case TWO_BALL:
-            return new TwoBallMode(autonLane.distanceToDrive);
+            return new TwoBallMode();
         case TWO_BALL_ROCK_WALL_MODE:
             return new TwoBallRockWallMode();
-        case DRIVE_5_FEET:
+        case TEST_DRIVE:
             return new AutoModeBase() {
                 @Override
                 protected void routine() throws AutoModeEndedException {
-                    ArrayList<Waypoint> path = new ArrayList<>();
-                    Superstructure.getInstance().getIntake().setDeploy(true);
-                    UtilityArm.getInstance().setWantedState(UtilityArm.WantedState.LOW_BAR);
-                    path.add(new Waypoint(new Translation2d(0, 0), 84.0));
-                    path.add(new Waypoint(new Translation2d(164, 0), 84.0));
+                    /*
+                     * final double kSpeed = 120.0;
+                     * 
+                     * { ArrayList<Waypoint> path = new ArrayList<>();
+                     * path.add(new Waypoint(new Translation2d(0, 0), kSpeed));
+                     * path.add(new Waypoint(new Translation2d(72, 0), kSpeed));
+                     * path.add(new Waypoint(new Translation2d(72, 120),
+                     * kSpeed));
+                     * 
+                     * ArrayList<Waypoint> reverse_path = new ArrayList<>();
+                     * reverse_path.add(new Waypoint(new Translation2d(72, 120),
+                     * kSpeed / 2)); reverse_path.add(new Waypoint(new
+                     * Translation2d(72, 0), kSpeed / 2)); reverse_path.add(new
+                     * Waypoint(new Translation2d(0, 0), kSpeed / 2));
+                     * 
+                     * runAction(new FollowPathAction(new Path(path), false));
+                     * runAction(new FollowPathAction(new Path(reverse_path),
+                     * true)); }
+                     * 
+                     * { ArrayList<Waypoint> path = new ArrayList<>();
+                     * path.add(new Waypoint(new Translation2d(0, 0), kSpeed));
+                     * path.add(new Waypoint(new Translation2d(72 - 24, 0),
+                     * kSpeed)); path.add(new Waypoint(new Translation2d(72,
+                     * 24), kSpeed)); path.add(new Waypoint(new
+                     * Translation2d(72, 120), kSpeed));
+                     * 
+                     * ArrayList<Waypoint> reverse_path = new ArrayList<>();
+                     * reverse_path.add(new Waypoint(new Translation2d(72, 120),
+                     * kSpeed / 2)); reverse_path.add(new Waypoint(new
+                     * Translation2d(72, 24), kSpeed / 2)); reverse_path.add(new
+                     * Waypoint(new Translation2d(72 - 24, 0), kSpeed / 2));
+                     * reverse_path.add(new Waypoint(new Translation2d(0, 0),
+                     * kSpeed / 2));
+                     * 
+                     * runAction(new FollowPathAction(new Path(path), false));
+                     * runAction(new FollowPathAction(new Path(reverse_path),
+                     * true)); }
+                     */
 
+                    Superstructure.getInstance().deployIntake();
+                    Superstructure.getInstance().setWantsToRunIntake();
+                    Superstructure.getInstance().setWantedState(WantedState.WANT_TO_STOW);
+                    runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(0.75))));
+                    ArrayList<Waypoint> path = new ArrayList<>();
+                    path.add(new Waypoint(new Translation2d(0, 0), 120.0));
+                    path.add(new Waypoint(new Translation2d(24, 0), 120.0));
+                    path.add(new Waypoint(new Translation2d(24, 18), 120.0));
+                    path.add(new Waypoint(new Translation2d(90, 18), 120.0, "PopHood"));
                     runAction(new FollowPathAction(new Path(path), false));
+                    Superstructure.getInstance().setWantsToStopIntake();
+
                 }
             };
 

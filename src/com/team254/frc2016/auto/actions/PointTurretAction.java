@@ -1,23 +1,21 @@
 package com.team254.frc2016.auto.actions;
 
+import com.team254.frc2016.subsystems.ShooterAimingParameters;
 import com.team254.frc2016.subsystems.Superstructure;
-import com.team254.lib.util.Rotation2d;
 
 public class PointTurretAction implements Action {
-    private static final double kTolerance = 2.0;
-    private Rotation2d mHintAngle;
+    private ShooterAimingParameters mHint;
     private boolean mIsDone;
     private final Superstructure mSuperstructure = Superstructure.getInstance();
 
-    public PointTurretAction(Rotation2d hint_angle) {
-        mHintAngle = hint_angle;
+    public PointTurretAction(ShooterAimingParameters hint) {
+        mHint = hint;
         mIsDone = false;
     }
 
     @Override
     public boolean isFinished() {
-        double error = Math.abs(mSuperstructure.getTurret().getAngle().inverse().rotateBy(mHintAngle).getDegrees());
-        return (mIsDone && error < kTolerance);
+        return (mIsDone && mSuperstructure.HasTarget());
     }
 
     @Override
@@ -31,7 +29,7 @@ public class PointTurretAction implements Action {
 
     @Override
     public void start() {
-        mSuperstructure.setTurretManualPositionSetpoint(mHintAngle);
+        mSuperstructure.setTurretManualPositionSetpoint(mHint);
         mIsDone = true;
     }
 }

@@ -3,6 +3,9 @@ package com.team254.frc2016.auto.modes;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
+import com.team254.frc2016.subsystems.ShooterAimingParameters;
+import com.team254.frc2016.subsystems.Superstructure;
+import com.team254.frc2016.subsystems.Superstructure.WantedState;
 import com.team254.frc2016.subsystems.UtilityArm;
 import com.team254.lib.util.Path;
 import com.team254.lib.util.Translation2d;
@@ -12,14 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShovelTheFriesMode extends AutoModeBase {
+    Superstructure mSuperstructure = Superstructure.getInstance();
 
-    private double mDistanceToCDF, mDistanceToDrive;
+    ShooterAimingParameters mHint;
+    private final double kDistanceToCDF = 41.0;
+    private final double kDistanceToDrive = 200;
     private boolean mShouldDriveBack;
     private boolean mComeBackRight;
 
-    public ShovelTheFriesMode(double distanceToShootAt, boolean shouldComeBack, boolean comeBackRight) {
-        mDistanceToCDF = 42.0;
-        mDistanceToDrive = distanceToShootAt - mDistanceToCDF;
+    public ShovelTheFriesMode(ShooterAimingParameters hint, boolean shouldComeBack, boolean comeBackRight) {
+        mHint = hint;
         mShouldDriveBack = shouldComeBack;
         mComeBackRight = comeBackRight;
     }
@@ -28,47 +33,35 @@ public class ShovelTheFriesMode extends AutoModeBase {
     protected void routine() throws AutoModeEndedException {
 
         List<Waypoint> first_path = new ArrayList<>();
-        first_path.add(new Waypoint(new Translation2d(0, 0), 48.0));
-        first_path.add(new Waypoint(new Translation2d(mDistanceToCDF, 0), 48.0));
+        first_path.add(new Waypoint(new Translation2d(0, 0), 36.0));
+        first_path.add(new Waypoint(new Translation2d(kDistanceToCDF, 0), 36.0));
 
         List<Waypoint> second_path = new ArrayList<>();
-        second_path.add(new Waypoint(new Translation2d(mDistanceToCDF, 0), 36.0));
-        second_path.add(new Waypoint(new Translation2d(mDistanceToDrive, 0), 48.0));
+        second_path.add(new Waypoint(new Translation2d(kDistanceToCDF, 0), 60.0));
+        second_path.add(new Waypoint(new Translation2d(kDistanceToCDF + 60, 0), 120.0));
+        second_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 120.0));
 
-        boolean has_first_return_path = (mDistanceToDrive < 160);
-        double y_distance = (mComeBackRight ? -44 : 61);
-        List<Waypoint> first_return_path = new ArrayList<>();
-        List<Waypoint> second_return_path = new ArrayList<>();
-        if (has_first_return_path) {
-            first_return_path.add(new Waypoint(new Translation2d(mDistanceToDrive, 0), 84.0));
-            // TODO different left or right distances
-            first_return_path.add(new Waypoint(new Translation2d(160, y_distance), 84.0));
-            first_return_path.add(new Waypoint(new Translation2d(180, y_distance), 84.0));
-            second_return_path.add(new Waypoint(new Translation2d(180, y_distance), 48.0));
-        } else {
-            second_return_path.add(new Waypoint(new Translation2d(mDistanceToDrive, 0), 84.0));
-            second_return_path.add(new Waypoint(new Translation2d(mDistanceToDrive, y_distance), 48.0));
-            second_return_path.add(new Waypoint(new Translation2d(160, y_distance), 84.0));
-        }
+        double y_distance = (mComeBackRight ? -52 : 64.0);
+        List<Waypoint> return_path = new ArrayList<>();
+        return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 120.0));
+        return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, y_distance), 60.0));
+        return_path.add(new Waypoint(new Translation2d(160, y_distance), 60.0));
+
         // CDF mode causes lots of counts to be skipped, so we can safely come
         // back this far
-        second_return_path.add(new Waypoint(new Translation2d(-12, y_distance), 48.0));
+        return_path.add(new Waypoint(new Translation2d(-12, y_distance), 60.0));
 
         runAction(new FollowPathAction(new Path(first_path), false));
         runAction(new GetLowAction());
-        runAction(new StartAutoAimingAction());
+        mSuperstructure.setWantedState(WantedState.WANT_TO_KEEP_SPINNING);
         runAction(new FollowPathAction(new Path(second_path), false));
-
-        runAction(new WaitAction(1));
+        runAction(new StartAutoAimingAction());
+        runAction(new PointTurretAction(mHint));
         runAction(new ShootWhenReadyAction());
-        runAction(new WaitAction(0.75));
         runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));
 
         if (mShouldDriveBack) {
-            if (has_first_return_path) {
-                runAction(new FollowPathAction(new Path(first_return_path), false));
-            }
-            runAction(new FollowPathAction(new Path(second_return_path), true));
+            runAction(new FollowPathAction(new Path(return_path), true));
         }
     }
 }

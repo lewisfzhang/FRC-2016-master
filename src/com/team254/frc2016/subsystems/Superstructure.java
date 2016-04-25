@@ -2,8 +2,6 @@ package com.team254.frc2016.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import com.team254.frc2016.Constants;
 import com.team254.frc2016.GoalTracker;
 import com.team254.frc2016.RobotState;
@@ -84,7 +82,7 @@ public class Superstructure extends Subsystem {
     private boolean mTuningMode = false;
 
     private double mTurretManualScanOutput = 0;
-    private Optional<Rotation2d> mTurretManualSetpoint = Optional.empty();
+    private ShooterAimingParameters mTurretManualSetpoint = null;
     private double mHoodManualScanOutput = 0;
     int mCurrentTrackId = -1;
     int mConsecutiveCyclesOnTarget = 0;
@@ -124,7 +122,7 @@ public class Superstructure extends Subsystem {
                 mCurrentStateStartTime = Timer.getFPGATimestamp();
                 mSystemState = SystemState.REENABLED;
                 mStateChanged = true;
-                mTurretManualSetpoint = Optional.empty();
+                mTurretManualSetpoint = null;
             }
         }
 
@@ -266,12 +264,12 @@ public class Superstructure extends Subsystem {
         mHoodManualScanOutput = output;
     }
 
-    public synchronized void setTurretManualPositionSetpoint(Rotation2d angle) {
-        mTurretManualSetpoint = Optional.of(angle);
+    public synchronized void setTurretManualPositionSetpoint(ShooterAimingParameters parameters) {
+        mTurretManualSetpoint = parameters;
     }
 
     public synchronized void clearTurretManualPositionSetpoint() {
-        mTurretManualSetpoint = Optional.empty();
+        mTurretManualSetpoint = null;
     }
 
     public void setTestServoSpeed(double speed) {
@@ -335,6 +333,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleReenabled() {
+        mCurrentTrackId = -1;
         if (!mHood.hasHomed()) {
             // We assume that this only happens when we are first enabled
             return handleDeployedAndHomingHood();
@@ -354,6 +353,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleDeployedAndHomingHood() {
+        mCurrentTrackId = -1;
         handleIntake(false, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
@@ -364,6 +364,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleStowedOrStowing() {
+        mCurrentTrackId = -1;
         handleIntake(false, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
@@ -389,6 +390,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleUnstowing(double now, double stateStartTime) {
+        mCurrentTrackId = -1;
         handleIntake(true, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
@@ -426,6 +428,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleLoading(double now, double stateStartTime) {
+        mCurrentTrackId = -1;
         handleIntake(true, true);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
@@ -541,6 +544,8 @@ public class Superstructure extends Subsystem {
         } else {
             mHoodRoller.stop();
             mNumShotsFired++;
+            mRobotState.resetVision();
+            mCurrentTrackId = -1;
             switch (mWantedState) {
             case WANT_TO_AIM:
                 return SystemState.SPINNING_AIM;
@@ -558,6 +563,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleDeployed() {
+        mCurrentTrackId = -1;
         mTurret.setDesiredAngle(new Rotation2d());
 
         handleIntake(!mTurret.isSafe(), false);
@@ -585,6 +591,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleKeepSpinning() {
+        mCurrentTrackId = -1;
         mTurret.setDesiredAngle(new Rotation2d());
 
         handleIntake(!mTurret.isSafe(), false);
@@ -612,6 +619,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized SystemState handleReturningToSafe(double now, double start_time) {
+        mCurrentTrackId = -1;
         handleIntake(true, false);
         mTurret.setDesiredAngle(new Rotation2d());
         mFlywheel.stop();
@@ -663,23 +671,23 @@ public class Superstructure extends Subsystem {
 
     private void autoAim(double now, boolean allow_changing_tracks) {
         List<ShooterAimingParameters> aimingParameters = getCurrentAimingParameters(now);
-        if ((aimingParameters.isEmpty() && allow_changing_tracks) || mTurretManualSetpoint.isPresent()) {
+        if (aimingParameters.isEmpty() && (allow_changing_tracks || mTurretManualSetpoint != null)) {
             // Manual search
-            if (mTurretManualSetpoint.isPresent()) {
+            if (mTurretManualSetpoint != null) {
                 // System.out.println("Going to manual setpoint");
-                mTurret.setDesiredAngle(mTurretManualSetpoint.get());
+                mTurret.setDesiredAngle(mTurretManualSetpoint.getTurretAngle());
+                mHood.setDesiredAngle(Rotation2d.fromDegrees(getHoodAngleForRange(mTurretManualSetpoint.range)));
             } else {
                 // System.out.println("No targets - Manual scan");
                 mTurret.setOpenLoop(mTurretManualScanOutput);
-            }
-            if (!mTuningMode) {
-                mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
-            } else {
-                mHood.setOpenLoop(mHoodManualScanOutput);
+                if (!mTuningMode) {
+                    mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
+                } else {
+                    mHood.setOpenLoop(mHoodManualScanOutput);
+                }
             }
             mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         } else {
-            mHoodManualScanOutput = 0.0;
             // System.out.println("Picking a target");
             // Pick the target to aim at
             boolean has_target = false;
@@ -710,6 +718,10 @@ public class Superstructure extends Subsystem {
                 mCurrentTrackId = -1;
             }
         }
+    }
+
+    public synchronized boolean HasTarget() {
+        return mCurrentTrackId != -1;
     }
 
     private double getShootingSetpointRpm(double range) {

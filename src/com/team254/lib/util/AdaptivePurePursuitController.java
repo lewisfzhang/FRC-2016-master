@@ -27,7 +27,7 @@ public class AdaptivePurePursuitController {
     public boolean isDone() {
         double remainingLength = mPath.getRemainingLength();
         // SmartDashboard.putNumber("PATH_remainingLength", remainingLength);
-        return remainingLength == 0;
+        return remainingLength < 0.5;
     }
 
     public RigidTransform2d.Delta update(RigidTransform2d robot_pose, double now) {
@@ -38,10 +38,13 @@ public class AdaptivePurePursuitController {
         }
 
         double distance_from_path = mPath.update(robot_pose.getTranslation());
-        // System.out.println(
-        // "Remaining path length: " + mPath.getRemainingLength()
-        // + ", robot pose " + robot_pose
-        // + ", distance from path " + distance_from_path);
+        if (this.isDone()) {
+            return new RigidTransform2d.Delta(0, 0, 0);
+        }
+        System.out.println(
+         "Remaining path length: " + mPath.getRemainingLength()
+         + ", robot pose " + robot_pose
+         + ", distance from path " + distance_from_path);
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
         Optional<Circle> circle = joinPath(pose, lookahead_point.translation);
@@ -70,6 +73,12 @@ public class AdaptivePurePursuitController {
         double max_allowed_speed = Math.sqrt(2 * mMaxAccel * remaining_distance);
         if (Math.abs(speed) > max_allowed_speed) {
             speed = max_allowed_speed * Math.signum(speed);
+        }
+        final double kMinSpeed = 4.0;
+        if (Math.abs(speed) < kMinSpeed) {
+            // Hack for dealing with problems tracking very low speeds with
+            // Talons
+            speed = kMinSpeed * Math.signum(speed);
         }
 
         RigidTransform2d.Delta rv;
