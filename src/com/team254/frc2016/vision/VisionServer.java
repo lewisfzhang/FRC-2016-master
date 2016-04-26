@@ -26,10 +26,6 @@ public class VisionServer implements Runnable {
     AdbBridge adb = new AdbBridge();
     double lastMessageReceivedTime = 0;
     private boolean m_use_java_time = false;
-    private boolean mUseVisionMode = true;
-
-    private static final int m_selfie_external_port = 5801;
-    private static final int m_selfie_internal_port = 5800;
 
     private ArrayList<ServerThread> serverThreads = new ArrayList<>();
 
@@ -137,26 +133,11 @@ public class VisionServer implements Runnable {
         }
         new Thread(this).start();
         new Thread(new ForcePortForwardingThread()).start();
-        new Thread(new SendCameraModeThread()).start();
-
-        // Start a port forwarder because Adb doesnt listen to anything but
-        // loopback
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Main.main(new String[] { "5800", "127.0.0.1:5801" });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
     public void restartAdb() {
         adb.restart();
         adb.reversePortForward(m_port, m_port);
-        adb.portForward(m_selfie_external_port, m_selfie_internal_port);
     }
 
     public void addVisionUpdateReceiver(VisionUpdateReceiver receiver) {
@@ -171,13 +152,6 @@ public class VisionServer implements Runnable {
         }
     }
 
-    public void sendMessage(VisionMessage message) {
-        for (ServerThread s : serverThreads) {
-            if (s.isAlive()) {
-                s.send(message);
-            }
-        }
-    }
 
     @Override
     public void run() {
@@ -193,39 +167,6 @@ public class VisionServer implements Runnable {
         }
     }
 
-    public void setUseVisionMode() {
-        if (!mUseVisionMode) {
-            sendMessage(SetCameraModeMessage.getVisionModeMessage());
-        }
-        mUseVisionMode = true;
-    }
-
-    public void setUseIntakeMode() {
-        if (mUseVisionMode) {
-            sendMessage(SetCameraModeMessage.getIntakeModeMessage());
-        }
-        mUseVisionMode = false;
-    }
-
-    private class SendCameraModeThread implements Runnable {
-
-        private SetCameraModeMessage mSetVision = SetCameraModeMessage.getVisionModeMessage();
-        private SetCameraModeMessage mSetIntake = SetCameraModeMessage.getIntakeModeMessage();
-
-        @Override
-        public void run() {
-            while (m_running) {
-                sendMessage(mUseVisionMode ? mSetVision : mSetIntake);
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-    }
-
     private class ForcePortForwardingThread implements Runnable {
         @Override
         public void run() {
@@ -233,7 +174,6 @@ public class VisionServer implements Runnable {
                 if (getTimestamp() - lastMessageReceivedTime > .1) {
                     // camera disconnected
                     adb.reversePortForward(m_port, m_port);
-                    adb.portForward(m_selfie_external_port, m_selfie_internal_port);
                     mIsConnect = false;
                 } else {
                     mIsConnect = true;

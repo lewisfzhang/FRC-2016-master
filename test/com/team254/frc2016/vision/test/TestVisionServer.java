@@ -18,30 +18,15 @@ public class TestVisionServer {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
         VisionServer server = VisionServer.getInstance();
         TestReceiver r = new TestReceiver();
         server.addVisionUpdateReceiver(r);
         System.out.println("Running");
         int i = 0;
-        // server.setUseIntakeMode();
         while (true) {
-            try {
-                Thread.sleep(1000);
-                if (i == 0) {
-                    server.setUseVisionMode();
-                } else if (i == 10) {
-                    server.setUseIntakeMode();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(i);
-            i++;
-            if (i > 19) {
-                i = 0;
-            }
+            Thread.sleep(1000);
         }
 
     }

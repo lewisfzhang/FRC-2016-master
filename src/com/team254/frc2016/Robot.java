@@ -44,9 +44,6 @@ public class Robot extends IterativeRobot {
 
     boolean mGetDown = false;
 
-    private LatchedBoolean mSelfieLatch = new LatchedBoolean();
-    private LatchedBoolean mVisionLatch = new LatchedBoolean();
-
     public Robot() {
     }
 
@@ -102,7 +99,7 @@ public class Robot extends IterativeRobot {
         mCompressor.start();
         mDiddlerServo.set(0);
 
-        VisionServer.getInstance().setUseVisionMode();
+        VisionServer.getInstance();
     }
 
     @Override
@@ -116,8 +113,6 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.stop();
         mDisabledLooper.start();
 
-        VisionServer.getInstance().setUseVisionMode();
-
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
         mDrive.setBrakeMode(true);
         // Stop all actuators
@@ -130,8 +125,6 @@ public class Robot extends IterativeRobot {
             mAutoModeExecuter.stop();
         }
         mAutoModeExecuter = null;
-
-        VisionServer.getInstance().setUseVisionMode();
 
         // Reset all sensors
         zeroAllSensors();
@@ -171,8 +164,6 @@ public class Robot extends IterativeRobot {
         mEnabledLooper.start();
         mDrive.setOpenLoop(DriveSignal.NEUTRAL);
         mDrive.setBrakeMode(false);
-
-        VisionServer.getInstance().setUseVisionMode();
 
         mGetDown = false;
         mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_DEPLOY);
@@ -291,14 +282,6 @@ public class Robot extends IterativeRobot {
             }
         } else {
             mSuperstructure.setTuningMode(false);
-        }
-
-        boolean wantSelfieMode = false;
-        if (mSelfieLatch.update(wantSelfieMode)) {
-            VisionServer.getInstance().setUseIntakeMode();
-        }
-        if (mVisionLatch.update(!wantSelfieMode)) {
-            VisionServer.getInstance().setUseVisionMode();
         }
 
         if (mControls.getHoodTuningPositiveButton()) {
