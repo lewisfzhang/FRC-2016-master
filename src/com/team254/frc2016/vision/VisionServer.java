@@ -163,6 +163,12 @@ public class VisionServer implements Runnable {
                 serverThreads.add(s);
             } catch (IOException e) {
                 System.err.println("Issue accepting socket connection!");
+            } finally {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
