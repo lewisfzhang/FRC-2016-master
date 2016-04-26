@@ -17,7 +17,7 @@ import com.team254.lib.util.Path.Waypoint;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
-public class TwoBallMode extends AutoModeBase {
+public class TwoBallLowBarMode extends AutoModeBase {
     Superstructure mSuperstructure = Superstructure.getInstance();
     Drive mDrive = Drive.getInstance();
 

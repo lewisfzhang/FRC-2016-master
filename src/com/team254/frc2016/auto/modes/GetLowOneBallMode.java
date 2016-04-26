@@ -43,7 +43,7 @@ public class GetLowOneBallMode extends AutoModeBase {
         first_path.add(new Waypoint(new Translation2d(DISTANCE_TO_DROP_INTAKE, 0), 48.0, "DropIntake"));
         first_path.add(new Waypoint(new Translation2d(DISTANCE_TO_POP_HOOD, 0), 48.0, "PopHood"));
         first_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 48.0));
-        
+
         double y_distance = (mComeBackRight ? -58 : 58);
         List<Waypoint> return_path = new ArrayList<>();
         return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 120.0));
@@ -53,12 +53,10 @@ public class GetLowOneBallMode extends AutoModeBase {
         // Get low and wait a minimum of 1.5 seconds
         runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(1.0))));
 
-        runAction(
-                new ParallelAction(
-                        Arrays.asList(new FollowPathAction(new Path(first_path), false),
-                                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("DropIntake"),
-                                        new DeployIntakeAction(), new WaitForPathMarkerAction("PopHood"),
-                                        new StartAutoAimingAction(), new PointTurretAction(mHint))))));
+        runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(first_path), false),
+                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("DropIntake"), new DeployIntakeAction(),
+                        new WaitForPathMarkerAction("PopHood"), new StartAutoAimingAction(),
+                        new PointTurretAction(mHint))))));
 
         runAction(new ShootWhenReadyAction());
         runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));

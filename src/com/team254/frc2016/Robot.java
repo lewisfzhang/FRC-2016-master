@@ -273,8 +273,10 @@ public class Robot extends IterativeRobot {
         if (mUtilityArm.isAllowedToHang()) {
             if (mControls.getHang()) {
                 mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
+                mCompressor.stop();
             } else {
                 mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
+                mCompressor.start();
             }
         }
 

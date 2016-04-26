@@ -103,8 +103,8 @@ public class SmartDashboardInteractions {
         CDF_ONE_BALL("CDF - Stop"), //
         CDF_COME_BACK_LEFT("CDF - Come back left"), //
         CDF_COME_BACK_RIGHT("CDF - Come back right"), //
-        TWO_BALL("Low Bar - Two Ball"), //
-        TWO_BALL_ROCK_WALL_MODE("Class B/D - Two Ball"), //
+        TWO_BALL_LOW_BAR("Low Bar - Two Ball"), //
+        TWO_BALL_CLASS_BD("Class B/D - Two Ball"), //
         STAND_STILL("Stand Still"), //
         TEST_DRIVE("TEST ONLY Driving");
 
@@ -159,10 +159,10 @@ public class SmartDashboardInteractions {
             return new ShovelTheFriesMode(getAimingHintForLane(autonLane), true, false);
         case CDF_COME_BACK_RIGHT:
             return new ShovelTheFriesMode(getAimingHintForLane(autonLane), true, true);
-        case TWO_BALL:
-            return new TwoBallMode();
-        case TWO_BALL_ROCK_WALL_MODE:
-            return new TwoBallRockWallMode();
+        case TWO_BALL_LOW_BAR:
+            return new TwoBallLowBarMode();
+        case TWO_BALL_CLASS_BD:
+            return new TwoBallClassBDMode(getAimingHintForLane(autonLane));
         case TEST_DRIVE:
             return new AutoModeBase() {
                 @Override

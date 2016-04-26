@@ -49,6 +49,7 @@ public class Drive extends Subsystem {
     private Counter lineSensorCounter2_;
     private int lastSeesLineCount_ = 0;
     private boolean stopOnNextCount_ = false;
+    private RigidTransform2d poseWhenStoppedOnLine_ = new RigidTransform2d();
 
     private DriveControlState driveControlState_;
     private VelocityHeadingSetpoint velocityHeadingSetpoint_;
@@ -69,6 +70,7 @@ public class Drive extends Subsystem {
             synchronized (Drive.this) {
                 // System.out.println("State " + driveControlState_);
                 if (stopOnNextCount_ && getSeesLineCount() > lastSeesLineCount_) {
+                    poseWhenStoppedOnLine_ = RobotState.getInstance().getLatestOdometricToVehicle().getValue();
                     stopOnNextCount_ = false;
                     stop();
                 }
@@ -383,6 +385,10 @@ public class Drive extends Subsystem {
     public synchronized void setStopOnNextLine() {
         stopOnNextCount_ = true;
         lastSeesLineCount_ = getSeesLineCount();
+    }
+
+    public synchronized RigidTransform2d getLastLinePose() {
+        return poseWhenStoppedOnLine_;
     }
 
     private static double rotationsToInches(double rotations) {
