@@ -20,7 +20,7 @@ public class Kinematics {
         return new RigidTransform2d.Delta(linear_velocity, 0, delta_rotation);
     }
 
-    // Forward kinematics using encoders and explictly measured rotation (ex.
+    // Forward kinematics using encoders and explicitly measured rotation (ex.
     // from gyro)
     public static RigidTransform2d.Delta forwardKinematics(double left_wheel_delta, double right_wheel_delta,
             double delta_rotation_rads) {
@@ -49,8 +49,6 @@ public class Kinematics {
         if (Math.abs(velocity.dtheta) < kEpsilon) {
             return new DriveVelocity(velocity.dx, velocity.dx);
         }
-        // From linear velocity and curvature, compute left velocity, right
-        // velocity, and heading velocity.
         double delta_v = Constants.kTrackEffectiveDiameter * velocity.dtheta / (2 * Constants.kTrackScrubFactor);
         return new DriveVelocity(velocity.dx - delta_v, velocity.dx + delta_v);
     }
