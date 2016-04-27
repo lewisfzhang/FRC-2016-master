@@ -70,7 +70,7 @@ public class Drive extends Subsystem {
             synchronized (Drive.this) {
                 // System.out.println("State " + driveControlState_);
                 if (stopOnNextCount_ && getSeesLineCount() > lastSeesLineCount_) {
-                    poseWhenStoppedOnLine_ = RobotState.getInstance().getLatestOdometricToVehicle().getValue();
+                    poseWhenStoppedOnLine_ = RobotState.getInstance().getLatestFieldToVehicle().getValue();
                     stopOnNextCount_ = false;
                     stop();
                 }
@@ -364,7 +364,7 @@ public class Drive extends Subsystem {
     }
 
     private void updatePathFollower() {
-        RigidTransform2d robot_pose = RobotState.getInstance().getLatestOdometricToVehicle().getValue();
+        RigidTransform2d robot_pose = RobotState.getInstance().getLatestFieldToVehicle().getValue();
         RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
         Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
         // Scale the command to respect the max velocity limits

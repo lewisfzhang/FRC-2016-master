@@ -11,8 +11,8 @@ public class GoalTracker {
     // Track reports contain all of the relevant information about a given goal
     // track.
     public static class TrackReport {
-        // Translation from the odometric frame to the goal
-        public Translation2d odometric_to_goal;
+        // Translation from the field frame to the goal
+        public Translation2d field_to_goal;
 
         // The timestamp of the latest time that the goal has been observed
         public double latest_timestamp;
@@ -25,7 +25,7 @@ public class GoalTracker {
         public int id;
 
         public TrackReport(GoalTrack track) {
-            this.odometric_to_goal = track.getSmoothedPosition();
+            this.field_to_goal = track.getSmoothedPosition();
             this.latest_timestamp = track.getLatestTimestamp();
             this.stability = track.getStability();
             this.id = track.getId();
@@ -89,13 +89,13 @@ public class GoalTracker {
         mCurrentTracks.clear();
     }
 
-    public void update(double timestamp, List<Translation2d> odometric_to_goals) {
+    public void update(double timestamp, List<Translation2d> field_to_goals) {
         // System.out.println("START GoalTracker::Update");
         // System.out.println("Current number of tracks: " +
         // mCurrentTracks.size());
         boolean hasUpdatedTrack = false;
         // Try to update existing tracks
-        for (Translation2d target : odometric_to_goals) {
+        for (Translation2d target : field_to_goals) {
             // System.out.println("Trying target " + target.toString());
             for (GoalTrack track : mCurrentTracks) {
                 // System.out.println("Trying track " + track.getId());
@@ -122,7 +122,7 @@ public class GoalTracker {
         }
         // If all tracks are dead, start new tracks for any detections
         if (mCurrentTracks.isEmpty()) {
-            for (Translation2d target : odometric_to_goals) {
+            for (Translation2d target : field_to_goals) {
                 // System.out.println("STARTING NEW TRACK");
                 mCurrentTracks.add(GoalTrack.makeNewTrack(timestamp, target, mNextId));
                 ++mNextId;
