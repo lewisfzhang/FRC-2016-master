@@ -27,5 +27,6 @@ while True:
                 "another auto option",
                 "crappy option",
                 "4th option"]))
+    table.putNumber("Air Pressure psi", i % 120)
     i += 1
     time.sleep(1)

@@ -17,6 +17,8 @@ var COLOR_BOX_TEXT_KEY = "color_box_text";
 var TYPE_STRING = "string";
 var TYPE_BOOL = "bool";
 
+var psi_progress_bar = null;
+
 $(document).ready(function() {
 
   initAutoLaneButton($("#autoLane1"), "1");
@@ -30,6 +32,18 @@ $(document).ready(function() {
   
   kickWebSocket();
   setInterval(kickWebSocket, 1000);
+
+  psi_progress_bar = new ChezyBar($("#psi_progress"), 120);
+  psi_progress_bar.colorFunction(function(value){
+    if (value*120 < 60) {
+      return {bg: "red", fg: "white"};
+    } else if(value*120 < 80) {
+      return {bg: "orange", fg: "white"};
+    } else {
+      return {bg: "green", fg: "white"};
+    }
+    return null
+  })
 });
 
 function initAutoLaneButton(autoLaneButton, stringValue) {
@@ -180,6 +194,8 @@ function refreshDriverStatusElements() {
   var airPressureElement = findElementModelOrNull(TABLE, "Air Pressure psi");
   $("#airPressureHolder").text(airPressureElement == null ? "UNKNOWN" : airPressureElement.value);
 
+  psi_progress_bar.val = parseInt(airPressureElement.value) / 120;
+
   var hoodTuningModeElement = findElementModelOrNull(TABLE, HOOD_TUNING_MODE_KEY);
   $("#hoodTuningModeHolder").text(
     hoodTuningModeElement == null ? "UNKNOWN" : hoodTuningModeElement.value);
@@ -249,7 +265,9 @@ function refreshAutoMode() {
   }
 
   $("#selectedAutoMode").text(
-    selectedModeElement == null ? "UNKNOWN" : ((didFindAutoInList)? selectedModeElement.value : "<span color=\"red\">" + selectedModeElement.value + "</span>"));
+    selectedModeElement == null ? "UNKNOWN" : selectedModeElement.value);
+
+  $("#selectedAutoMode").get(0).className = (didFindAutoInList)? "" : "errored";
 
 }
 
