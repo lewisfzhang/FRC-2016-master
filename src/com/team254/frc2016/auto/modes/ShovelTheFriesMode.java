@@ -41,7 +41,7 @@ public class ShovelTheFriesMode extends AutoModeBase {
         second_path.add(new Waypoint(new Translation2d(kDistanceToCDF + 60, 0), 120.0));
         second_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 120.0));
 
-        double y_distance = (mComeBackRight ? -52 : 64.0);
+        double y_distance = (mComeBackRight ? -47 : 58.0);
         List<Waypoint> return_path = new ArrayList<>();
         return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 120.0));
         return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, y_distance), 60.0));

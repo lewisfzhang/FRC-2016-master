@@ -44,7 +44,7 @@ public class GetLowOneBallMode extends AutoModeBase {
         first_path.add(new Waypoint(new Translation2d(DISTANCE_TO_POP_HOOD, 0), 48.0, "PopHood"));
         first_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 48.0));
 
-        double y_distance = (mComeBackRight ? -58 : 58);
+        double y_distance = (mComeBackRight ? -53 : 53);
         List<Waypoint> return_path = new ArrayList<>();
         return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 120.0));
         return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, y_distance), 60.0));
