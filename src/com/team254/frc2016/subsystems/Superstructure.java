@@ -488,7 +488,7 @@ public class Superstructure extends Subsystem {
                             && readyToFire(SystemState.SPINNING_AIM, now))) {
                 System.out.println("FIRING BALL " + (mNumShotsFired + 1) + "\nAngle to Goal: " + mCurrentAngleForLogging
                         + ", Distance to Goal: " + mCurrentRangeForLogging + "\nHood Angle (desired): "
-                        + mHood.getSetpoint() + ", (actual): " + mHood.getAngle() + "\nTurret Angle (desired): "
+                        + mHood.getSetpoint() + ", (actual): " + mHood.getAngle() + ", adjustment: " + mHoodAdjustment + "\nTurret Angle (desired): "
                         + mTurret.getSetpoint() + ", (actual): " + mTurret.getAngle() + "\nFlywheel RPM (desired): "
                         + mFlywheel.getSetpoint() + ", (actual): " + mFlywheel.getRpm());
                 return SystemState.FIRING_AIM;
