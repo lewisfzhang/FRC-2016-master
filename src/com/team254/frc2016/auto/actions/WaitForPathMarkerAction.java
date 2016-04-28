@@ -1,5 +1,7 @@
 package com.team254.frc2016.auto.actions;
 
+import java.util.Set;
+
 import com.team254.frc2016.subsystems.Drive;
 
 public class WaitForPathMarkerAction implements Action {
@@ -13,7 +15,8 @@ public class WaitForPathMarkerAction implements Action {
 
     @Override
     public boolean isFinished() {
-        return mDrive.getPathMarkersCrossed().contains(mMarker);
+        Set<String> markers = mDrive.getPathMarkersCrossed();
+        return (markers != null && markers.contains(mMarker));
     }
 
     @Override
