@@ -13,6 +13,7 @@ var SELECTED_AUTO_LANE_KEY = "selected_auto_lane";
 var HOOD_TUNING_MODE_KEY = "Hood Tuning Mode";
 var COLOR_BOX_COLOR_KEY = "color_box_color";
 var COLOR_BOX_TEXT_KEY = "color_box_text";
+var AUTO_BALLS_WORN_KEY = "auto_balls_worn";
 
 var TYPE_STRING = "string";
 var TYPE_BOOL = "bool";
@@ -29,6 +30,9 @@ $(document).ready(function() {
 
   $("#enableHoodTuningMode").click(function() { setHoodTuningMode(true); });
   $("#disableHoodTuningMode").click(function() { setHoodTuningMode(false); });
+
+  $("#autoBallsWornButton").click(function() { setAutoBallsWorn(true); });
+  $("#autoBallsNotWornButton").click(function() { setAutoBallsWorn(false); });
   
   kickWebSocket();
   setInterval(kickWebSocket, 1000);
@@ -54,6 +58,10 @@ function initAutoLaneButton(autoLaneButton, stringValue) {
 
 function setHoodTuningMode(enableHoodTuning) {
   sendValueUpdate(TABLE, HOOD_TUNING_MODE_KEY, enableHoodTuning, TYPE_BOOL);
+}
+
+function setAutoBallsWorn(ballsWorn) {
+  sendValueUpdate(TABLE, AUTO_BALLS_WORN_KEY, ballsWorn, TYPE_BOOL);
 }
 
 function kickWebSocket() {
@@ -178,27 +186,48 @@ function refreshDriverStatusElements() {
   refreshAutoMode();
 
   var autoLaneElement = findElementModelOrNull(TABLE, SELECTED_AUTO_LANE_KEY);
-  $("#selectedAutoLane").text(
-    autoLaneElement == null ? "UNKNOWN" : ("Lane " + autoLaneElement.value));
-
-  $(".laneSelector div button").each(function(){
-    if (this.id == "autoLane" + autoLaneElement.value) {
-      this.className = "active"
-    } else {
+  if (autoLaneElement == null) {
+    $("#selectedAutoLane").text("UNKNOWN");
+    $(".laneSelector div button").each(function() {
       this.className = ""
-    }
-  })
+    });
+  } else {
+    $("#selectedAutoLane").text("Lane " + autoLaneElement.value);
 
-
+    $(".laneSelector div button").each(function() {
+      if (this.id == "autoLane" + autoLaneElement.value) {
+        this.className = "active"
+      } else {
+        this.className = ""
+      }
+    });
+  }
 
   var airPressureElement = findElementModelOrNull(TABLE, "Air Pressure psi");
-  $("#airPressureHolder").text(airPressureElement == null ? "UNKNOWN" : airPressureElement.value);
-
-  psi_progress_bar.val = parseInt(airPressureElement.value) / 120;
+  if (airPressureElement == null) {
+    $("#airPressureHolder").text("UNKNOWN");
+    psi_progress_bar.val = 0;
+  } else {
+    $("#airPressureHolder").text(airPressureElement.value);
+    psi_progress_bar.val = parseInt(airPressureElement.value) / 120;
+  }
 
   var hoodTuningModeElement = findElementModelOrNull(TABLE, HOOD_TUNING_MODE_KEY);
   $("#hoodTuningModeHolder").text(
     hoodTuningModeElement == null ? "UNKNOWN" : hoodTuningModeElement.value);
+
+  var autoBallsWornElement = findElementModelOrNull(TABLE, AUTO_BALLS_WORN_KEY);
+  if (autoBallsWornElement == null) {
+    $("#autoBallsWornHolder").text("UNKNOWN");
+    $(".autoBallsWornSelector div button").each(function() {this.className = "";})
+  } else {
+    $("#autoBallsWornHolder").text(autoBallsWornElement.value);
+    $("#autoBallsWornButton").each(
+      function() { this.className = autoBallsWornElement.value ? "active" : ""; });
+    $("#autoBallsNotWornButton").each(function() {
+      this.className = autoBallsWornElement.value ? "" : "active";
+    });
+  }
 }
 
 function maybeRefreshAutoOptions() {
@@ -252,7 +281,10 @@ function arraysEqual(a, b) {
 
 function refreshAutoMode() {
   var selectedModeElement = findElementModelOrNull(TABLE, SELECTED_AUTO_MODE_KEY);
-
+  if (selectedModeElement == null) {
+    return;
+  }
+  
   var didFindAutoInList = false;
   var buttons = $("#autoSelectorContainer div button")
   for (button in buttons) {

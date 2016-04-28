@@ -36,6 +36,8 @@ public class SmartDashboardInteractions {
     private static final String SELECTED_AUTO_MODE = "selected_auto_mode";
     private static final String SELECTED_AUTO_LANE = "selected_auto_lane";
 
+    private static final String AUTO_BALLS_WORN = "auto_balls_worn";
+
     private static final AutonOption DEFAULT_MODE = AutonOption.STAY_HIGH_ONE_BALL;
     private static final AutonLane DEFAULT_LANE = AutonLane.LANE_4;
 
@@ -51,6 +53,7 @@ public class SmartDashboardInteractions {
         SmartDashboard.putString(AUTO_OPTIONS, autoOptionsArray.toString());
         SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
         SmartDashboard.putString(SELECTED_AUTO_LANE, DEFAULT_LANE.numberString);
+        SmartDashboard.putBoolean(AUTO_BALLS_WORN, false);
     }
 
     public boolean isInHoodTuningMode() {
@@ -88,6 +91,10 @@ public class SmartDashboardInteractions {
         }
 
         return createAutoMode(selectedOption, selectedLane);
+    }
+
+    public boolean areAutoBallsWorn() {
+        return SmartDashboard.getBoolean(AUTO_BALLS_WORN, false);
     }
 
     /**
