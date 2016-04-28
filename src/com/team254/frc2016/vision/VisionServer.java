@@ -4,7 +4,6 @@ import com.team254.frc2016.Constants;
 
 import com.team254.frc2016.vision.messages.HeartbeatMessage;
 import com.team254.frc2016.vision.messages.OffWireMessage;
-import com.team254.frc2016.vision.messages.SetCameraModeMessage;
 import com.team254.frc2016.vision.messages.VisionMessage;
 import edu.wpi.first.wpilibj.Timer;
 import jtcpfwd.Main;
@@ -28,6 +27,7 @@ public class VisionServer implements Runnable {
     private boolean m_use_java_time = false;
 
     private ArrayList<ServerThread> serverThreads = new ArrayList<>();
+    private volatile boolean mWantsAppRestart = false;
 
     public static VisionServer getInstance() {
         if (s_instance == null) {
@@ -40,6 +40,10 @@ public class VisionServer implements Runnable {
 
     public boolean isConnected() {
         return mIsConnect;
+    }
+
+    public void requestAppRestart() {
+        mWantsAppRestart = true;
     }
 
     protected class ServerThread implements Runnable {
@@ -132,11 +136,11 @@ public class VisionServer implements Runnable {
             e.printStackTrace();
         }
         new Thread(this).start();
-        new Thread(new ForcePortForwardingThread()).start();
+        new Thread(new AppMaintainanceThread()).start();
     }
 
     public void restartAdb() {
-        adb.restart();
+        adb.restartAdb();
         adb.reversePortForward(m_port, m_port);
     }
 
@@ -173,7 +177,7 @@ public class VisionServer implements Runnable {
         }
     }
 
-    private class ForcePortForwardingThread implements Runnable {
+    private class AppMaintainanceThread implements Runnable {
         @Override
         public void run() {
             while (true) {
@@ -183,6 +187,10 @@ public class VisionServer implements Runnable {
                     mIsConnect = false;
                 } else {
                     mIsConnect = true;
+                }
+                if (mWantsAppRestart) {
+                    adb.restartApp();
+                    mWantsAppRestart = false;
                 }
                 try {
                     Thread.sleep(200);

@@ -60,7 +60,7 @@ public class AdbBridge {
         runCommand("kill-server");
     }
 
-    public void restart() {
+    public void restartAdb() {
         System.out.println("Restarting adb");
         stop();
         start();
@@ -76,5 +76,11 @@ public class AdbBridge {
         // System.out.println("Adb reverse forwarding " + remote_port + " to " +
         // local_port);
         runCommand("reverse tcp:" + remote_port + " tcp:" + local_port);
+    }
+
+    public void restartApp() {
+        System.out.println("Restarting app");
+        runCommand("shell am force-stop com.team254.cheezdroid \\; "
+                + "am start com.team254.cheezdroid/com.team254.cheezdroid.VisionTrackerActivity");
     }
 }

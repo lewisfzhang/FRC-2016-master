@@ -122,4 +122,8 @@ public class ControlBoard {
     public boolean getHoodDownButton() {
         return mButtonBoard.getRawButton(3);
     }
+
+    public boolean getRestartCameraAppButton() {
+        return mButtonBoard.getRawButton(1) && mButtonBoard.getRawButton(2);
+    }
 }

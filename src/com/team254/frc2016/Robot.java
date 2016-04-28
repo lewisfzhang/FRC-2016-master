@@ -292,6 +292,10 @@ public class Robot extends IterativeRobot {
             mSuperstructure.setTestServoSpeed(0.0);
         }
 
+        if (mControls.getRestartCameraAppButton()) {
+            mVisionServer.requestAppRestart();
+        }
+
         outputAllToSmartDashboard();
         updateDriverFeedback();
     }
