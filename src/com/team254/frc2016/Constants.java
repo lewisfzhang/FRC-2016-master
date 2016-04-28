@@ -223,7 +223,7 @@ public class Constants extends ConstantsBase {
     }
 
     // Shooter Operational consts
-    public static final double kOldBallHoodAdjustment = -1.0;
+    public static final double kOldBallHoodAdjustment = 1.0;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
