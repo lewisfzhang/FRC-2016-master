@@ -17,9 +17,9 @@ public class MA3AnalogEncoder {
     protected Rotation2d home_ = new Rotation2d();
     protected int num_rotations_ = 0;
 
-    private Runnable read_thread_ = new Runnable() {
+    private CrashTrackingRunnable read_thread_ = new CrashTrackingRunnable() {
         @Override
-        public void run() {
+        public void runCrashTracked() {
             Rotation2d new_rotation = Rotation2d.fromRadians(2 * Math.PI * mAnalogInput.getVoltage() / 5.0);
 
             // Check for rollover

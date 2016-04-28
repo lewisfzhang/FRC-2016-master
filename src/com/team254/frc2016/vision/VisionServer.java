@@ -5,8 +5,8 @@ import com.team254.frc2016.Constants;
 import com.team254.frc2016.vision.messages.HeartbeatMessage;
 import com.team254.frc2016.vision.messages.OffWireMessage;
 import com.team254.frc2016.vision.messages.VisionMessage;
+import com.team254.lib.util.CrashTrackingRunnable;
 import edu.wpi.first.wpilibj.Timer;
-import jtcpfwd.Main;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class VisionServer implements Runnable {
+public class VisionServer extends CrashTrackingRunnable {
 
     private static VisionServer s_instance = null;
     private ServerSocket m_server_socket;
@@ -46,7 +46,7 @@ public class VisionServer implements Runnable {
         mWantsAppRestart = true;
     }
 
-    protected class ServerThread implements Runnable {
+    protected class ServerThread extends CrashTrackingRunnable {
         private Socket m_socket;
 
         public ServerThread(Socket socket) {
@@ -85,7 +85,7 @@ public class VisionServer implements Runnable {
         }
 
         @Override
-        public void run() {
+        public void runCrashTracked() {
             if (m_socket == null) {
                 return;
             }
@@ -158,7 +158,7 @@ public class VisionServer implements Runnable {
 
 
     @Override
-    public void run() {
+    public void runCrashTracked() {
         while (m_running) {
             try {
                 Socket p = m_server_socket.accept();
@@ -177,9 +177,9 @@ public class VisionServer implements Runnable {
         }
     }
 
-    private class AppMaintainanceThread implements Runnable {
+    private class AppMaintainanceThread extends CrashTrackingRunnable {
         @Override
-        public void run() {
+        public void runCrashTracked() {
             while (true) {
                 if (getTimestamp() - lastMessageReceivedTime > .1) {
                     // camera disconnected

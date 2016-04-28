@@ -26,9 +26,9 @@ public class MA3Encoder {
     protected int num_rotations_ = 0;
     protected boolean error_ = false;
 
-    private Runnable read_thread_ = new Runnable() {
+    private CrashTrackingRunnable read_thread_ = new CrashTrackingRunnable() {
         @Override
-        public void run() {
+        public void runCrashTracked() {
             if (high_counter_.getStopped()) {
                 if (!error_) {
                     DriverStation.reportError("No MA3Encoder on channel " + digital_input_.getChannel(), false);

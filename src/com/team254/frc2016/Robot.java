@@ -45,6 +45,7 @@ public class Robot extends IterativeRobot {
     boolean mGetDown = false;
 
     public Robot() {
+        CrashTracker.logRobotConstruction();
     }
 
     public void stopAll() {
@@ -78,238 +79,277 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void robotInit() {
-        mVisionServer.addVisionUpdateReceiver(VisionProcessor.getInstance());
+        try {
+            CrashTracker.logRobotInit();
+            mVisionServer.addVisionUpdateReceiver(VisionProcessor.getInstance());
 
-        // Reset all state
-        zeroAllSensors();
+            // Reset all state
+            zeroAllSensors();
 
-        mUtilityArm.setWantedState(UtilityArm.WantedState.STAY_IN_SIZE_BOX);
+            mUtilityArm.setWantedState(UtilityArm.WantedState.STAY_IN_SIZE_BOX);
 
-        // Configure loopers
-        mEnabledLooper.register(new TurretResetter());
-        mEnabledLooper.register(VisionProcessor.getInstance());
-        mEnabledLooper.register(RobotStateEstimator.getInstance());
-        mEnabledLooper.register(Superstructure.getInstance().getLoop());
-        mEnabledLooper.register(mDrive.getLoop());
-        mEnabledLooper.register(mUtilityArm.getLoop());
-        mDisabledLooper.register(new GyroCalibrator());
+            // Configure loopers
+            mEnabledLooper.register(new TurretResetter());
+            mEnabledLooper.register(VisionProcessor.getInstance());
+            mEnabledLooper.register(RobotStateEstimator.getInstance());
+            mEnabledLooper.register(Superstructure.getInstance().getLoop());
+            mEnabledLooper.register(mDrive.getLoop());
+            mEnabledLooper.register(mUtilityArm.getLoop());
+            mDisabledLooper.register(new GyroCalibrator());
 
-        mSmartDashboardInteractions.initWithDefaults();
+            mSmartDashboardInteractions.initWithDefaults();
 
-        mCompressor.start();
-        mDiddlerServo.set(0);
+            mCompressor.start();
+            mDiddlerServo.set(0);
 
-        VisionServer.getInstance();
+            VisionServer.getInstance();
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     @Override
     public void disabledInit() {
-        if (mAutoModeExecuter != null) {
-            mAutoModeExecuter.stop();
+        try {
+            CrashTracker.logDisabledInit();
+            if (mAutoModeExecuter != null) {
+                mAutoModeExecuter.stop();
+            }
+            mAutoModeExecuter = null;
+
+            // Configure loopers
+            mEnabledLooper.stop();
+            mDisabledLooper.start();
+
+            mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+            mDrive.setBrakeMode(true);
+            // Stop all actuators
+            stopAll();
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
-        mAutoModeExecuter = null;
-
-        // Configure loopers
-        mEnabledLooper.stop();
-        mDisabledLooper.start();
-
-        mDrive.setOpenLoop(DriveSignal.NEUTRAL);
-        mDrive.setBrakeMode(true);
-        // Stop all actuators
-        stopAll();
     }
 
     @Override
     public void autonomousInit() {
-        if (mAutoModeExecuter != null) {
-            mAutoModeExecuter.stop();
+        try {
+            CrashTracker.logAutoInit();
+            if (mAutoModeExecuter != null) {
+                mAutoModeExecuter.stop();
+            }
+            mAutoModeExecuter = null;
+
+            // Reset all sensors
+            zeroAllSensors();
+
+            // Shift to high
+            mDrive.setHighGear(true);
+            mDrive.setBrakeMode(true);
+            mSuperstructure.setTuningMode(false);
+            mSuperstructure.setHoodAdjustment(
+                    mSmartDashboardInteractions.areAutoBallsWorn()
+                            ? Constants.kOldBallHoodAdjustment
+                            : 0.0);
+
+            maybeResetUtilityArmState();
+
+            // Configure loopers
+            mDisabledLooper.stop();
+            mEnabledLooper.start();
+
+            mAutoModeExecuter = new AutoModeExecuter();
+            mAutoModeExecuter.setAutoMode(mSmartDashboardInteractions.getSelectedAutonMode());
+            mAutoModeExecuter.start();
+
+            mDiddlerServo.set(0);
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
-        mAutoModeExecuter = null;
-
-        // Reset all sensors
-        zeroAllSensors();
-
-        // Shift to high
-        mDrive.setHighGear(true);
-        mDrive.setBrakeMode(true);
-        mSuperstructure.setTuningMode(false);
-        mSuperstructure.setHoodAdjustment(
-                mSmartDashboardInteractions.areAutoBallsWorn()
-                        ? Constants.kOldBallHoodAdjustment
-                        : 0.0);
-
-        maybeResetUtilityArmState();
-
-        // Configure loopers
-        mDisabledLooper.stop();
-        mEnabledLooper.start();
-
-        mAutoModeExecuter = new AutoModeExecuter();
-        mAutoModeExecuter.setAutoMode(mSmartDashboardInteractions.getSelectedAutonMode());
-        mAutoModeExecuter.start();
-
-        mDiddlerServo.set(0);
     }
 
     @Override
     public void teleopInit() {
-        if (mAutoModeExecuter != null) {
-            mAutoModeExecuter.stop();
+        try {
+            CrashTracker.logTeleopInit();
+            if (mAutoModeExecuter != null) {
+                mAutoModeExecuter.stop();
+            }
+            mAutoModeExecuter = null;
+
+            // Reset drive
+            mDrive.resetEncoders();
+
+            maybeResetUtilityArmState();
+
+            // Configure loopers
+            mDisabledLooper.stop();
+            mEnabledLooper.start();
+            mDrive.setOpenLoop(DriveSignal.NEUTRAL);
+            mDrive.setBrakeMode(false);
+
+            mGetDown = false;
+            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_DEPLOY);
+            mSuperstructure.stowIntake();
+
+            mDiddlerServo.set(0);
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
-        mAutoModeExecuter = null;
-
-        // Reset drive
-        mDrive.resetEncoders();
-
-        maybeResetUtilityArmState();
-
-        // Configure loopers
-        mDisabledLooper.stop();
-        mEnabledLooper.start();
-        mDrive.setOpenLoop(DriveSignal.NEUTRAL);
-        mDrive.setBrakeMode(false);
-
-        mGetDown = false;
-        mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_DEPLOY);
-        mSuperstructure.stowIntake();
-
-        mDiddlerServo.set(0);
     }
 
     @Override
     public void disabledPeriodic() {
-        // Keep kicking the CAN driver even though we are disabled...
-        // See:
-        // https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%20Manual.pdf
-        // page 130
-        stopAll();
+        try {
+            // Keep kicking the CAN driver even though we are disabled...
+            // See:
+            // https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%20Manual.pdf
+            // page 130
+            stopAll();
 
-        mDrive.resetEncoders();
+            mDrive.resetEncoders();
 
-        outputAllToSmartDashboard();
+            outputAllToSmartDashboard();
 
-        mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
-        mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
-        mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), mSuperstructure.getTurret().getAngle());
+            mHoodTuningMode = mSmartDashboardInteractions.isInHoodTuningMode();
+            mLogToSmartdashboard = mSmartDashboardInteractions.shouldLogToSmartDashboard();
+            mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), mSuperstructure.getTurret().getAngle());
 
-        updateDriverFeedback();
+            updateDriverFeedback();
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     @Override
     public void teleopPeriodic() {
-        double throttle = mControls.getThrottle();
-        double turn = mControls.getTurn();
-        if (mControls.getTractionControl()) {
-            Rotation2d heading_setpoint = mDrive.getGyroAngle();
-            if (mDrive.getControlState() == Drive.DriveControlState.VELOCITY_HEADING_CONTROL) {
-                heading_setpoint = mDrive.getVelocityHeadingSetpoint().getHeading();
-            }
-            mDrive.setVelocityHeadingSetpoint(
-                    mCheesyDriveHelper.handleDeadband(throttle, CheesyDriveHelper.kThrottleDeadband)
-                            * Constants.kDriveLowGearMaxSpeedInchesPerSec,
-                    heading_setpoint);
-        } else {
-            mDrive.setBrakeMode(false);
-            mDrive.setHighGear(!mControls.getLowGear());
-            mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
-        }
-
-        if (mControls.getIntakeButton()) {
-            mSuperstructure.deployIntake();
-            mSuperstructure.setWantsToRunIntake();
-        } else if (mControls.getStowIntakeButton()) {
-            mSuperstructure.stowIntake();
-            mSuperstructure.setWantsToStopIntake();
-        } else if (mControls.getExhaustButton()) {
-            mSuperstructure.setWantsToExhaust();
-        } else {
-            mSuperstructure.setWantsToStopIntake();
-        }
-
-        Superstructure.WantedState idle_state = mControls.getKeepWheelRunning()
-                ? Superstructure.WantedState.WANT_TO_KEEP_SPINNING : Superstructure.WantedState.WANT_TO_DEPLOY;
-        if (mControls.getAutoAimNewBalls()) {
-            mSuperstructure.setHoodAdjustment(0.0);
-            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
-            mGetDown = false;
-        } else if (mControls.getAutoAimOldBalls()) {
-            mSuperstructure.setHoodAdjustment(Constants.kOldBallHoodAdjustment);
-            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
-            mGetDown = false;
-        } else if (mControls.getHoodUpButton()) {
-            mSuperstructure.setWantedState(idle_state);
-            mGetDown = false;
-        } else if (mControls.getHoodDownButton()) {
-            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_STOW);
-            mGetDown = true;
-        } else {
-            mSuperstructure.setWantedState(mGetDown ? Superstructure.WantedState.WANT_TO_STOW : idle_state);
-        }
-
-        mSuperstructure.setTurretManualScanOutput(mControls.getTurretManual() * .66);
-
-        if (mControls.getFireButton()) {
-            mSuperstructure.setWantsToFireWhenReady();
-        } else {
-            mSuperstructure.setWantsToHoldFire();
-        }
-
-        if (mControls.getPortcullisButton()) {
-            mSuperstructure.deployIntake();
-            mGetDown = true;
-            mUtilityArm.setWantedState(UtilityArm.WantedState.LOW_BAR);
-        } else if (mControls.getCdfButton()) {
-            mUtilityArm.setWantedState(UtilityArm.WantedState.LOW_BAR);
-        } else if (mControls.getBailButton()) {
-            mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
-        } else if (mControls.getDeployHangerButton()) {
-            mSuperstructure.stowIntake();
-            mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
-        }
-
-        if (mUtilityArm.isAllowedToHang()) {
-            if (mControls.getHang()) {
-                mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
-                mCompressor.stop();
+        try {
+            double throttle = mControls.getThrottle();
+            double turn = mControls.getTurn();
+            if (mControls.getTractionControl()) {
+                Rotation2d heading_setpoint = mDrive.getGyroAngle();
+                if (mDrive.getControlState() == Drive.DriveControlState.VELOCITY_HEADING_CONTROL) {
+                    heading_setpoint = mDrive.getVelocityHeadingSetpoint().getHeading();
+                }
+                mDrive.setVelocityHeadingSetpoint(
+                        mCheesyDriveHelper.handleDeadband(throttle, CheesyDriveHelper.kThrottleDeadband)
+                                * Constants.kDriveLowGearMaxSpeedInchesPerSec,
+                        heading_setpoint);
             } else {
+                mDrive.setBrakeMode(false);
+                mDrive.setHighGear(!mControls.getLowGear());
+                mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControls.getQuickTurn()));
+            }
+
+            if (mControls.getIntakeButton()) {
+                mSuperstructure.deployIntake();
+                mSuperstructure.setWantsToRunIntake();
+            } else if (mControls.getStowIntakeButton()) {
+                mSuperstructure.stowIntake();
+                mSuperstructure.setWantsToStopIntake();
+            } else if (mControls.getExhaustButton()) {
+                mSuperstructure.setWantsToExhaust();
+            } else {
+                mSuperstructure.setWantsToStopIntake();
+            }
+
+            Superstructure.WantedState idle_state = mControls.getKeepWheelRunning()
+                    ? Superstructure.WantedState.WANT_TO_KEEP_SPINNING : Superstructure.WantedState.WANT_TO_DEPLOY;
+            if (mControls.getAutoAimNewBalls()) {
+                mSuperstructure.setHoodAdjustment(0.0);
+                mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
+                mGetDown = false;
+            } else if (mControls.getAutoAimOldBalls()) {
+                mSuperstructure.setHoodAdjustment(Constants.kOldBallHoodAdjustment);
+                mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
+                mGetDown = false;
+            } else if (mControls.getHoodUpButton()) {
+                mSuperstructure.setWantedState(idle_state);
+                mGetDown = false;
+            } else if (mControls.getHoodDownButton()) {
+                mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_STOW);
+                mGetDown = true;
+            } else {
+                mSuperstructure.setWantedState(mGetDown ? Superstructure.WantedState.WANT_TO_STOW : idle_state);
+            }
+
+            mSuperstructure.setTurretManualScanOutput(mControls.getTurretManual() * .66);
+
+            if (mControls.getFireButton()) {
+                mSuperstructure.setWantsToFireWhenReady();
+            } else {
+                mSuperstructure.setWantsToHoldFire();
+            }
+
+            if (mControls.getPortcullisButton()) {
+                mSuperstructure.deployIntake();
+                mGetDown = true;
+                mUtilityArm.setWantedState(UtilityArm.WantedState.LOW_BAR);
+            } else if (mControls.getCdfButton()) {
+                mUtilityArm.setWantedState(UtilityArm.WantedState.LOW_BAR);
+            } else if (mControls.getBailButton()) {
+                mUtilityArm.setWantedState(UtilityArm.WantedState.DRIVING);
+            } else if (mControls.getDeployHangerButton()) {
+                mSuperstructure.stowIntake();
                 mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
-                mCompressor.start();
             }
-        }
 
-        if (mHoodTuningMode) {
-            mSuperstructure.setTuningMode(true);
-            if (mControls.getHoodTuningPositiveButton()) {
-                mSuperstructure.setHoodManualScanOutput(0.05);
-            } else if (mControls.getHoodTuningNegativeButton()) {
-                mSuperstructure.setHoodManualScanOutput(-0.05);
+            if (mUtilityArm.isAllowedToHang()) {
+                if (mControls.getHang()) {
+                    mUtilityArm.setWantedState(UtilityArm.WantedState.PULL_UP_HANG);
+                    mCompressor.stop();
+                } else {
+                    mUtilityArm.setWantedState(UtilityArm.WantedState.PREPARE_FOR_HANG);
+                    mCompressor.start();
+                }
+            }
+
+            if (mHoodTuningMode) {
+                mSuperstructure.setTuningMode(true);
+                if (mControls.getHoodTuningPositiveButton()) {
+                    mSuperstructure.setHoodManualScanOutput(0.05);
+                } else if (mControls.getHoodTuningNegativeButton()) {
+                    mSuperstructure.setHoodManualScanOutput(-0.05);
+                } else {
+                    mSuperstructure.setHoodManualScanOutput(0.0);
+                }
             } else {
-                mSuperstructure.setHoodManualScanOutput(0.0);
+                mSuperstructure.setTuningMode(false);
             }
-        } else {
-            mSuperstructure.setTuningMode(false);
-        }
 
-        if (mControls.getHoodTuningPositiveButton()) {
-            mSuperstructure.setTestServoSpeed(1.0);
-        } else if (mControls.getHoodTuningNegativeButton()) {
-            mSuperstructure.setTestServoSpeed(-1.0);
-        } else {
-            mSuperstructure.setTestServoSpeed(0.0);
-        }
+            if (mControls.getHoodTuningPositiveButton()) {
+                mSuperstructure.setTestServoSpeed(1.0);
+            } else if (mControls.getHoodTuningNegativeButton()) {
+                mSuperstructure.setTestServoSpeed(-1.0);
+            } else {
+                mSuperstructure.setTestServoSpeed(0.0);
+            }
 
-        if (mControls.getRestartCameraAppButton()) {
-            mVisionServer.requestAppRestart();
-        }
+            if (mControls.getRestartCameraAppButton()) {
+                mVisionServer.requestAppRestart();
+            }
 
-        outputAllToSmartDashboard();
-        updateDriverFeedback();
+            outputAllToSmartDashboard();
+            updateDriverFeedback();
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     @Override
     public void autonomousPeriodic() {
-        outputAllToSmartDashboard();
-        updateDriverFeedback();
+        try {
+            outputAllToSmartDashboard();
+            updateDriverFeedback();
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     private void maybeResetUtilityArmState() {

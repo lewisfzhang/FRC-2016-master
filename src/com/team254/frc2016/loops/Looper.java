@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.team254.frc2016.Constants;
 
+import com.team254.lib.util.CrashTrackingRunnable;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,9 +20,9 @@ public class Looper {
     private final Object taskRunningLock_ = new Object();
     private double timestamp_ = 0;
     private double dt_ = 0;
-    private final Runnable runnable_ = new Runnable() {
+    private final CrashTrackingRunnable runnable_ = new CrashTrackingRunnable() {
         @Override
-        public void run() {
+        public void runCrashTracked() {
             synchronized (taskRunningLock_) {
                 if (running_) {
                     double now = Timer.getFPGATimestamp();

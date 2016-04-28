@@ -1,5 +1,7 @@
 package com.team254.frc2016.auto;
 
+import com.team254.lib.util.CrashTrackingRunnable;
+
 public class AutoModeExecuter {
     private AutoModeBase m_auto_mode;
     private Thread m_thread = null;
@@ -10,9 +12,9 @@ public class AutoModeExecuter {
 
     public void start() {
         if (m_thread == null) {
-            m_thread = new Thread(new Runnable() {
+            m_thread = new Thread(new CrashTrackingRunnable() {
                 @Override
-                public void run() {
+                public void runCrashTracked() {
                     if (m_auto_mode != null) {
                         m_auto_mode.run();
                     }
