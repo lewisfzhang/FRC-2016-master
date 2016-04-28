@@ -71,11 +71,11 @@ public class ControlBoard {
         return mButtonBoard.getRawButton(3);
     }
 
-    public boolean getAutoAim() {
+    public boolean getAutoAimNewBalls() {
         return mButtonBoard.getRawButton(10);
     }
 
-    public boolean getBatterShot() {
+    public boolean getAutoAimOldBalls() {
         return mButtonBoard.getRawButton(9);
     }
 

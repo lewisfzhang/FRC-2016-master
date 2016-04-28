@@ -133,6 +133,7 @@ public class Robot extends IterativeRobot {
         mDrive.setHighGear(true);
         mDrive.setBrakeMode(true);
         mSuperstructure.setTuningMode(false);
+        mSuperstructure.setHoodAdjustment(0.0);  // TODO
 
         maybeResetUtilityArmState();
 
@@ -224,11 +225,13 @@ public class Robot extends IterativeRobot {
 
         Superstructure.WantedState idle_state = mControls.getKeepWheelRunning()
                 ? Superstructure.WantedState.WANT_TO_KEEP_SPINNING : Superstructure.WantedState.WANT_TO_DEPLOY;
-        if (mControls.getAutoAim()) {
+        if (mControls.getAutoAimNewBalls()) {
+            mSuperstructure.setHoodAdjustment(0.0);
             mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
             mGetDown = false;
-        } else if (mControls.getBatterShot()) {
-            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_BATTER);
+        } else if (mControls.getAutoAimOldBalls()) {
+            mSuperstructure.setHoodAdjustment(Constants.kOldBallHoodAdjustment);
+            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
             mGetDown = false;
         } else if (mControls.getHoodUpButton()) {
             mSuperstructure.setWantedState(idle_state);

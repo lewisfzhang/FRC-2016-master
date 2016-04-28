@@ -62,7 +62,6 @@ public class Constants extends ConstantsBase {
     public static double kAutoAimMaxRange = 220.0;
     public static double kAutoShootMaxDriveSpeed = 18.0;
     public static double kAutoAimPredictionTime = 0.25;
-    public static double kShooterVelocityInchesPerSec = 576.0;
     public static int kAutoAimMinConsecutiveCyclesOnTarget = 3;
     public static double kShootActuationTime = 0.75;
     public static double kHoodUnstowToFlywheelSpinTime = 0.4;
@@ -224,6 +223,7 @@ public class Constants extends ConstantsBase {
     }
 
     // Shooter Operational consts
+    public static final double kOldBallHoodAdjustment = -1.0;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMap = new InterpolatingTreeMap<>();
 
     static {

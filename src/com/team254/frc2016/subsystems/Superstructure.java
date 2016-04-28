@@ -84,6 +84,7 @@ public class Superstructure extends Subsystem {
     private double mTurretManualScanOutput = 0;
     private ShooterAimingParameters mTurretManualSetpoint = null;
     private double mHoodManualScanOutput = 0;
+    private double mHoodAdjustment = 0.0;
     int mCurrentTrackId = -1;
     int mConsecutiveCyclesOnTarget = 0;
     int mNumShotsFired = 0;
@@ -298,6 +299,10 @@ public class Superstructure extends Subsystem {
 
     public synchronized void setWantsToRunIntake() {
         mWantedIntakeState = WANT_TO_RUN_INTAKE;
+    }
+    
+    public synchronized void setHoodAdjustment(double adjustment) {
+        mHoodAdjustment = adjustment;
     }
 
     public synchronized void deployIntake() {
@@ -701,7 +706,10 @@ public class Superstructure extends Subsystem {
                     // This target works
                     mFlywheel.setRpm(getShootingSetpointRpm(param.getRange()));
                     if (!mTuningMode) {
-                        mHood.setDesiredAngle(Rotation2d.fromDegrees(getHoodAngleForRange(param.getRange())));
+                        double angle_degrees = getHoodAngleForRange(param.getRange()) + mHoodAdjustment;
+                        angle_degrees = Math.max(angle_degrees, Constants.kMinHoodAngle);
+                        angle_degrees = Math.min(angle_degrees, Constants.kMaxHoodAngle);
+                        mHood.setDesiredAngle(Rotation2d.fromDegrees(angle_degrees));
                     } else {
                         mHood.setOpenLoop(mHoodManualScanOutput);
                     }
