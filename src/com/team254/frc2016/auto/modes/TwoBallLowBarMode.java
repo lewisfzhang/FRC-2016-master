@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.team254.frc2016.RobotState;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
@@ -55,6 +56,7 @@ public class TwoBallLowBarMode extends AutoModeBase {
         runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(first_path), false),
                 new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"), new StartAutoAimingAction(),
                         new PointTurretAction(hint))))));
+        // RobotState.getInstance().resetVision();
         mSuperstructure.setWantsToStopIntake();
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
@@ -63,6 +65,7 @@ public class TwoBallLowBarMode extends AutoModeBase {
         runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(third_path), false),
                 new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"), new StartAutoAimingAction(),
                         new PointTurretAction(hint))))));
+        // RobotState.getInstance().resetVision();
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(WantedState.WANT_TO_DEPLOY);
         mSuperstructure.setWantsToStopIntake();

@@ -1,5 +1,6 @@
 package com.team254.frc2016.auto.modes;
 
+import com.team254.frc2016.RobotState;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;
@@ -58,7 +59,7 @@ public class TwoBallClassBDMode extends AutoModeBase {
                         new StartAutoAimingAction(), new PointTurretAction(mHint))))));
 
         // Shoot ball
-        runAction(new WaitAction(.5));
+        runAction(new WaitAction(.25));
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_KEEP_SPINNING);
         runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));

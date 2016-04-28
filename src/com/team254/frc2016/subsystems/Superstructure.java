@@ -535,7 +535,7 @@ public class Superstructure extends Subsystem {
     private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
         handleIntake(true, true);
         if (state == SystemState.FIRING_AIM) {
-            autoAim(now, false);
+            autoAim(now, true);  // was false, testing if this is the source of auto issues
         }
 
         if (now - stateStartTime < Constants.kShootActuationTime) {
