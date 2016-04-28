@@ -133,7 +133,10 @@ public class Robot extends IterativeRobot {
         mDrive.setHighGear(true);
         mDrive.setBrakeMode(true);
         mSuperstructure.setTuningMode(false);
-        mSuperstructure.setHoodAdjustment(0.0);  // TODO
+        mSuperstructure.setHoodAdjustment(
+                mSmartDashboardInteractions.areAutoBallsWorn()
+                        ? Constants.kOldBallHoodAdjustment
+                        : 0.0);
 
         maybeResetUtilityArmState();
 
