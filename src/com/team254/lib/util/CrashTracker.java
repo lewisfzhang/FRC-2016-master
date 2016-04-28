@@ -1,9 +1,6 @@
 package com.team254.lib.util;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -47,7 +44,10 @@ public class CrashTracker {
     }
 
     private static void logMarker(String mark, Throwable nullableException) {
-        try (PrintWriter writer = new PrintWriter("~/crash_tracking.txt")) {
+
+
+        try (PrintWriter writer =
+                     new PrintWriter(new FileWriter("/home/lvuser/crash_tracking.txt", true))) {
             writer.print(RUN_INSTANCE_UUID.toString());
             writer.print(", ");
             writer.print(mark);

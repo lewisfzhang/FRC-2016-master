@@ -166,7 +166,7 @@ public class Constants extends ConstantsBase {
     // (Note that if multiple talons are dedicated to a mechanism, any sensors
     // are attached to the master)
     // TALONS
-    public static final int kTurretTalonId = 10;
+    public static final int kTurretTalonId = 9;
     public static final int kLeftDriveMasterId = 11;
     public static final int kLeftDriveSlaveId = 12;
     public static final int kRightDriveMasterId = 4;

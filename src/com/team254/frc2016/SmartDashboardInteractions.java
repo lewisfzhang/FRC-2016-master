@@ -213,7 +213,8 @@ public class SmartDashboardInteractions {
                      * true)); }
                      */
 
-                    Superstructure.getInstance().deployIntake();
+                    throw new RuntimeException("Expected exception!!!");
+                    /* Superstructure.getInstance().deployIntake();
                     Superstructure.getInstance().setWantsToRunIntake();
                     Superstructure.getInstance().setWantedState(WantedState.WANT_TO_STOW);
                     runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(0.75))));
@@ -224,7 +225,7 @@ public class SmartDashboardInteractions {
                     path.add(new Waypoint(new Translation2d(90, 18), 120.0, "PopHood"));
                     runAction(new FollowPathAction(new Path(path), false));
                     Superstructure.getInstance().setWantsToStopIntake();
-
+*/
                 }
             };
 
