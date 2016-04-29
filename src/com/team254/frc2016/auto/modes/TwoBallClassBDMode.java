@@ -1,6 +1,5 @@
 package com.team254.frc2016.auto.modes;
 
-import com.team254.frc2016.RobotState;
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 import com.team254.frc2016.auto.actions.*;

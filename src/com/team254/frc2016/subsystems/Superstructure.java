@@ -300,7 +300,7 @@ public class Superstructure extends Subsystem {
     public synchronized void setWantsToRunIntake() {
         mWantedIntakeState = WANT_TO_RUN_INTAKE;
     }
-    
+
     public synchronized void setHoodAdjustment(double adjustment) {
         mHoodAdjustment = adjustment;
     }
@@ -488,9 +488,9 @@ public class Superstructure extends Subsystem {
                             && readyToFire(SystemState.SPINNING_AIM, now))) {
                 System.out.println("FIRING BALL " + (mNumShotsFired + 1) + "\nAngle to Goal: " + mCurrentAngleForLogging
                         + ", Distance to Goal: " + mCurrentRangeForLogging + "\nHood Angle (desired): "
-                        + mHood.getSetpoint() + ", (actual): " + mHood.getAngle() + ", adjustment: " + mHoodAdjustment + "\nTurret Angle (desired): "
-                        + mTurret.getSetpoint() + ", (actual): " + mTurret.getAngle() + "\nFlywheel RPM (desired): "
-                        + mFlywheel.getSetpoint() + ", (actual): " + mFlywheel.getRpm());
+                        + mHood.getSetpoint() + ", (actual): " + mHood.getAngle() + ", adjustment: " + mHoodAdjustment
+                        + "\nTurret Angle (desired): " + mTurret.getSetpoint() + ", (actual): " + mTurret.getAngle()
+                        + "\nFlywheel RPM (desired): " + mFlywheel.getSetpoint() + ", (actual): " + mFlywheel.getRpm());
                 return SystemState.FIRING_AIM;
             } else {
                 return SystemState.SPINNING_AIM;
@@ -540,7 +540,8 @@ public class Superstructure extends Subsystem {
     private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
         handleIntake(true, true);
         if (state == SystemState.FIRING_AIM) {
-            autoAim(now, true);  // was false, testing if this is the source of auto issues
+            autoAim(now, true); // was false, testing if this is the source of
+                                // auto issues
         }
 
         if (now - stateStartTime < Constants.kShootActuationTime) {

@@ -66,7 +66,7 @@ public class PathSegment {
         Translation2d start_to_other = mStart.inverse().translateBy(other);
         return mStartToEnd.getX() * start_to_other.getX() + mStartToEnd.getY() * start_to_other.getY();
     }
-    
+
     public ClosestPointReport getClosestPoint(Translation2d query_point) {
         ClosestPointReport rv = new ClosestPointReport();
         if (mLength > kEpsilon) {

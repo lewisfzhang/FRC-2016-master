@@ -18,8 +18,8 @@ import com.team254.lib.util.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * RobotState keeps track of the poses of various coordinate frames throughout the
- * match.
+ * RobotState keeps track of the poses of various coordinate frames throughout
+ * the match.
  * 
  * Robot frames of interest (from parent to child):
  * 
@@ -148,8 +148,8 @@ public class RobotState {
         Collections.sort(reports, comparator);
 
         // turret fixed (latest) -> vehicle (latest) -> field
-        RigidTransform2d latest_turret_fixed_to_field = getPredictedFieldToVehicle(
-                Constants.kAutoAimPredictionTime).transformBy(kVehicleToTurretFixed).inverse();
+        RigidTransform2d latest_turret_fixed_to_field = getPredictedFieldToVehicle(Constants.kAutoAimPredictionTime)
+                .transformBy(kVehicleToTurretFixed).inverse();
 
         for (TrackReport report : reports) {
             if (current_timestamp - report.latest_timestamp > kMaxTargetAge) {

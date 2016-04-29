@@ -156,7 +156,6 @@ public class VisionServer extends CrashTrackingRunnable {
         }
     }
 
-
     @Override
     public void runCrashTracked() {
         while (m_running) {

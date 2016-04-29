@@ -2,24 +2,12 @@ package com.team254.frc2016;
 
 import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
-import com.team254.frc2016.auto.actions.FollowPathAction;
-import com.team254.frc2016.auto.actions.GetLowAction;
-import com.team254.frc2016.auto.actions.ParallelAction;
-import com.team254.frc2016.auto.actions.WaitAction;
 import com.team254.frc2016.auto.modes.*;
 import com.team254.frc2016.subsystems.ShooterAimingParameters;
-import com.team254.frc2016.subsystems.Superstructure;
-import com.team254.frc2016.subsystems.Superstructure.WantedState;
-import com.team254.lib.util.Path;
 import com.team254.lib.util.Rotation2d;
-import com.team254.lib.util.Path.Waypoint;
-import com.team254.lib.util.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.json.simple.JSONArray;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Controls the interactive elements of smartdashboard.
@@ -214,18 +202,21 @@ public class SmartDashboardInteractions {
                      */
 
                     throw new RuntimeException("Expected exception!!!");
-                    /* Superstructure.getInstance().deployIntake();
-                    Superstructure.getInstance().setWantsToRunIntake();
-                    Superstructure.getInstance().setWantedState(WantedState.WANT_TO_STOW);
-                    runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(0.75))));
-                    ArrayList<Waypoint> path = new ArrayList<>();
-                    path.add(new Waypoint(new Translation2d(0, 0), 120.0));
-                    path.add(new Waypoint(new Translation2d(24, 0), 120.0));
-                    path.add(new Waypoint(new Translation2d(24, 18), 120.0));
-                    path.add(new Waypoint(new Translation2d(90, 18), 120.0, "PopHood"));
-                    runAction(new FollowPathAction(new Path(path), false));
-                    Superstructure.getInstance().setWantsToStopIntake();
-*/
+                    /*
+                     * Superstructure.getInstance().deployIntake();
+                     * Superstructure.getInstance().setWantsToRunIntake();
+                     * Superstructure.getInstance().setWantedState(WantedState.
+                     * WANT_TO_STOW); runAction(new
+                     * ParallelAction(Arrays.asList(new GetLowAction(), new
+                     * WaitAction(0.75)))); ArrayList<Waypoint> path = new
+                     * ArrayList<>(); path.add(new Waypoint(new Translation2d(0,
+                     * 0), 120.0)); path.add(new Waypoint(new Translation2d(24,
+                     * 0), 120.0)); path.add(new Waypoint(new Translation2d(24,
+                     * 18), 120.0)); path.add(new Waypoint(new Translation2d(90,
+                     * 18), 120.0, "PopHood")); runAction(new
+                     * FollowPathAction(new Path(path), false));
+                     * Superstructure.getInstance().setWantsToStopIntake();
+                     */
                 }
             };
 
