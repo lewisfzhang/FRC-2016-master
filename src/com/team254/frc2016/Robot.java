@@ -23,7 +23,6 @@ public class Robot extends IterativeRobot {
     Compressor mCompressor = new Compressor(1);
     RevRoboticsAirPressureSensor mAirPressureSensor = new RevRoboticsAirPressureSensor(3);
     AutoModeExecuter mAutoModeExecuter = null;
-    Servo mDiddlerServo = new Servo(2);
     DigitalOutput mHasBallLightOutput = new DigitalOutput(0);
 
     // Other parts of the robot
@@ -100,7 +99,6 @@ public class Robot extends IterativeRobot {
             mSmartDashboardInteractions.initWithDefaults();
 
             mCompressor.start();
-            mDiddlerServo.set(0);
 
             VisionServer.getInstance();
         } catch (Throwable t) {
@@ -160,8 +158,6 @@ public class Robot extends IterativeRobot {
             mAutoModeExecuter = new AutoModeExecuter();
             mAutoModeExecuter.setAutoMode(mSmartDashboardInteractions.getSelectedAutonMode());
             mAutoModeExecuter.start();
-
-            mDiddlerServo.set(0);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -191,8 +187,6 @@ public class Robot extends IterativeRobot {
             mGetDown = false;
             mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_DEPLOY);
             mSuperstructure.stowIntake();
-
-            mDiddlerServo.set(0);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
