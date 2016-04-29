@@ -32,14 +32,14 @@ public class HoodRoller extends Subsystem {
                     if (isBallPresent()) {
                         stop();
                     } else {
-                        mRollerTalon.set(10.0);
+                        mRollerTalon.set(10.5);
                     }
                     break;
                 case WANTS_REVERSE:
                     mRollerTalon.set(-12.0);
                     break;
                 case WANTS_SHOOT:
-                    mRollerTalon.set(10.0);
+                    mRollerTalon.set(10.5);
                     break;
                 case WANTS_STOP:
                 default:

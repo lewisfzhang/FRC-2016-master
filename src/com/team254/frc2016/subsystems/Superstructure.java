@@ -97,6 +97,7 @@ public class Superstructure extends Subsystem {
     HoodRoller mHoodRoller = new HoodRoller();
     Intake mIntake = new Intake();
     RobotState mRobotState = RobotState.getInstance();
+    Drive mDrive = Drive.getInstance();
     private final TimeDelayedBoolean mHasBallDelayedBoolean = new TimeDelayedBoolean();
 
     // NetworkTables
@@ -402,6 +403,7 @@ public class Superstructure extends Subsystem {
         mHood.setStowed(false);
         mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kBatterHoodAngle));
         mHoodRoller.stop();
+        mRobotState.resetVision();
 
         // State transitions
         boolean isDoneUnstowing = now - stateStartTime > Constants.kHoodUnstowToFlywheelSpinTime;
@@ -738,10 +740,8 @@ public class Superstructure extends Subsystem {
     }
 
     private boolean readyToFire(SystemState state, double now) {
-        Drive drive = Drive.getInstance(); // TODO: hold onto a permanent
-                                           // reference to this
-        boolean is_stopped = Math.abs(drive.getLeftVelocityInchesPerSec()) < Constants.kAutoShootMaxDriveSpeed
-                && Math.abs(drive.getRightVelocityInchesPerSec()) < Constants.kAutoShootMaxDriveSpeed;
+        boolean is_stopped = Math.abs(mDrive.getLeftVelocityInchesPerSec()) < Constants.kAutoShootMaxDriveSpeed
+                && Math.abs(mDrive.getRightVelocityInchesPerSec()) < Constants.kAutoShootMaxDriveSpeed;
         if (state == SystemState.SPINNING_AIM) {
             if ((mTuningMode || mHood.isOnTarget()) && mFlywheel.isOnTarget() && mTurret.isOnTarget()
                     && (mCurrentTrackId != -1)) {

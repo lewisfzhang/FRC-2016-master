@@ -46,7 +46,7 @@ public class TwoBallClassBDMode extends AutoModeBase {
         List<Path.Waypoint> return_path = new ArrayList<>();
         return_path.add(new Path.Waypoint(new Translation2d(TOTAL_DISTANCE_TO_DRIVE, 0), 120.0));
         return_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_DROP_ARM, 0), 72.0));
-        return_path.add(new Path.Waypoint(new Translation2d(48, 0), 60.0, "WatchLine"));
+        return_path.add(new Path.Waypoint(new Translation2d(54, 0), 50.0, "WatchLine"));
         return_path.add(new Path.Waypoint(new Translation2d(30, 0), 40.0));
         return_path.add(new Path.Waypoint(new Translation2d(-100, 0), 40.0));
 

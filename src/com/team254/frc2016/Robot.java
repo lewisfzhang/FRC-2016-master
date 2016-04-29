@@ -147,7 +147,7 @@ public class Robot extends IterativeRobot {
             mDrive.setBrakeMode(true);
             mSuperstructure.setTuningMode(false);
             mSuperstructure.setHoodAdjustment(
-                    mSmartDashboardInteractions.areAutoBallsWorn() ? Constants.kOldBallHoodAdjustment : 0.0);
+                    mSmartDashboardInteractions.areAutoBallsWorn() ? Constants.kOldBallHoodAdjustment : Constants.kNewBallHoodAdjustment);
 
             maybeResetUtilityArmState();
 
@@ -211,6 +211,8 @@ public class Robot extends IterativeRobot {
             mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), mSuperstructure.getTurret().getAngle());
 
             updateDriverFeedback();
+            
+            System.gc();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -252,7 +254,7 @@ public class Robot extends IterativeRobot {
             Superstructure.WantedState idle_state = mControls.getKeepWheelRunning()
                     ? Superstructure.WantedState.WANT_TO_KEEP_SPINNING : Superstructure.WantedState.WANT_TO_DEPLOY;
             if (mControls.getAutoAimNewBalls()) {
-                mSuperstructure.setHoodAdjustment(0.0);
+                mSuperstructure.setHoodAdjustment(Constants.kNewBallHoodAdjustment);
                 mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
                 mGetDown = false;
             } else if (mControls.getAutoAimOldBalls()) {

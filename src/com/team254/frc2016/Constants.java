@@ -156,7 +156,7 @@ public class Constants extends ConstantsBase {
 
     // Utility arm time delays, all in seconds
     public static double kUtilityArmDropTime = 0.7;
-    public static double kUtilityArmRaiseTime = 1.0;
+    public static double kUtilityArmRaiseTime = 0.8;
     public static double kUtilityArmHardStopsMoveForRaiseArmDelay = 0.5;
 
     // Do not change anything after this line!
@@ -223,7 +223,8 @@ public class Constants extends ConstantsBase {
     }
 
     // Shooter Operational consts
-    public static final double kOldBallHoodAdjustment = 3.0;
+    public static final double kOldBallHoodAdjustment = 2.5;
+    public static final double kNewBallHoodAdjustment = 1.0;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
