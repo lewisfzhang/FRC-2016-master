@@ -232,7 +232,7 @@ public class Drive extends Subsystem {
             velocityHeadingPid_.reset();
         }
         pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
-                Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed);
+                Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed, 0.25);
         updatePathFollower();
     }
 

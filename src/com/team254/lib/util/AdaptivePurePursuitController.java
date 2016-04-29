@@ -13,9 +13,10 @@ public class AdaptivePurePursuitController {
     double mMaxAccel;
     double mDt;
     boolean mReversed;
+    double mPathCompletionTolerance;
 
     public AdaptivePurePursuitController(double fixed_lookahead, double max_accel, double nominal_dt, Path path,
-            boolean reversed) {
+            boolean reversed, double path_completion_tolerance) {
         mFixedLookahead = fixed_lookahead;
         mMaxAccel = max_accel;
         mPath = path;
@@ -27,7 +28,7 @@ public class AdaptivePurePursuitController {
     public boolean isDone() {
         double remainingLength = mPath.getRemainingLength();
         // SmartDashboard.putNumber("PATH_remainingLength", remainingLength);
-        return remainingLength < 0.25;
+        return remainingLength <= mPathCompletionTolerance;
     }
 
     public RigidTransform2d.Delta update(RigidTransform2d robot_pose, double now) {
