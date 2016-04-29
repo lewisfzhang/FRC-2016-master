@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.team254.lib.util.*;
 import com.team254.lib.util.Path.Waypoint;
@@ -173,5 +174,24 @@ public class PathTest {
         lookahead_point = path.getLookaheadPoint(robot_position, 5);
         assertEquals(2, lookahead_point.translation.getX(), kTestEpsilon);
         assertTrue(2 < lookahead_point.translation.getY());
+    }
+
+    @Test
+    public void testNumericalStability() {
+        Random rand = new Random(1);
+        for (int i = 0; i < 10000; ++i) {
+            List<Waypoint> waypoints = new ArrayList<>();
+            waypoints.add(new Waypoint(new Translation2d(18, 26), 120.0));
+            waypoints.add(new Waypoint(new Translation2d(24, 18), 120.0));
+            waypoints.add(new Waypoint(new Translation2d(90, 18), 120.0, "PopHood"));
+            waypoints.add(new Waypoint(new Translation2d(205, 18), 120.0));
+            Path path = new Path(waypoints);
+            for (int j = 0; j < 50; ++j) {
+                Translation2d robot_position = new Translation2d(rand.nextDouble() * 10.0 + 24,
+                        rand.nextDouble() * 10.0 + 18);
+                path.update(robot_position);
+                assertTrue(path.getMarkersCrossed().isEmpty());
+            }
+        }
     }
 }

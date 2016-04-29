@@ -46,10 +46,7 @@ public class ShovelTheFriesMode extends AutoModeBase {
         return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, 0), 120.0));
         return_path.add(new Waypoint(new Translation2d(kDistanceToDrive, y_distance), 60.0));
         return_path.add(new Waypoint(new Translation2d(160, y_distance), 60.0));
-
-        // CDF mode causes lots of counts to be skipped, so we can safely come
-        // back this far
-        return_path.add(new Waypoint(new Translation2d(-12, y_distance), 60.0));
+        return_path.add(new Waypoint(new Translation2d(0, y_distance), 60.0));
 
         runAction(new FollowPathAction(new Path(first_path), false));
         runAction(new GetLowAction());

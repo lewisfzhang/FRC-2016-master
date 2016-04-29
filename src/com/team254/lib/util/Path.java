@@ -87,7 +87,7 @@ public class Path {
                         // System.out.println("Jumping to next segment");
                         next.updateStart(next_closest_point_report.closest_point);
                         rv = next_closest_point_report.distance;
-                        it.remove();
+                        mSegments.remove(0);
                         if (mWaypoints.size() > 0) {
                             Waypoint waypoint = mWaypoints.get(0);
                             if (waypoint.marker.isPresent()) {

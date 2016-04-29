@@ -45,7 +45,7 @@ public class TwoBallLowBarMode extends AutoModeBase {
         List<Waypoint> third_path = new ArrayList<>();
         third_path.add(new Waypoint(new Translation2d(18, 26), 120.0));
         third_path.add(new Waypoint(new Translation2d(24, 18), 120.0));
-        third_path.add(new Waypoint(new Translation2d(90, 18), 120.0, "PopHood"));
+        third_path.add(new Waypoint(new Translation2d(95, 18), 120.0, "PopHood"));
         third_path.add(new Waypoint(new Translation2d(205, 18), 120.0));
 
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
