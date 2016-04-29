@@ -23,6 +23,7 @@ public class AdaptivePurePursuitController {
         mDt = nominal_dt;
         mLastCommand = null;
         mReversed = reversed;
+        mPathCompletionTolerance = path_completion_tolerance;
     }
 
     public boolean isDone() {
