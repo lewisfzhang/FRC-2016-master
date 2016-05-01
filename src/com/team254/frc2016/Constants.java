@@ -19,7 +19,7 @@ public class Constants extends ConstantsBase {
     public static double kCameraZOffset = 19.75;
     public static double kCameraPitchAngleDegrees = 35.75; // calibrated 4/22
     public static double kCameraYawAngleDegrees = -1.0;
-    public static double kCameraDeadband = 0.01;
+    public static double kCameraDeadband = 0.0;
 
     // Wheels
     public static double kDriveWheelDiameterInches = 7.3; // Measured on
@@ -223,8 +223,8 @@ public class Constants extends ConstantsBase {
     }
 
     // Shooter Operational consts
-    public static final double kOldBallHoodAdjustment = 2.5;
-    public static final double kNewBallHoodAdjustment = 1.0;
+    public static final double kOldBallHoodAdjustment = 2.4;
+    public static final double kNewBallHoodAdjustment = 0.7;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMap = new InterpolatingTreeMap<>();
 
     static {

@@ -9,8 +9,6 @@ public class StartAutoAimingAction implements Action {
 
     @Override
     public void start() {
-        mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
-        mIsDone = true;
     }
 
     @Override
@@ -20,6 +18,10 @@ public class StartAutoAimingAction implements Action {
 
     @Override
     public void update() {
+        if (mSuperstructure.getIntake().hasBall()) {
+            mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_AIM);
+            mIsDone = true;
+        }
     }
 
     @Override

@@ -47,8 +47,8 @@ public class TwoBallClassBDMode extends AutoModeBase {
         return_path.add(new Path.Waypoint(new Translation2d(TOTAL_DISTANCE_TO_DRIVE, 0), 120.0));
         return_path.add(new Path.Waypoint(new Translation2d(DISTANCE_TO_DROP_ARM, 0), 72.0));
         return_path.add(new Path.Waypoint(new Translation2d(54, 0), 50.0, "WatchLine"));
-        return_path.add(new Path.Waypoint(new Translation2d(30, 0), 40.0));
-        return_path.add(new Path.Waypoint(new Translation2d(-100, 0), 40.0));
+        return_path.add(new Path.Waypoint(new Translation2d(20, 0), 30.0));
+        return_path.add(new Path.Waypoint(new Translation2d(-100, 0), 30.0));
 
         // Start robot actions
         mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_KEEP_SPINNING);
@@ -63,30 +63,21 @@ public class TwoBallClassBDMode extends AutoModeBase {
         mSuperstructure.setWantedState(Superstructure.WantedState.WANT_TO_KEEP_SPINNING);
         runAction(new SetArmModeAction(UtilityArm.WantedState.DRIVING));
 
-        // Drive back to center line
-        runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(return_path), true),
-                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("WatchLine"), new WaitUntilLineAction())))));
-
-        // Creep off the line
-        RigidTransform2d lineRobotPose = Drive.getInstance().getLastLinePose();
-
-        double mCreepDistance = .8;
-
-        List<Path.Waypoint> creep_path = new ArrayList<>();
-        creep_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 20.0));
-        creep_path.add(
-                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mCreepDistance, 0), 20.0));
-
-        // intake ball
+        // Drive back to center line and intake ball
         mSuperstructure.setWantsToRunIntake();
         mSuperstructure.deployIntake();
-        runAction(new FollowPathAction(new Path(creep_path), false));
-        runAction(new WaitAction(0.25));
+        runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(return_path), true),
+                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("WatchLine"), new WaitUntilLineAction())))));
+        mDrive.stop();
+
+        // Get the pose of the line
+        RigidTransform2d lineRobotPose = Drive.getInstance().getLastLinePose();
+        lineRobotPose.transformBy(RigidTransform2d.fromTranslation(new Translation2d(2.0, 0.0)));
 
         // Go over defenses again
         List<Path.Waypoint> second_shot_path = new ArrayList<>();
         second_shot_path.add(
-                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX() + mCreepDistance, 0), 120.0));
+                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 120.0));
         second_shot_path.add(new Path.Waypoint(
                 new Translation2d(DISTANCE_TO_SLOW_DOWN + lineRobotPose.getTranslation().getX(), 0), 72.0));
         second_shot_path.add(new Path.Waypoint(
