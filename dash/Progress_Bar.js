@@ -14,7 +14,7 @@ class ChezyBar {
 		this.value = val;
 		var progessWidth = this.width * this.value;
 		this.innerElement.width(progessWidth)
-		this.innerText.text((this.max)? val * this.max : (Math.floor(this.value*10000) / 100) + "%")
+		this.innerText.text((this.max)? (Math.floor(val * this.max * 100)/100) : (Math.floor(this.value*10000) / 100) + "%")
 		this.innerElement.css('background-color', this.ColorCallback(val).bg || "#DDD");
 		this.innerElement.css('color', this.ColorCallback(val).fg || "black");
 	}
