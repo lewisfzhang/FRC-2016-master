@@ -6,12 +6,7 @@ import java.text.DecimalFormat;
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  * 
- * This representation in SO(2) (see https://en.wikipedia.org/wiki/Circle_group)
- * has well defined behavior for multiplication (rotateBy) and inversion.
- * 
  * Inspired by Sophus (https://github.com/strasdat/Sophus/tree/master/sophus)
- * 
- * @author Jared
  */
 public class Rotation2d implements Interpolable<Rotation2d> {
     protected static final double kEpsilon = 1E-9;

@@ -55,8 +55,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 
  * 5. Camera-to-goal: This is a pure translation, and is measured by the vision
  * system.
- * 
- * @author Jared
  */
 public class RobotState {
     private static RobotState instance_ = new RobotState();

@@ -4,8 +4,6 @@ import java.text.DecimalFormat;
 
 /**
  * A translation in a 2d coordinate frame.
- * 
- * @author Jared
  */
 public class Translation2d implements Interpolable<Translation2d> {
     protected double x_;

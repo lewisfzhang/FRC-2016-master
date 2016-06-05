@@ -4,13 +4,7 @@ package com.team254.lib.util;
  * Represents a 2d pose (rigid transform) containing translational and
  * rotational elements.
  * 
- * This representation in SE(2) (see
- * https://en.wikipedia.org/wiki/Euclidean_group) has well defined behavior for
- * multiplication (transformBy) and inversion.
- * 
  * Inspired by Sophus (https://github.com/strasdat/Sophus/tree/master/sophus)
- * 
- * @author Jared
  */
 public class RigidTransform2d implements Interpolable<RigidTransform2d> {
     private final static double kEps = 1E-9;
