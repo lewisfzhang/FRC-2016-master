@@ -3,7 +3,7 @@ package com.team254.frc2016.auto.actions;
 import com.team254.frc2016.subsystems.UtilityArm;
 
 /**
- * Action for putting the utility arm and intake low
+ * Action for lowering the utility arm
  */
 public class GetLowAction implements Action {
 

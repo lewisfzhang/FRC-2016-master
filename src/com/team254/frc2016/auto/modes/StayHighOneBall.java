@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Go over the defenses in starting config
+ * Go over the defenses in the starting configuration, then launch one ball
+ * (in the robot at start)
  */
 public class StayHighOneBall extends AutoModeBase {
     Superstructure mSuperstructure = Superstructure.getInstance();

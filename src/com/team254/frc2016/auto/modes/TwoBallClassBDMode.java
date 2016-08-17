@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This mode goes over the rock wall and tries to 2 ball
+ * This mode goes over the rock wall and tries to fire two balls
  */
 public class TwoBallClassBDMode extends AutoModeBase {
     ShooterAimingParameters mHint;

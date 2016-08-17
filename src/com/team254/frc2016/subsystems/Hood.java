@@ -11,6 +11,25 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * The Hood assembly controls the launch angle of the ball. Additionally, it
+ * must be lowered whenever the robot is crossing a defense. There are several
+ * parameters accessible to the rest of the robot code: the hood angle, whether
+ * or not the hood is stowed.
+ * 
+ * The ball is first picked up with the Intake then is fed to the 
+ * Flywheel with the HoodRoller. The Turret controls the direction 
+ * that the ball is fired at. Finally, the Hood controls the output
+ * angle and, conversely, trajectory.
+ * 
+ * This is a member of the Superstructure superclass.
+ * 
+ * @see Flywheel
+ * @see Intake
+ * @see HoodRoller
+ * @see Turret
+ * @see Superstructure
+ */
 public class Hood extends Subsystem {
     private ContinuousRotationServo left_servo_;
     private ContinuousRotationServo right_servo_;
@@ -87,6 +106,10 @@ public class Hood extends Subsystem {
         return hood_loop_;
     }
 
+    /**
+     * Sets the angle of the hood to a specified angle.
+     * @param A set angle
+     */
     synchronized void setDesiredAngle(Rotation2d angle) {
         if (control_mode_ != ControlMode.HOMING && control_mode_ != ControlMode.POSITION) {
             control_mode_ = ControlMode.POSITION;
@@ -94,7 +117,11 @@ public class Hood extends Subsystem {
         }
         pid_.setSetpoint(angle.getDegrees());
     }
-
+    
+    /**
+     * Gets the current angle of the hood.
+     * @return The hood's current angle.
+     */
     public synchronized Rotation2d getAngle() {
         return Rotation2d.fromDegrees(
                 encoder_.getContinuousAngleDegrees() * Constants.kHoodGearReduction + Constants.kMinHoodAngle);
@@ -112,15 +139,27 @@ public class Hood extends Subsystem {
         }
     }
 
+    /**
+     * Sets the hood state such that it begins retracting
+     */
     public synchronized void homeSystem() {
         control_mode_ = ControlMode.HOMING;
     }
 
+    /**
+     * Makes the hood assembly begin to retract, or home.
+     */
     synchronized void startHoming() {
         control_mode_ = ControlMode.HOMING;
         set(-1.0);
     }
 
+    /**
+     * Changes the control state of the Hood assembly if the
+     * hood is fully retracted. If not, the Hood state is set to
+     * Open Loop.
+     * @param If the hood has fully retracted.
+     */
     synchronized void stopHoming(boolean success) {
         if (success) {
             has_homed_ = true;
@@ -140,11 +179,19 @@ public class Hood extends Subsystem {
         return pid_.getSetpoint();
     }
 
+    /**
+     * @return If the hood position is within a set tolerance to a specified value.
+     */
     public synchronized boolean isOnTarget() {
         return (has_homed_ && control_mode_ == ControlMode.POSITION
                 && Math.abs(pid_.getError()) < Constants.kHoodOnTargetTolerance);
     }
 
+    /**
+     * To pass an obstacle, the robot's hood must be stowed and the state must be Position.
+     * This function checks that the robot is safe to pass through an obstacle.
+     * @return If the robot is safe to pass through an obstacle
+     */
     public synchronized boolean isSafe() {
         return (control_mode_ == ControlMode.POSITION && getAngle().getDegrees() < Constants.kHoodMaxSafeAngle
                 && pid_.getSetpoint() < Constants.kHoodMaxSafeAngle);

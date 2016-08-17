@@ -14,7 +14,13 @@ import com.team254.lib.util.Path.Waypoint;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShovelTheFriesMode extends AutoModeBase {
+/**
+ * In this autonomous routine, the robot crosses the cheval de frise.
+ * There are switchable modes in this routine- the driver can specify 
+ * whether the robot should return, if it should return on the right side
+ * low bar, and if it should launch a single ball. 
+ */
+public class ChevalDeFriseMode extends AutoModeBase {
     Superstructure mSuperstructure = Superstructure.getInstance();
 
     ShooterAimingParameters mHint;
@@ -23,7 +29,7 @@ public class ShovelTheFriesMode extends AutoModeBase {
     private boolean mShouldDriveBack;
     private boolean mComeBackRight;
 
-    public ShovelTheFriesMode(ShooterAimingParameters hint, boolean shouldComeBack, boolean comeBackRight) {
+    public ChevalDeFriseMode(ShooterAimingParameters hint, boolean shouldComeBack, boolean comeBackRight) {
         mHint = hint;
         mShouldDriveBack = shouldComeBack;
         mComeBackRight = comeBackRight;

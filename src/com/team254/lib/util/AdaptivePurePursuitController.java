@@ -28,7 +28,6 @@ public class AdaptivePurePursuitController {
 
     public boolean isDone() {
         double remainingLength = mPath.getRemainingLength();
-        // SmartDashboard.putNumber("PATH_remainingLength", remainingLength);
         return remainingLength <= mPathCompletionTolerance;
     }
 
@@ -43,9 +42,7 @@ public class AdaptivePurePursuitController {
         if (this.isDone()) {
             return new RigidTransform2d.Delta(0, 0, 0);
         }
-        // System.out.println("Remaining path length: " +
-        // mPath.getRemainingLength() + ", robot pose " + robot_pose
-        // + ", distance from path " + distance_from_path);
+        
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
         Optional<Circle> circle = joinPath(pose, lookahead_point.translation);
@@ -77,8 +74,7 @@ public class AdaptivePurePursuitController {
         }
         final double kMinSpeed = 4.0;
         if (Math.abs(speed) < kMinSpeed) {
-            // Hack for dealing with problems tracking very low speeds with
-            // Talons
+            // Hack for dealing with problems tracking very low speeds with Talons
             speed = kMinSpeed * Math.signum(speed);
         }
 
@@ -129,10 +125,7 @@ public class AdaptivePurePursuitController {
         double mx = (cross_product > 0 ? 1 : -1) * robot_pose.getRotation().sin();
 
         double cross_term = mx * dx + my * dy;
-        // System.out.println("center to right? " + (cross_product > 0) + ", dx
-        // " + dx + ", dy " + dy + ", cross term "
-        // + cross_term + ", pose " + robot_pose + ", lookahead " +
-        // lookahead_point);
+
         if (Math.abs(cross_term) < kEpsilon) {
             // Points are colinear
             return Optional.empty();

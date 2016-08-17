@@ -1,5 +1,10 @@
 package com.team254.lib.util;
 
+/**
+ * A PathSegment consists of two Translation2d objects (the start and end points)
+ * as well as the speed of the robot.
+ *
+ */
 public class PathSegment {
     protected static final double kEpsilon = 1E-9;
 

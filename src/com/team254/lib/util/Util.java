@@ -4,13 +4,9 @@ import java.util.List;
 
 /**
  * Contains basic functions that are used often.
- *
- * @author richard@team254.com (Richard Lin)
- * @author brandon.gonzalez.451@gmail.com (Brandon Gonzalez)
- * @author tom.bottiglieri@gmail.com (Tom Bottiglieri)
  */
 public class Util {
-    // Prevent this class from being instantiated.
+    /** Prevent this class from being instantiated. */
     private Util() {
     }
 

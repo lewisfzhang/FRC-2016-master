@@ -1,4 +1,3 @@
-
 package com.team254.frc2016;
 
 import com.team254.frc2016.auto.AutoModeExecuter;
@@ -15,6 +14,16 @@ import com.team254.lib.util.*;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * The main robot class, which instantiates all robot parts and helper classes.
+ * Some classes are already instantiated upon robot startup; for those classes, the robot
+ * gets the instance as opposed to creating a new object (after all, one can't have two drivetrains)
+ * 
+ * After initializing all robot parts, the code sets up the autonomous and teleoperated
+ * cycles and also code that runs periodically inside both routines.
+ * 
+ * This is the nexus/converging point of the robot code.
+ */
 public class Robot extends IterativeRobot {
     // Subsystems
     Drive mDrive = Drive.getInstance();
@@ -61,7 +70,6 @@ public class Robot extends IterativeRobot {
             mUtilityArm.outputToSmartDashboard();
             mEnabledLooper.outputToSmartDashboard();
         }
-        // TODO: rate limit this
         SmartDashboard.putNumber("Air Pressure psi", mAirPressureSensor.getAirPressurePsi());
     }
 
@@ -194,12 +202,15 @@ public class Robot extends IterativeRobot {
     }
 
     @Override
+    /**
+     * Keep kicking the CAN driver even though we are disabled...
+     * See:
+     * https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%20Manual.pdf
+     * page 130
+     */
     public void disabledPeriodic() {
         try {
-            // Keep kicking the CAN driver even though we are disabled...
-            // See:
-            // https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%20Manual.pdf
-            // page 130
+            // 
             stopAll();
 
             mDrive.resetEncoders();
@@ -219,6 +230,11 @@ public class Robot extends IterativeRobot {
         }
     }
 
+    /** 
+     * To control the robot, the code sets the desired state of the robot (a state machine). 
+     * The robot will constantly compare the desired and actual state and act to bring the 
+     * two closer. State machines are fundamental to the operation of the robot.
+     */
     @Override
     public void teleopPeriodic() {
         try {

@@ -1,7 +1,8 @@
 package com.team254.lib.util;
 
 /**
- * Created by ryanjohnson on 1/30/16.
+ * A drivetrain command consisting of the left, right motor settings
+ * and whether the brake mode is enabled.
  */
 public class DriveSignal {
     public double leftMotor;

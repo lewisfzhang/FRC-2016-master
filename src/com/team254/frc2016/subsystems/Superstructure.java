@@ -16,6 +16,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static com.team254.frc2016.subsystems.Superstructure.WantedIntakeState.WANT_TO_RUN_INTAKE;
 
+/**
+ * The overarching superclass containing all components of the superstructure:
+ * the computer vision, flywheel, hood, hood roller, and intake. This 
+ * coordinates the entire firing sequence, from when the ball is intaked to 
+ * when it is fired.
+ * 
+ * @see Flywheel
+ * @see Hood
+ * @see HoodRoller
+ * @see Intake
+ * @see VisionServer
+ */
 public class Superstructure extends Subsystem {
 
     static Superstructure mInstance = new Superstructure();
@@ -100,7 +112,6 @@ public class Superstructure extends Subsystem {
     Drive mDrive = Drive.getInstance();
     private final TimeDelayedBoolean mHasBallDelayedBoolean = new TimeDelayedBoolean();
 
-    // NetworkTables
     NetworkTable mShooterTable = NetworkTable.getTable("shooter");
 
     Loop mLoop = new Loop() {
@@ -108,8 +119,7 @@ public class Superstructure extends Subsystem {
         private SystemState mSystemState = SystemState.REENABLED;
 
         // Every time we transition states, we update the current state start
-        // time and the state
-        // changed boolean (for one cycle)
+        // time and the state changed boolean (for one cycle)
         private double mCurrentStateStartTime;
         private boolean mStateChanged;
 
@@ -542,8 +552,7 @@ public class Superstructure extends Subsystem {
     private synchronized SystemState handleShooting(SystemState state, double now, double stateStartTime) {
         handleIntake(true, true);
         if (state == SystemState.FIRING_AIM) {
-            autoAim(now, true); // was false, testing if this is the source of
-                                // auto issues
+            autoAim(now, true);
         }
 
         if (now - stateStartTime < Constants.kShootActuationTime) {
@@ -682,11 +691,9 @@ public class Superstructure extends Subsystem {
         if (aimingParameters.isEmpty() && (allow_changing_tracks || mTurretManualSetpoint != null)) {
             // Manual search
             if (mTurretManualSetpoint != null) {
-                // System.out.println("Going to manual setpoint");
                 mTurret.setDesiredAngle(mTurretManualSetpoint.getTurretAngle());
                 mHood.setDesiredAngle(Rotation2d.fromDegrees(getHoodAngleForRange(mTurretManualSetpoint.range)));
             } else {
-                // System.out.println("No targets - Manual scan");
                 mTurret.setOpenLoop(mTurretManualScanOutput);
                 if (!mTuningMode) {
                     mHood.setDesiredAngle(Rotation2d.fromDegrees(Constants.kHoodNeutralAngle));
@@ -696,7 +703,6 @@ public class Superstructure extends Subsystem {
             }
             mFlywheel.setRpm(Constants.kFlywheelGoodBallRpmSetpoint);
         } else {
-            // System.out.println("Picking a target");
             // Pick the target to aim at
             boolean has_target = false;
             for (ShooterAimingParameters param : aimingParameters) {
@@ -717,7 +723,6 @@ public class Superstructure extends Subsystem {
                         mHood.setOpenLoop(mHoodManualScanOutput);
                     }
                     mTurret.setDesiredAngle(param.getTurretAngle());
-                    // mTurret.setOpenLoop(mTurretManualScanOutput / 10.0);
                     mCurrentAngleForLogging = param.getTurretAngle().getDegrees();
                     mCurrentRangeForLogging = param.getRange();
                     mCurrentTrackId = param.getTrackid();

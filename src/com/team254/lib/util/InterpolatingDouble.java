@@ -1,5 +1,10 @@
 package com.team254.lib.util;
 
+/**
+ * A Double that can be interpolated using the InterpolatingTreeMap.
+ * 
+ * @see InterpolatingTreeMap
+ */
 public class InterpolatingDouble implements Interpolable<InterpolatingDouble>, InverseInterpolable<InterpolatingDouble>,
         Comparable<InterpolatingDouble> {
     public Double value = 0.0;

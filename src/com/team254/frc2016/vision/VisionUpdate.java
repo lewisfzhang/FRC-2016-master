@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * VisionUpdate contains the various attributes outputted by the vision system,
+ * namely a list of targets and the timestamp at which it was captured.
+ */
 public class VisionUpdate {
     protected boolean valid = false;
     protected long capturedAgoMs;
@@ -33,8 +37,14 @@ public class VisionUpdate {
         }
     }
 
-    // Example json string
-    // { "capturedAgoMs" : 100, "targets": [{"y": 5.4, "z": 5.5}] }
+    /**
+     * Generates a VisionUpdate object given a JSON blob and a timestamp.
+     * 
+     * @param Capture timestamp
+     * @param JSON blob with update string, example: { "capturedAgoMs" : 100, "targets": [{"y": 5.4, "z": 5.5}] }
+     * @return VisionUpdate object
+     */
+    // 
     public static VisionUpdate generateFromJsonString(double current_time, String updateString) {
         VisionUpdate update = new VisionUpdate();
         try {

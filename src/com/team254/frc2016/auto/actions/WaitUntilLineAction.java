@@ -2,6 +2,9 @@ package com.team254.frc2016.auto.actions;
 
 import com.team254.frc2016.subsystems.Drive;
 
+/**
+ * Sets the robot to stop at the next detected line
+ */
 public class WaitUntilLineAction implements Action {
     Drive mDrive = Drive.getInstance();
     int mCount = 0;

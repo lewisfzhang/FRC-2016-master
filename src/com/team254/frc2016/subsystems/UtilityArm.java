@@ -92,14 +92,16 @@ public class UtilityArm extends Subsystem {
 
         private SystemState mSystemState = PANIC_SYSTEM_STATE;
 
-        // Every time we transition states, we update the current state start
-        // time and the state
-        // changed boolean (for one cycle)
+        /** 
+         * Every time we transition states, we update the current state start
+         * time and the state changed boolean (for one cycle)
+         */
+        
         private double mCurrentStateStartTime;
 
         @Override
         public void onStart() {
-            // Leave the wanted state as it was set before enabling
+            /** Leave the wanted state as it was set before enabling */
             mSystemState = stateForOnStart();
             mCurrentStateStartTime = Timer.getFPGATimestamp();
             mIsAllowedToHang = false;
@@ -231,15 +233,15 @@ public class UtilityArm extends Subsystem {
 
     private synchronized SystemState handleDrivingToLowBar(double timeSinceStateStart) {
         switch (mWantedState) {
-        case PREPARE_FOR_HANG: // fallthrough
-        case BATTER_CHALLENGE: // fallthrough
+        case PREPARE_FOR_HANG:
+        case BATTER_CHALLENGE:
         case LOW_BAR:
             return timeSinceStateStart >= Constants.kUtilityArmDropTime ? SystemState.LOW_BAR
                     : SystemState.DRIVE_TO_LOW_BAR;
-        case DRIVING: // fallthrough
+        case DRIVING:
             return SystemState.DRIVE;
-        case STAY_IN_SIZE_BOX: // fallthrough
-        case PULL_UP_HANG: // fallthrough
+        case STAY_IN_SIZE_BOX:
+        case PULL_UP_HANG:
         default:
             logIllegalWantedState(SystemState.DRIVE_TO_LOW_BAR, mWantedState);
             return SystemState.DRIVE_TO_LOW_BAR;
@@ -251,7 +253,7 @@ public class UtilityArm extends Subsystem {
         switch (mWantedState) {
         case LOW_BAR:
             return SystemState.LOW_BAR;
-        case DRIVING: // fallthrough
+        case DRIVING:
             mIsSafeToDriveThroughPortcullis = false;
             return SystemState.DRIVE;
         case PREPARE_FOR_HANG:
@@ -260,8 +262,8 @@ public class UtilityArm extends Subsystem {
         case BATTER_CHALLENGE:
             mIsSafeToDriveThroughPortcullis = false;
             return SystemState.LOW_BAR_WAIT_FOR_HARDSTOP_CLEARANCE;
-        case STAY_IN_SIZE_BOX: // Fallthrough
-        case PULL_UP_HANG: // Fallthrough
+        case STAY_IN_SIZE_BOX:
+        case PULL_UP_HANG:
         default:
             logIllegalWantedState(SystemState.LOW_BAR, mWantedState);
             return SystemState.LOW_BAR;
@@ -270,14 +272,14 @@ public class UtilityArm extends Subsystem {
 
     private synchronized SystemState handleDriving() {
         switch (mWantedState) {
-        case LOW_BAR: // fallthrough
-        case BATTER_CHALLENGE: // fallthrough
+        case LOW_BAR:
+        case BATTER_CHALLENGE:
         case PREPARE_FOR_HANG:
             return SystemState.DRIVE_TO_LOW_BAR;
         case DRIVING:
             return SystemState.DRIVE;
-        case STAY_IN_SIZE_BOX: // fallthrough
-        case PULL_UP_HANG: // fallthrough
+        case STAY_IN_SIZE_BOX:
+        case PULL_UP_HANG:
         default:
             logIllegalWantedState(SystemState.DRIVE, mWantedState);
             return SystemState.DRIVE;
@@ -318,15 +320,15 @@ public class UtilityArm extends Subsystem {
 
     private synchronized SystemState handleBatterChallenge() {
         switch (mWantedState) {
-        case LOW_BAR: // fallthrough
-        case DRIVING: // fallthrough
+        case LOW_BAR:
+        case DRIVING:
             return SystemState.DRIVE_TO_LOW_BAR;
         case PREPARE_FOR_HANG:
             return SystemState.LIFTING_ARM_FOR_HANG;
         case BATTER_CHALLENGE:
             return SystemState.BATTER_CHALLENGE;
-        case PULL_UP_HANG: // fallthrough
-        case STAY_IN_SIZE_BOX: // fallthrough
+        case PULL_UP_HANG:
+        case STAY_IN_SIZE_BOX:
         default:
             logIllegalWantedState(SystemState.BATTER_CHALLENGE, mWantedState);
             return SystemState.BATTER_CHALLENGE;
@@ -335,17 +337,17 @@ public class UtilityArm extends Subsystem {
 
     private synchronized SystemState handleWaitForHardstopClearance(double timeSinceStateStart) {
         switch (mWantedState) {
-        case LOW_BAR: // fallthrough
-        case DRIVING: // fallthrough
+        case LOW_BAR:
+        case DRIVING:
             return SystemState.DRIVE_TO_LOW_BAR;
         case PREPARE_FOR_HANG:
-        case PULL_UP_HANG: // fallthrough
+        case PULL_UP_HANG:
             return timeSinceStateStart >= Constants.kUtilityArmHardStopsMoveForRaiseArmDelay ? SystemState.DEPLOY_HOOKS
                     : SystemState.LOW_BAR_WAIT_FOR_HARDSTOP_CLEARANCE;
         case BATTER_CHALLENGE:
             return timeSinceStateStart >= Constants.kUtilityArmHardStopsMoveForRaiseArmDelay
                     ? SystemState.BATTER_CHALLENGE : SystemState.LOW_BAR_WAIT_FOR_HARDSTOP_CLEARANCE;
-        case STAY_IN_SIZE_BOX: // fallthrough
+        case STAY_IN_SIZE_BOX:
         default:
             logIllegalWantedState(SystemState.BATTER_CHALLENGE, mWantedState);
             return SystemState.LOW_BAR_WAIT_FOR_HARDSTOP_CLEARANCE;
@@ -358,19 +360,19 @@ public class UtilityArm extends Subsystem {
 
     private void setOutputsForState(SystemState systemState) {
         switch (systemState) {
-        case SIZE_BOX_TO_LOW_BAR: // fallthrough
-        case DRIVE_TO_LOW_BAR: // fallthrough
-        case LOW_BAR_WAIT_FOR_HARDSTOP_CLEARANCE: // fallthrough
+        case SIZE_BOX_TO_LOW_BAR:
+        case DRIVE_TO_LOW_BAR:
+        case LOW_BAR_WAIT_FOR_HARDSTOP_CLEARANCE:
         case LOW_BAR:
             setOutputs(ArmOutput.ARM_DOWN, AdjustableHardstopOutput.PREVENT_HANG, HookReleaseOutput.HOOKS_HELD_IN);
             mMasterTalon.set(0.0);
             break;
-        case SIZE_BOX: // fallthrough
+        case SIZE_BOX:
         case DRIVE:
             setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.PREVENT_HANG, HookReleaseOutput.HOOKS_HELD_IN);
             mMasterTalon.set(0.0);
             break;
-        case BATTER_CHALLENGE: // fallthrough
+        case BATTER_CHALLENGE:
         case LIFTING_ARM_FOR_HANG:
             setOutputs(ArmOutput.ARM_UP, AdjustableHardstopOutput.ALLOW_HANG, HookReleaseOutput.HOOKS_HELD_IN);
             mMasterTalon.set(0.0);
@@ -401,8 +403,7 @@ public class UtilityArm extends Subsystem {
         mHookReleaseSolenoid.set(hookReleaseOutput.value);
     }
 
-    // These enums strongly type solenoid outputs to their respective solenoid
-    // directions
+    /** These enums strongly type solenoid outputs to their respective solenoid directions **/
     private enum ArmOutput {
         ARM_UP(false), ARM_DOWN(!ARM_UP.value);
 

@@ -8,11 +8,13 @@ import com.team254.lib.util.Rotation2d;
  * wheelbase as a differential drive (with a corrective factor to account for
  * the inherent skidding of the center 4 wheels quasi-kinematically).
  */
+
 public class Kinematics {
     private static final double kEpsilon = 1E-9;
 
-    // Forward kinematics using only encoders, rotation is implicit (less
-    // accurate than below, but useful for predicting motion)
+    /** Forward kinematics using only encoders, rotation is implicit (less
+     * accurate than below, but useful for predicting motion)
+     */
     public static RigidTransform2d.Delta forwardKinematics(double left_wheel_delta, double right_wheel_delta) {
         double linear_velocity = (left_wheel_delta + right_wheel_delta) / 2;
         double delta_v = (right_wheel_delta - left_wheel_delta) / 2;
@@ -20,14 +22,13 @@ public class Kinematics {
         return new RigidTransform2d.Delta(linear_velocity, 0, delta_rotation);
     }
 
-    // Forward kinematics using encoders and explicitly measured rotation (ex.
-    // from gyro)
+    /** Forward kinematics using encoders and explicitly measured rotation (ex. from gyro) */
     public static RigidTransform2d.Delta forwardKinematics(double left_wheel_delta, double right_wheel_delta,
             double delta_rotation_rads) {
         return new RigidTransform2d.Delta((left_wheel_delta + right_wheel_delta) / 2, 0, delta_rotation_rads);
     }
 
-    // Append the result of forward kinematics to a previous pose.
+    /** Append the result of forward kinematics to a previous pose. */
     public static RigidTransform2d integrateForwardKinematics(RigidTransform2d current_pose, double left_wheel_delta,
             double right_wheel_delta, Rotation2d current_heading) {
         RigidTransform2d.Delta with_gyro = forwardKinematics(left_wheel_delta, right_wheel_delta,

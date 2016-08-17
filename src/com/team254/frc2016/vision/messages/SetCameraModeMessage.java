@@ -1,5 +1,8 @@
 package com.team254.frc2016.vision.messages;
 
+/**
+ * A Message that contains and can set the state of the camera and intake systems.
+ */
 public class SetCameraModeMessage extends VisionMessage {
 
     private static final String K_VISION_MODE = "vision";

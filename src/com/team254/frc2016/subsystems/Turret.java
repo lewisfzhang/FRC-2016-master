@@ -7,6 +7,24 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * The Turret subsystem controls the direction the ball is fired.
+ * On the Turret assembly is the Hood and Flywheel. The Turret can only
+ * rotate within 240 degrees, and mechanical bumper switches indicate when
+ * the mechanical limits are reached. This is part of the Superstructure
+ * superclass.
+ * 
+ * The ball is first picked up with the Intake then is fed to the 
+ * Flywheel with the HoodRoller. The Turret controls the direction 
+ * that the ball is fired at. Finally, the Hood controls the output
+ * angle and, conversely, trajectory.
+ * 
+ * @see Flywheel
+ * @see Hood
+ * @see HoodRoller
+ * @see Intake
+ * @see Superstructure
+ */
 public class Turret extends Subsystem {
     private CANTalon talon_;
 
@@ -76,6 +94,9 @@ public class Turret extends Subsystem {
                 && Math.abs(getError()) < Constants.kTurretOnTargetTolerance);
     }
 
+    /**
+     * @return If the turret is within its mechanical limits and in the right state.
+     */
     public synchronized boolean isSafe() {
         return (talon_.getControlMode() == CANTalon.TalonControlMode.Position && talon_.getSetpoint() == 0 && Math.abs(
                 getAngle().getDegrees() * Constants.kTurretRotationsPerTick * 360.0) < Constants.kTurretSafeTolerance);

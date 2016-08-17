@@ -14,11 +14,9 @@ import java.util.*;
 
 /**
  * ConstantsBase
- * <p>
+ * 
  * Base class for storing robot constants. Anything stored as a public static
  * field will be reflected and be able to set externally
- *
- * @author Tom Bottiglieri
  */
 public abstract class ConstantsBase {
     HashMap<String, Boolean> modifiedKeys = new HashMap<String, Boolean>();
@@ -105,7 +103,6 @@ public abstract class ConstantsBase {
                 try {
                     return new Constant(field.getName(), field.getType(), field.get(this));
                 } catch (IllegalArgumentException | IllegalAccessException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -135,7 +132,6 @@ public abstract class ConstantsBase {
                     c = new Constant(field.getName(), field.getType(), field.get(this));
                     constants.add(c);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -167,10 +163,8 @@ public abstract class ConstantsBase {
                 setConstantRaw(key, value);
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -194,7 +188,6 @@ public abstract class ConstantsBase {
             writer.write(json.toJSONString());
             writer.close();
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

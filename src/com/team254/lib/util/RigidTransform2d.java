@@ -49,8 +49,9 @@ public class RigidTransform2d implements Interpolable<RigidTransform2d> {
         return new RigidTransform2d(new Translation2d(), rotation);
     }
 
-    // SE(2) exponential map
-    // https://github.com/strasdat/Sophus/blob/master/sophus/se2.hpp
+    /** SE(2) exponential map
+     *  https://github.com/strasdat/Sophus/blob/master/sophus/se2.hpp
+     */
     public static RigidTransform2d fromVelocity(Delta delta) {
         double sin_theta = Math.sin(delta.dtheta);
         double cos_theta = Math.cos(delta.dtheta);
@@ -92,8 +93,7 @@ public class RigidTransform2d implements Interpolable<RigidTransform2d> {
         return new RigidTransform2d(translation_.inverse().rotateBy(rotation_inverted), rotation_inverted);
     }
 
-    // This currently does Riemannian interpolation. We could do twist
-    // interpolation if necessary.
+    /** This does Riemannian interpolation and can do twist interpolation if necessary. */
     @Override
     public RigidTransform2d interpolate(RigidTransform2d other, double x) {
         if (x <= 0) {

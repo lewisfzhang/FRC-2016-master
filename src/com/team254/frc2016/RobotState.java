@@ -56,6 +56,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 5. Camera-to-goal: This is a pure translation, and is measured by the vision
  * system.
  */
+
 public class RobotState {
     private static RobotState instance_ = new RobotState();
 
@@ -168,8 +169,6 @@ public class RobotState {
     }
 
     public synchronized void addFieldToVehicleObservation(double timestamp, RigidTransform2d observation) {
-        // System.out.println("addFieldToVehicleObservation " +
-        // observation);
         field_to_vehicle_.put(new InterpolatingDouble(timestamp), observation);
     }
 
@@ -185,8 +184,6 @@ public class RobotState {
     }
 
     public void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
-        // System.out.println("Start addVisionUpdate at " +
-        // Timer.getFPGATimestamp());
         List<Translation2d> field_to_goals = new ArrayList<>();
         RigidTransform2d field_to_camera = getFieldToCamera(timestamp);
         if (!(vision_update == null || vision_update.isEmpty())) {
@@ -219,8 +216,6 @@ public class RobotState {
         synchronized (this) {
             goal_tracker_.update(timestamp, field_to_goals);
         }
-        // System.out.println("Done addVisionUpdate at " +
-        // Timer.getFPGATimestamp());
     }
 
     public synchronized void resetVision() {
