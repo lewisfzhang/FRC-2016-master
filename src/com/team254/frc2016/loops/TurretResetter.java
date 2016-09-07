@@ -4,10 +4,10 @@ import com.team254.frc2016.subsystems.Superstructure;
 import com.team254.frc2016.subsystems.Turret;
 
 /**
- * Periodically checks if the pivoting turret hits either extreme
- * (remember, the turret cannot spin in a complete circle). There are
- * bumper switches at both extremes of the turret, and this checks if
- * the bumper switches are pressed. If so, the turret re-centers itself.
+ * Periodically checks if the pivoting turret hits either extreme (remember, the
+ * turret cannot spin in a complete circle). There are bumper switches at both
+ * extremes of the turret, and this checks if the bumper switches are pressed.
+ * If so, the turret re-centers itself.
  */
 public class TurretResetter implements Loop {
     Superstructure mSuperstructure = Superstructure.getInstance();

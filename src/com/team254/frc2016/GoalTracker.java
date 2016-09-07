@@ -10,14 +10,15 @@ import com.team254.lib.util.Translation2d;
 /**
  * This is used in the event that multiple goals are detected to judge all goals
  * based on timestamp, stability, and continuation of previous goals (i.e. if a
- * goal was detected earlier and has changed locations).
- * This code is crucial to determining the appropriate goal to fire at.
+ * goal was detected earlier and has changed locations). This allows the robot
+ * to make consistent decisions about which goal to aim at and to smooth out
+ * jitter from vibration of the camera.
  * 
  * @see GoalTrack.java
  */
 public class GoalTracker {
-    /** 
-     * Track reports contain all of the relevant information about a given goal 
+    /**
+     * Track reports contain all of the relevant information about a given goal
      * track.
      */
     public static class TrackReport {
@@ -44,10 +45,10 @@ public class GoalTracker {
 
     /**
      * TrackReportComparators are used in the case that multiple tracks are
-     * active (e.g. we see or have recently seen multiple goals).
-     * They contain heuristics used to pick which track we should aim at by
-     * calculating a score for each track (highest score wins).
-     */    
+     * active (e.g. we see or have recently seen multiple goals). They contain
+     * heuristics used to pick which track we should aim at by calculating a
+     * score for each track (highest score wins).
+     */
     public static class TrackReportComparator implements Comparator<TrackReport> {
         // Reward tracks for being more stable (seen in more frames)
         double mStabilityWeight;

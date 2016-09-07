@@ -12,7 +12,8 @@ import com.team254.lib.util.Rotation2d;
 public class Kinematics {
     private static final double kEpsilon = 1E-9;
 
-    /** Forward kinematics using only encoders, rotation is implicit (less
+    /**
+     * Forward kinematics using only encoders, rotation is implicit (less
      * accurate than below, but useful for predicting motion)
      */
     public static RigidTransform2d.Delta forwardKinematics(double left_wheel_delta, double right_wheel_delta) {
@@ -22,7 +23,10 @@ public class Kinematics {
         return new RigidTransform2d.Delta(linear_velocity, 0, delta_rotation);
     }
 
-    /** Forward kinematics using encoders and explicitly measured rotation (ex. from gyro) */
+    /**
+     * Forward kinematics using encoders and explicitly measured rotation (ex.
+     * from gyro)
+     */
     public static RigidTransform2d.Delta forwardKinematics(double left_wheel_delta, double right_wheel_delta,
             double delta_rotation_rads) {
         return new RigidTransform2d.Delta((left_wheel_delta + right_wheel_delta) / 2, 0, delta_rotation_rads);

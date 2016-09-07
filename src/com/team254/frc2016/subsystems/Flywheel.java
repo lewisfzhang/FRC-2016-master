@@ -7,14 +7,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * The flywheel has several parameters: the RPM speed, the setpoint,
- * and the RPM tolerance. When told to, the flywheel will try to spin
- * up to the setpoint within the set RPM tolerance.
+ * The flywheel has several parameters: the RPM speed, the setpoint, and the RPM
+ * tolerance. When told to, the flywheel will try to spin up to the setpoint
+ * within the set RPM tolerance.
  * 
- * The ball is first picked up with the Intake then is fed to the 
- * Flywheel with the HoodRoller. The Turret controls the direction 
- * that the ball is fired at. Finally, the Hood controls the output
- * angle and, conversely, trajectory.
+ * The ball is first picked up with the Intake then is fed to the Flywheel with
+ * the HoodRoller. The Turret controls the direction that the ball is fired at.
+ * Finally, the Hood controls the output angle and, conversely, trajectory.
  * 
  * This is a member of the Superstructure superclass.
  * 
@@ -64,9 +63,11 @@ public class Flywheel extends Subsystem {
     }
 
     /**
-     * Sets the RPM of the flywheel. The flywheel will then spin up to the set speed 
-     * within a preset tolerance.
-     * @param Set flywheel RPM 
+     * Sets the RPM of the flywheel. The flywheel will then spin up to the set
+     * speed within a preset tolerance.
+     * 
+     * @param Set
+     *            flywheel RPM
      */
     synchronized void setRpm(double rpm) {
         master_talon_.changeControlMode(CANTalon.TalonControlMode.Speed);
@@ -83,7 +84,8 @@ public class Flywheel extends Subsystem {
     }
 
     /**
-     * @return If the flywheel RPM is within the tolerance to the specified set point.
+     * @return If the flywheel RPM is within the tolerance to the specified set
+     *         point.
      */
     public synchronized boolean isOnTarget() {
         return (master_talon_.getControlMode() == CANTalon.TalonControlMode.Speed

@@ -3,7 +3,8 @@ package com.team254.frc2016.auto.actions;
 import com.team254.frc2016.subsystems.UtilityArm;
 
 /**
- * Action for moving the utility arm to a specified mode (taken in as a parameter)
+ * Action for moving the utility arm to a specified mode (taken in as a
+ * parameter)
  */
 public class SetArmModeAction implements Action {
 

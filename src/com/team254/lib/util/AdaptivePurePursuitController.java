@@ -3,6 +3,16 @@ package com.team254.lib.util;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Implements an adaptive pure pursuit controller. See:
+ * https://www.ri.cmu.edu/pub_files/pub1/kelly_alonzo_1994_4/kelly_alonzo_1994_4
+ * .pdf
+ * 
+ * Basically, we find a spot on the path we'd like to follow and calculate the
+ * wheel speeds necessary to make us land on that spot. The target spot is a
+ * specified distance ahead of us, and we look further ahead the greater our
+ * tracking error.
+ */
 public class AdaptivePurePursuitController {
     private static final double kEpsilon = 1E-9;
 
@@ -42,7 +52,7 @@ public class AdaptivePurePursuitController {
         if (this.isDone()) {
             return new RigidTransform2d.Delta(0, 0, 0);
         }
-        
+
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
         Optional<Circle> circle = joinPath(pose, lookahead_point.translation);
@@ -74,7 +84,8 @@ public class AdaptivePurePursuitController {
         }
         final double kMinSpeed = 4.0;
         if (Math.abs(speed) < kMinSpeed) {
-            // Hack for dealing with problems tracking very low speeds with Talons
+            // Hack for dealing with problems tracking very low speeds with
+            // Talons
             speed = kMinSpeed * Math.signum(speed);
         }
 

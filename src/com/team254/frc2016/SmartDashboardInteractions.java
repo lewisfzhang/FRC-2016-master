@@ -10,9 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.json.simple.JSONArray;
 
 /**
- * Controls the interactive elements of smartdashboard.
+ * Controls the interactive elements of SmartDashboard.
  *
- * Keeps the network tables keys in one spot and enforces autonomous mode invariants.
+ * Keeps the network tables keys in one spot and enforces autonomous mode
+ * invariants.
  */
 public class SmartDashboardInteractions {
 

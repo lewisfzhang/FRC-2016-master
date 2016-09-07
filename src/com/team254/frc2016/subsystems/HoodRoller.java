@@ -8,15 +8,14 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * This is the hood roller, which feeds balls from the intake to the
- * shooter. More precisely, the ball is fed to the Flywheel, and the
- * Hood controls the output angle and, conversely, trajectory. The HoodRoller
- * can also out-take balls by reversing the direction of the rollers.
+ * This is the hood roller, which feeds balls from the intake to the shooter.
+ * More precisely, the ball is fed to the Flywheel, and the Hood controls the
+ * output angle and, conversely, trajectory. The HoodRoller can also eject balls
+ * by reversing the direction of the rollers.
  * 
- * The ball is first picked up with the Intake then is fed to the 
- * Flywheel with the HoodRoller. The Turret controls the direction 
- * that the ball is fired at. Finally, the Hood controls the output
- * angle and, conversely, trajectory.
+ * The ball is first picked up with the Intake then is fed to the Flywheel with
+ * the HoodRoller. The Turret controls the direction that the ball is fired at.
+ * Finally, the Hood controls the output angle and, conversely, trajectory.
  * 
  * This is a member of the Superstructure superclass.
  * 

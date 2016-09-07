@@ -18,9 +18,9 @@ import static com.team254.frc2016.subsystems.Superstructure.WantedIntakeState.WA
 
 /**
  * The overarching superclass containing all components of the superstructure:
- * the computer vision, flywheel, hood, hood roller, and intake. This 
- * coordinates the entire firing sequence, from when the ball is intaked to 
- * when it is fired.
+ * the computer vision, flywheel, hood, hood roller, and intake. This
+ * coordinates the entire firing sequence, from when the ball is intaked to when
+ * it is fired.
  * 
  * @see Flywheel
  * @see Hood

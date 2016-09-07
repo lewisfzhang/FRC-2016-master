@@ -9,13 +9,13 @@ import java.util.Set;
 import com.team254.frc2016.subsystems.Drive;
 
 /**
- * Waits for the robot to pass by a provided path marker (i.e.
- * a waypoint on the field). This action routinely compares to the
- * crossed path markers provided by the drivetrain (in Path Control mode)
- * and returns if the parameter path marker is inside the drivetrain's
- * Path Markers Crossed list
+ * Waits for the robot to pass by a provided path marker (i.e. a waypoint on the
+ * field). This action routinely compares to the crossed path markers provided
+ * by the drivetrain (in Path Control mode) and returns if the parameter path
+ * marker is inside the drivetrain's Path Markers Crossed list
  * 
- * @param A Path Marker to determine if crossed
+ * @param A
+ *            Path Marker to determine if crossed
  */
 public class WaitForPathMarkerAction implements Action {
 

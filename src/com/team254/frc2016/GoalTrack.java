@@ -9,11 +9,12 @@ import com.team254.lib.util.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * A class that is used to keep track of all goals detected by the vision system.
- * As goals are detected/not detected anymore by the vision system, function calls will
- * be made to create, destroy, or update a goal track.
+ * A class that is used to keep track of all goals detected by the vision
+ * system. As goals are detected/not detected anymore by the vision system,
+ * function calls will be made to create, destroy, or update a goal track.
  * 
- * This helps in the goal ranking process that determines which goal to fire into.
+ * This helps in the goal ranking process that determines which goal to fire
+ * into, and helps to smooth measurements of the goal's location over time.
  * 
  * @see GoalTracker.java
  */
@@ -26,7 +27,8 @@ public class GoalTrack {
     }
 
     /**
-     * Makes a new track based on the timestamp and the goal's coordinates (from computer vision)
+     * Makes a new track based on the timestamp and the goal's coordinates (from
+     * vision)
      */
     public static GoalTrack makeNewTrack(double timestamp, Translation2d first_observation, int id) {
         GoalTrack rv = new GoalTrack();
@@ -41,7 +43,7 @@ public class GoalTrack {
     }
 
     /**
-     * Attempts to update the track with a new set of data.
+     * Attempts to update the track with a new observation.
      * 
      * @return True if the track was updated
      */
@@ -63,9 +65,10 @@ public class GoalTrack {
     public boolean isAlive() {
         return mObservedPositions.size() > 0;
     }
-    
+
     /**
-     * Removes the branch if it is older than the set "age" described in the Constants file.
+     * Removes the track if it is older than the set "age" described in the
+     * Constants file.
      * 
      * @see Constants.java
      */

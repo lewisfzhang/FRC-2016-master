@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * In this autonomous routine, the robot crosses the cheval de frise.
- * There are switchable modes in this routine- the driver can specify 
- * whether the robot should return, if it should return on the right side
- * low bar, and if it should launch a single ball. 
+ * In this autonomous routine, the robot crosses the cheval de frise. There are
+ * switchable modes in this routine- the driver can specify whether the robot
+ * should return, if it should return on the right side low bar, and if it
+ * should launch a single ball.
  */
 public class ChevalDeFriseMode extends AutoModeBase {
     Superstructure mSuperstructure = Superstructure.getInstance();

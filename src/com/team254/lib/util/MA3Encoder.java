@@ -38,7 +38,8 @@ public class MA3Encoder {
             double t_high = high_counter_.getPeriod();
             double t_total = period_counter_.getPeriod();
             if (t_total > kNominalPeriodS + kPeriodToleranceS || t_total < kNominalPeriodS - kPeriodToleranceS) {
-                // We got a nonsensical rising-to-rising edge period, so ignore this sample.
+                // We got a nonsensical rising-to-rising edge period, so ignore
+                // this sample.
                 return;
             }
             double x = (t_high * 4098) / (t_total) - 1;

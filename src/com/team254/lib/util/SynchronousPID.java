@@ -72,7 +72,7 @@ public class SynchronousPID {
                 }
             }
         }
-        
+
         if ((m_error * m_P < m_maximumOutput) && (m_error * m_P > m_minimumOutput)) {
             m_totalError += m_error;
         } else {

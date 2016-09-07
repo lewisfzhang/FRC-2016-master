@@ -3,8 +3,8 @@ package com.team254.frc2016.subsystems;
 import com.team254.lib.util.Rotation2d;
 
 /**
- * A container class to specify the shooter angle. It contains the
- * desired range, the turret angle, and the computer vision's track's ID.
+ * A container class to specify the shooter angle. It contains the desired
+ * range, the turret angle, and the computer vision's track's ID.
  */
 public class ShooterAimingParameters {
     double range;

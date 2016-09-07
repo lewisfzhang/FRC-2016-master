@@ -31,9 +31,10 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * determine the default offset. This is subtracted from each sample to
  * determine the heading.
  *
- * This class is for the digital ADXRS453 gyro sensor that connects via SPI.
- * A datasheet can be found here:
- * http://www.analog.com/media/en/technical-documentation/data-sheets/ADXRS453.pdf
+ * This class is for the digital ADXRS453 gyro sensor that connects via SPI. A
+ * datasheet can be found here:
+ * http://www.analog.com/media/en/technical-documentation/data-sheets/ADXRS453.
+ * pdf
  */
 public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
     public static final double kCalibrationSampleTime = 5.0;
@@ -58,7 +59,8 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     /**
      * Constructor.
      *
-     * @param port (the SPI port that the gyro is connected to)
+     * @param port
+     *            (the SPI port that the gyro is connected to)
      */
     public ADXRS453_Gyro(SPI.Port port) {
         m_spi = new SPI(port);
@@ -80,8 +82,8 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
 
         calibrate();
 
-        UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue()); 
-        
+        UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue());
+
         LiveWindow.addSensor("ADXRS453_Gyro", port.getValue(), this);
     }
 
@@ -93,7 +95,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
      */
     @Override
     public synchronized void calibrate() {
-        Timer.delay(0.1); 
+        Timer.delay(0.1);
         startCalibrate();
         Timer.delay(kCalibrationSampleTime);
         endCalibrate();
@@ -155,7 +157,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
         m_spi.read(false, buf, 4);
 
         if ((buf.get(0) & 0xe0) == 0) {
-            return 0; 
+            return 0;
         }
         return (buf.getInt(0) >> 5) & 0xffff;
     }

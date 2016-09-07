@@ -6,8 +6,8 @@ import com.team254.lib.util.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.Solenoid;
 
 /**
- * A list of constants used by the rest of the robot code.
- * This include physics constants as well as constants determined through calibrations.
+ * A list of constants used by the rest of the robot code. This include physics
+ * constants as well as constants determined through calibrations.
  */
 public class Constants extends ConstantsBase {
     public static double kCenterOfTargetHeight = 89.0; // inches
@@ -78,7 +78,7 @@ public class Constants extends ConstantsBase {
     public static double kTrackReportComparatorStablityWeight = 1.0;
     public static double kTrackReportComparatorAgeWeight = 1.0;
     public static double kTrackReportComparatorSwitchingWeight = 3.0;
-    public static double kTrackReportComparatorDistanceWeight = 2.0; // TODO
+    public static double kTrackReportComparatorDistanceWeight = 2.0; // Unused
 
     public static int kAndroidAppTcpPort = 8254;
 

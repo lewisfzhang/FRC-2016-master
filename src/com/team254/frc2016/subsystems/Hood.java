@@ -17,10 +17,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * parameters accessible to the rest of the robot code: the hood angle, whether
  * or not the hood is stowed.
  * 
- * The ball is first picked up with the Intake then is fed to the 
- * Flywheel with the HoodRoller. The Turret controls the direction 
- * that the ball is fired at. Finally, the Hood controls the output
- * angle and, conversely, trajectory.
+ * The ball is first picked up with the Intake then is fed to the Flywheel with
+ * the HoodRoller. The Turret controls the direction that the ball is fired at.
+ * Finally, the Hood controls the output angle and, conversely, trajectory.
  * 
  * This is a member of the Superstructure superclass.
  * 
@@ -108,7 +107,9 @@ public class Hood extends Subsystem {
 
     /**
      * Sets the angle of the hood to a specified angle.
-     * @param A set angle
+     * 
+     * @param A
+     *            set angle
      */
     synchronized void setDesiredAngle(Rotation2d angle) {
         if (control_mode_ != ControlMode.HOMING && control_mode_ != ControlMode.POSITION) {
@@ -117,9 +118,10 @@ public class Hood extends Subsystem {
         }
         pid_.setSetpoint(angle.getDegrees());
     }
-    
+
     /**
      * Gets the current angle of the hood.
+     * 
      * @return The hood's current angle.
      */
     public synchronized Rotation2d getAngle() {
@@ -155,10 +157,11 @@ public class Hood extends Subsystem {
     }
 
     /**
-     * Changes the control state of the Hood assembly if the
-     * hood is fully retracted. If not, the Hood state is set to
-     * Open Loop.
-     * @param If the hood has fully retracted.
+     * Changes the control state of the Hood assembly if the hood is fully
+     * retracted. If not, the Hood state is set to Open Loop.
+     * 
+     * @param If
+     *            the hood has fully retracted.
      */
     synchronized void stopHoming(boolean success) {
         if (success) {
@@ -180,7 +183,8 @@ public class Hood extends Subsystem {
     }
 
     /**
-     * @return If the hood position is within a set tolerance to a specified value.
+     * @return If the hood position is within a set tolerance to a specified
+     *         value.
      */
     public synchronized boolean isOnTarget() {
         return (has_homed_ && control_mode_ == ControlMode.POSITION
@@ -188,8 +192,10 @@ public class Hood extends Subsystem {
     }
 
     /**
-     * To pass an obstacle, the robot's hood must be stowed and the state must be Position.
-     * This function checks that the robot is safe to pass through an obstacle.
+     * To pass an obstacle, the robot's hood must be stowed and the state must
+     * be Position. This function checks that the robot is safe to pass through
+     * an obstacle.
+     * 
      * @return If the robot is safe to pass through an obstacle
      */
     public synchronized boolean isSafe() {

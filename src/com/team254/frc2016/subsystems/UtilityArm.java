@@ -92,11 +92,11 @@ public class UtilityArm extends Subsystem {
 
         private SystemState mSystemState = PANIC_SYSTEM_STATE;
 
-        /** 
+        /**
          * Every time we transition states, we update the current state start
          * time and the state changed boolean (for one cycle)
          */
-        
+
         private double mCurrentStateStartTime;
 
         @Override
@@ -403,7 +403,10 @@ public class UtilityArm extends Subsystem {
         mHookReleaseSolenoid.set(hookReleaseOutput.value);
     }
 
-    /** These enums strongly type solenoid outputs to their respective solenoid directions **/
+    /**
+     * These enums strongly type solenoid outputs to their respective solenoid
+     * directions
+     **/
     private enum ArmOutput {
         ARM_UP(false), ARM_DOWN(!ARM_UP.value);
 

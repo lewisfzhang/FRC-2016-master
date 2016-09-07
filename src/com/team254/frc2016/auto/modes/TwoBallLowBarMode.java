@@ -56,8 +56,8 @@ public class TwoBallLowBarMode extends AutoModeBase {
         runAction(new ParallelAction(Arrays.asList(new GetLowAction(), new WaitAction(0.75))));
 
         runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(first_path), false),
-                  new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"), new StartAutoAimingAction(),
-                  new PointTurretAction(hint))))));
+                new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"), new StartAutoAimingAction(),
+                        new PointTurretAction(hint))))));
         mSuperstructure.setWantsToStopIntake();
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);

@@ -23,10 +23,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * The robot's drivetrain, which implements the Superstructure abstract
- * class. The drivetrain has several states and builds on the abstract class
- * by offering additional control methods, including control by path and
- * velocity.
+ * The robot's drivetrain, which implements the Superstructure abstract class.
+ * The drivetrain has several states and builds on the abstract class by
+ * offering additional control methods, including control by path and velocity.
  * 
  * @see Subsystem.java
  */
@@ -40,7 +39,7 @@ public class Drive extends Subsystem {
     public static Drive getInstance() {
         return instance_;
     }
-    
+
     // The robot drivetrain's various states
     public enum DriveControlState {
         OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL
@@ -239,7 +238,9 @@ public class Drive extends Subsystem {
 
     /**
      * The robot follows a set path, which is defined by Waypoint objects.
-     * @param Path to follow
+     * 
+     * @param Path
+     *            to follow
      * @param reversed
      * @see com.team254.lib.util/Path.java
      */
@@ -255,16 +256,19 @@ public class Drive extends Subsystem {
     }
 
     /**
-     * @return Returns if the robot mode is Path Following Control and the set path is complete. 
+     * @return Returns if the robot mode is Path Following Control and the set
+     *         path is complete.
      */
     public synchronized boolean isFinishedPath() {
         return (driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL && pathFollowingController_.isDone())
                 || driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL;
     }
-    
+
     /**
-     * Path Markers are an optional functionality that name the various Waypoints
-     * in a Path with a String. This can make defining set locations much easier.
+     * Path Markers are an optional functionality that name the various
+     * Waypoints in a Path with a String. This can make defining set locations
+     * much easier.
+     * 
      * @return Set of Strings with Path Markers that the robot has crossed.
      */
     public synchronized Set<String> getPathMarkersCrossed() {
@@ -388,12 +392,12 @@ public class Drive extends Subsystem {
         updateVelocitySetpoint(velocityHeadingSetpoint_.getLeftSpeed() + deltaSpeed / 2,
                 velocityHeadingSetpoint_.getRightSpeed() - deltaSpeed / 2);
     }
-    
+
     private void updatePathFollower() {
         RigidTransform2d robot_pose = RobotState.getInstance().getLatestFieldToVehicle().getValue();
         RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
         Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
-        
+
         // Scale the command to respect the max velocity limits
         double max_vel = 0.0;
         max_vel = Math.max(max_vel, Math.abs(setpoint.left));
@@ -445,10 +449,10 @@ public class Drive extends Subsystem {
     }
 
     /**
-     * VelocityHeadingSetpoints are used to calculate the robot's path
-     * given the speed of the robot in each wheel and the polar coordinates.
-     * Especially useful if the robot is negotiating a turn and to forecast
-     * the robot's location.
+     * VelocityHeadingSetpoints are used to calculate the robot's path given the
+     * speed of the robot in each wheel and the polar coordinates. Especially
+     * useful if the robot is negotiating a turn and to forecast the robot's
+     * location.
      */
     public static class VelocityHeadingSetpoint {
         private final double leftSpeed_;

@@ -6,9 +6,9 @@ import com.team254.lib.util.ADXRS453_Gyro;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Routine that recalibrates the gyroscope every 5 seconds.
- * The gyroscope helps the robot drive in a straight line despite
- * obstacles and compensates for bumps and obstacles.
+ * Routine that recalibrates the gyroscope every 5 seconds. The gyroscope helps
+ * the robot drive in a straight line despite obstacles and compensates for
+ * bumps and obstacles.
  */
 public class GyroCalibrator implements Loop {
     ADXRS453_Gyro mGyro = Drive.getInstance().getGyro();

@@ -76,8 +76,7 @@ public class TwoBallClassBDMode extends AutoModeBase {
 
         // Go over defenses again
         List<Path.Waypoint> second_shot_path = new ArrayList<>();
-        second_shot_path.add(
-                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 120.0));
+        second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 120.0));
         second_shot_path.add(new Path.Waypoint(
                 new Translation2d(DISTANCE_TO_SLOW_DOWN + lineRobotPose.getTranslation().getX(), 0), 72.0));
         second_shot_path.add(new Path.Waypoint(

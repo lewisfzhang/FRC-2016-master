@@ -3,7 +3,7 @@ package com.team254.frc2016.vision.messages;
 import org.json.simple.JSONObject;
 
 /**
- * An abstract class used for messages about the vision subsystem. 
+ * An abstract class used for messages about the vision subsystem.
  */
 public abstract class VisionMessage {
 

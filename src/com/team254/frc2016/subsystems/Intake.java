@@ -10,13 +10,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The Intake roller either intakes balls (towards the shooter assembly,
- * consisting of the Flywheel, Hood, and HoodRoller), or out-takes them
- * to the field. It is in one of these two states.
+ * consisting of the Flywheel, Hood, and HoodRoller), or out-takes them to the
+ * field. It is in one of these two states.
  * 
- * The ball is first picked up with the Intake then is fed to the 
- * Flywheel with the HoodRoller. The Turret controls the direction 
- * that the ball is fired at. Finally, the Hood controls the output
- * angle and, conversely, trajectory.
+ * The ball is first picked up with the Intake then is fed to the Flywheel with
+ * the HoodRoller. The Turret controls the direction that the ball is fired at.
+ * Finally, the Hood controls the output angle and, conversely, trajectory.
  * 
  * @see Flywheel
  * @see Hood
@@ -50,8 +49,11 @@ public class Intake extends Subsystem {
 
     /**
      * Positive intakes balls, negative exhausts
-     * @param Set power for the deploy Talon
-     * @param Set power for the roller Talon
+     * 
+     * @param Set
+     *            power for the deploy Talon
+     * @param Set
+     *            power for the roller Talon
      */
     public synchronized void setIntakeRoller(double outer_power, double fixed_power) {
         boolean has_ball = hasBall();

@@ -3,8 +3,8 @@ package com.team254.frc2016.auto;
 import com.team254.lib.util.CrashTrackingRunnable;
 
 /**
- * This class selects, runs, and stops (if necessary) a specified 
- * autonomous mode.
+ * This class selects, runs, and stops (if necessary) a specified autonomous
+ * mode.
  */
 public class AutoModeExecuter {
     private AutoModeBase m_auto_mode;

@@ -16,13 +16,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The main robot class, which instantiates all robot parts and helper classes.
- * Some classes are already instantiated upon robot startup; for those classes, the robot
- * gets the instance as opposed to creating a new object (after all, one can't have two drivetrains)
+ * Some classes are already instantiated upon robot startup; for those classes,
+ * the robot gets the instance as opposed to creating a new object (after all,
+ * one can't have two drivetrains)
  * 
- * After initializing all robot parts, the code sets up the autonomous and teleoperated
- * cycles and also code that runs periodically inside both routines.
+ * After initializing all robot parts, the code sets up the autonomous and
+ * teleoperated cycles and also code that runs periodically inside both
+ * routines.
  * 
- * This is the nexus/converging point of the robot code.
+ * This is the nexus/converging point of the robot code and the best place to
+ * start exploring.
  */
 public class Robot extends IterativeRobot {
     // Subsystems
@@ -154,8 +157,8 @@ public class Robot extends IterativeRobot {
             mDrive.setHighGear(true);
             mDrive.setBrakeMode(true);
             mSuperstructure.setTuningMode(false);
-            mSuperstructure.setHoodAdjustment(
-                    mSmartDashboardInteractions.areAutoBallsWorn() ? Constants.kOldBallHoodAdjustment : Constants.kNewBallHoodAdjustment);
+            mSuperstructure.setHoodAdjustment(mSmartDashboardInteractions.areAutoBallsWorn()
+                    ? Constants.kOldBallHoodAdjustment : Constants.kNewBallHoodAdjustment);
 
             maybeResetUtilityArmState();
 
@@ -203,14 +206,13 @@ public class Robot extends IterativeRobot {
 
     @Override
     /**
-     * Keep kicking the CAN driver even though we are disabled...
-     * See:
-     * https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%20Manual.pdf
-     * page 130
+     * Keep kicking the CAN driver even though we are disabled... See:
+     * https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%
+     * 20Manual.pdf page 130 NOTE: Not sure if this is still required with the
+     * latest firmware, but no harm in leaving it in.
      */
     public void disabledPeriodic() {
         try {
-            // 
             stopAll();
 
             mDrive.resetEncoders();
@@ -222,7 +224,7 @@ public class Robot extends IterativeRobot {
             mRobotState.reset(Timer.getFPGATimestamp(), new RigidTransform2d(), mSuperstructure.getTurret().getAngle());
 
             updateDriverFeedback();
-            
+
             System.gc();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
@@ -230,10 +232,12 @@ public class Robot extends IterativeRobot {
         }
     }
 
-    /** 
-     * To control the robot, the code sets the desired state of the robot (a state machine). 
-     * The robot will constantly compare the desired and actual state and act to bring the 
-     * two closer. State machines are fundamental to the operation of the robot.
+    /**
+     * To control the robot, the code sets the desired state of the robot (a
+     * state machine). The robot will constantly compare the desired and actual
+     * state and act to bring the two closer. State machines help ensure that no
+     * matter what buttons the driver presses, the robot behaves in a safe and
+     * consistent manner.
      */
     @Override
     public void teleopPeriodic() {

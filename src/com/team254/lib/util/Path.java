@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * A Path is a recording of the path that the robot takes. Path objects
- * consist of a List of Waypoints that the robot passes by. Using multiple
- * Waypoints in a Path object and the robot's current speed, the code can 
- * extrapolate future Waypoints and predict the robot's motion. It can also
- * dictate the robot's motion along the set path.
+ * A Path is a recording of the path that the robot takes. Path objects consist
+ * of a List of Waypoints that the robot passes by. Using multiple Waypoints in
+ * a Path object and the robot's current speed, the code can extrapolate future
+ * Waypoints and predict the robot's motion. It can also dictate the robot's
+ * motion along the set path.
  */
 public class Path {
     protected static final double kSegmentCompletePercentage = .99;
@@ -22,9 +22,9 @@ public class Path {
     protected Set<String> mMarkersCrossed;
 
     /**
-     * A point along the Path, which consists of the location, the speed, and
-     * a string marker (that future code can identify). Paths consist of a List
-     * of Waypoints.
+     * A point along the Path, which consists of the location, the speed, and a
+     * string marker (that future code can identify). Paths consist of a List of
+     * Waypoints.
      */
     public static class Waypoint {
         public final Translation2d position;
@@ -63,8 +63,10 @@ public class Path {
     }
 
     /**
-     * @param An initial position
-     * @return Returns the distance from the position to the first point on the path
+     * @param An
+     *            initial position
+     * @return Returns the distance from the position to the first point on the
+     *         path
      */
     public double update(Translation2d position) {
         double rv = 0.0;
@@ -124,10 +126,13 @@ public class Path {
         return length;
     }
 
-    /** 
-     * @param The robot's current position
-     * @param A specified distance to predict a future waypoint
-     * @return A segment of the robot's predicted motion with start/end points and speed.
+    /**
+     * @param The
+     *            robot's current position
+     * @param A
+     *            specified distance to predict a future waypoint
+     * @return A segment of the robot's predicted motion with start/end points
+     *         and speed.
      */
     public PathSegment.Sample getLookaheadPoint(Translation2d position, double lookahead_distance) {
         if (mSegments.size() == 0) {
@@ -139,7 +144,8 @@ public class Path {
         // lies somewhere on that segment.
         Translation2d position_inverse = position.inverse();
         if (position_inverse.translateBy(mSegments.get(0).getStart()).norm() >= lookahead_distance) {
-            // Special case: Before the first point, so just return the first point.
+            // Special case: Before the first point, so just return the first
+            // point.
             return new PathSegment.Sample(mSegments.get(0).getStart(), mSegments.get(0).getSpeed());
         }
         for (int i = 0; i < mSegments.size(); ++i) {
