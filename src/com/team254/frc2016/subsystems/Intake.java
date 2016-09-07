@@ -8,6 +8,21 @@ import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * The Intake roller either intakes balls (towards the shooter assembly,
+ * consisting of the Flywheel, Hood, and HoodRoller), or out-takes them to the
+ * field. It is in one of these two states.
+ * 
+ * The ball is first picked up with the Intake then is fed to the Flywheel with
+ * the HoodRoller. The Turret controls the direction that the ball is fired at.
+ * Finally, the Hood controls the output angle and, conversely, trajectory.
+ * 
+ * @see Flywheel
+ * @see Hood
+ * @see HoodRoller
+ * @see Turret
+ * @see Superstructure
+ */
 public class Intake extends Subsystem {
     private CANTalon intake_talon_;
     private CANTalon fixed_talon_;
@@ -16,7 +31,6 @@ public class Intake extends Subsystem {
 
     Intake() {
         intake_talon_ = new CANTalon(Constants.kIntakeTalonId);
-        // intake_talon_.changeControlMode(TalonControlMode.PercentVbus);
         intake_talon_.enableBrakeMode(false);
 
         intake_talon_.setPID(Constants.kIntakeKp, Constants.kIntakeKi, Constants.kIntakeKd, Constants.kIntakeKf,
@@ -33,7 +47,14 @@ public class Intake extends Subsystem {
         have_ball_sensor_ = new AnalogInput(Constants.kHaveBallSensorAnalogId);
     }
 
-    // Positive intakes balls, negative exhausts
+    /**
+     * Positive intakes balls, negative exhausts
+     * 
+     * @param Set
+     *            power for the deploy Talon
+     * @param Set
+     *            power for the roller Talon
+     */
     public synchronized void setIntakeRoller(double outer_power, double fixed_power) {
         boolean has_ball = hasBall();
         if (has_ball) {

@@ -4,7 +4,8 @@ import com.team254.frc2016.auto.AutoModeBase;
 import com.team254.frc2016.auto.AutoModeEndedException;
 
 /**
- * "Oh shit everything is broken and we shouldn't run auton" Mode
+ * Fallback for when all autonomous modes do not work, resulting in a robot
+ * standstill
  */
 public class StandStillMode extends AutoModeBase {
 

@@ -10,6 +10,11 @@ import com.team254.lib.util.Rotation2d;
 
 import edu.wpi.first.wpilibj.Timer;
 
+/**
+ * Periodically estimates the state of the robot using the robot's distance
+ * traveled (compares two waypoints), gyroscope orientation, and velocity, among
+ * various other factors. Similar to a car's odometer.
+ */
 public class RobotStateEstimator implements Loop {
     static RobotStateEstimator instance_ = new RobotStateEstimator();
 

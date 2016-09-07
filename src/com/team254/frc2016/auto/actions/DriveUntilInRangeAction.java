@@ -9,8 +9,9 @@ import com.team254.lib.util.Rotation2d;
 import java.util.List;
 
 /**
- * DriveUntilInRangeAction is an autonomous mode action that drives until the shooter has a shot that it sees.
- * This is accomplished by looking for a target with a supplied minimum distance and given a range of distances that
+ * DriveUntilInRangeAction is an autonomous mode action that drives until the
+ * shooter sees that a goal is in range. This is accomplished by looking for a
+ * target with a supplied minimum distance and given a range of distances that
  * the robot will drive
  *
  * @see Superstructure

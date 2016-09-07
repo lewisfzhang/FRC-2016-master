@@ -2,6 +2,12 @@ package com.team254.frc2016.auto.actions;
 
 import com.team254.frc2016.subsystems.Superstructure;
 
+/**
+ * Shoots the ball when ready by setting the robot state machine's desired
+ * state.
+ * 
+ * @return If the firing was successful
+ */
 public class ShootWhenReadyAction implements Action {
 
     private final Superstructure mSuperstructure = Superstructure.getInstance();

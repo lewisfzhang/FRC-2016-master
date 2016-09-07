@@ -4,9 +4,12 @@ import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Util;
 
 /**
- * Created by ryanjohnson on 1/30/16.
+ * Helper class to implement "Cheesy Drive". "Cheesy Drive" simply means that
+ * the "turning" stick controls the curvature of the robot's path rather than
+ * its rate of heading change. This helps make the robot more controllable at
+ * high speeds. Also handles the robot's quick turn functionality - "quick turn"
+ * overrides constant-curvature turning for turn-in-place maneuvers.
  */
-
 public class CheesyDriveHelper {
 
     double mQuickStopAccumulator;
@@ -17,7 +20,6 @@ public class CheesyDriveHelper {
 
     public DriveSignal cheesyDrive(double throttle, double wheel, boolean isQuickTurn) {
 
-        // Apply deadbands to joystick inputs
         wheel = handleDeadband(wheel, kWheelDeadband);
         throttle = handleDeadband(throttle, kThrottleDeadband);
 
@@ -25,11 +27,9 @@ public class CheesyDriveHelper {
 
         double angularPower;
 
-        // Quickturn!
         if (isQuickTurn) {
             if (Math.abs(throttle) < 0.2) {
                 double alpha = 0.1;
-                // quickStopAccumulator approaches wheel*2
                 mQuickStopAccumulator = (1 - alpha) * mQuickStopAccumulator + alpha * Util.limit(wheel, 1.0) * 2;
             }
             overPower = 1.0;
@@ -37,7 +37,6 @@ public class CheesyDriveHelper {
         } else {
             overPower = 0.0;
             angularPower = Math.abs(throttle) * wheel * kTurnSensitivity - mQuickStopAccumulator;
-            // quickStopAccumulator -> 0 (gradually, by 1 per step)
             if (mQuickStopAccumulator > 1) {
                 mQuickStopAccumulator -= 1;
             } else if (mQuickStopAccumulator < -1) {
@@ -47,7 +46,6 @@ public class CheesyDriveHelper {
             }
         }
 
-        // Calculate final L/R output values
         double rightPwm = throttle - angularPower;
         double leftPwm = throttle + angularPower;
         if (leftPwm > 1.0) {

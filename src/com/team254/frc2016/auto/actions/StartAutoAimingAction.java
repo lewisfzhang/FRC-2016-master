@@ -2,6 +2,9 @@ package com.team254.frc2016.auto.actions;
 
 import com.team254.frc2016.subsystems.Superstructure;
 
+/**
+ * Action to begin aiming if the superstructure has a ball
+ */
 public class StartAutoAimingAction implements Action {
 
     private final Superstructure mSuperstructure = Superstructure.getInstance();

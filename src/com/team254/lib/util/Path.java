@@ -7,6 +7,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * A Path is a recording of the path that the robot takes. Path objects consist
+ * of a List of Waypoints that the robot passes by. Using multiple Waypoints in
+ * a Path object and the robot's current speed, the code can extrapolate future
+ * Waypoints and predict the robot's motion. It can also dictate the robot's
+ * motion along the set path.
+ */
 public class Path {
     protected static final double kSegmentCompletePercentage = .99;
 
@@ -14,6 +21,11 @@ public class Path {
     protected List<PathSegment> mSegments;
     protected Set<String> mMarkersCrossed;
 
+    /**
+     * A point along the Path, which consists of the location, the speed, and a
+     * string marker (that future code can identify). Paths consist of a List of
+     * Waypoints.
+     */
     public static class Waypoint {
         public final Translation2d position;
         public final double speed;
@@ -50,16 +62,18 @@ public class Path {
         }
     }
 
-    // Returns the distance from the position to the first point on the path
+    /**
+     * @param An
+     *            initial position
+     * @return Returns the distance from the position to the first point on the
+     *         path
+     */
     public double update(Translation2d position) {
         double rv = 0.0;
         for (Iterator<PathSegment> it = mSegments.iterator(); it.hasNext();) {
             PathSegment segment = it.next();
             PathSegment.ClosestPointReport closest_point_report = segment.getClosestPoint(position);
             if (closest_point_report.index >= kSegmentCompletePercentage) {
-                // This segment is complete and can be removed.
-                // System.out.println("Segment from " + segment.getStart() + "
-                // to " + segment.getEnd() + " complete");
                 it.remove();
                 if (mWaypoints.size() > 0) {
                     Waypoint waypoint = mWaypoints.get(0);
@@ -72,8 +86,6 @@ public class Path {
                 if (closest_point_report.index > 0.0) {
                     // Can shorten this segment
                     segment.updateStart(closest_point_report.closest_point);
-                    // System.out.println("Shortening segment start to " +
-                    // closest_point_report.closest_point);
                 }
                 // We are done
                 rv = closest_point_report.distance;
@@ -84,7 +96,6 @@ public class Path {
                     if (next_closest_point_report.index > 0
                             && next_closest_point_report.index < kSegmentCompletePercentage
                             && next_closest_point_report.distance < rv) {
-                        // System.out.println("Jumping to next segment");
                         next.updateStart(next_closest_point_report.closest_point);
                         rv = next_closest_point_report.distance;
                         mSegments.remove(0);
@@ -112,10 +123,17 @@ public class Path {
         for (int i = 0; i < mSegments.size(); ++i) {
             length += mSegments.get(i).getLength();
         }
-        // System.out.println("Remaining length " + length);
         return length;
     }
 
+    /**
+     * @param The
+     *            robot's current position
+     * @param A
+     *            specified distance to predict a future waypoint
+     * @return A segment of the robot's predicted motion with start/end points
+     *         and speed.
+     */
     public PathSegment.Sample getLookaheadPoint(Translation2d position, double lookahead_distance) {
         if (mSegments.size() == 0) {
             return new PathSegment.Sample(new Translation2d(), 0);

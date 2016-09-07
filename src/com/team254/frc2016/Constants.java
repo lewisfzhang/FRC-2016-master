@@ -5,6 +5,10 @@ import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.Solenoid;
 
+/**
+ * A list of constants used by the rest of the robot code. This include physics
+ * constants as well as constants determined through calibrations.
+ */
 public class Constants extends ConstantsBase {
     public static double kCenterOfTargetHeight = 89.0; // inches
 
@@ -28,8 +32,7 @@ public class Constants extends ConstantsBase {
     public static double kTrackWidthInches = 23.8;
     public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
             + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
-    public static double kTrackScrubFactor = 0.5; // Should be <= 1.0...tune
-                                                  // experimentally
+    public static double kTrackScrubFactor = 0.5;
 
     // Drive constants
     public static double kDriveLowGearMaxSpeedInchesPerSec = 12.0 * 7.0;
@@ -75,7 +78,7 @@ public class Constants extends ConstantsBase {
     public static double kTrackReportComparatorStablityWeight = 1.0;
     public static double kTrackReportComparatorAgeWeight = 1.0;
     public static double kTrackReportComparatorSwitchingWeight = 3.0;
-    public static double kTrackReportComparatorDistanceWeight = 2.0; // TODO
+    public static double kTrackReportComparatorDistanceWeight = 2.0; // Unused
 
     public static int kAndroidAppTcpPort = 8254;
 
@@ -228,28 +231,6 @@ public class Constants extends ConstantsBase {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
-        /*
-         * Tune 4/23 with 5600 rpm setpoint at 75 and above, 5800 at 70 and
-         * below kHoodAutoAimMap.put(new InterpolatingDouble(70.0), new
-         * InterpolatingDouble(42.5)); kHoodAutoAimMap.put(new
-         * InterpolatingDouble(75.0), new InterpolatingDouble(43.5));
-         * kHoodAutoAimMap.put(new InterpolatingDouble(80.0), new
-         * InterpolatingDouble(45.0)); kHoodAutoAimMap.put(new
-         * InterpolatingDouble(85.0), new InterpolatingDouble(46.5));
-         * kHoodAutoAimMap.put(new InterpolatingDouble(90.0), new
-         * InterpolatingDouble(48.5)); kHoodAutoAimMap.put(new
-         * InterpolatingDouble(100.0), new InterpolatingDouble(50.0));
-         * kHoodAutoAimMap.put(new InterpolatingDouble(110.0), new
-         * InterpolatingDouble(52.0)); kHoodAutoAimMap.put(new
-         * InterpolatingDouble(120.0), new InterpolatingDouble(53.25));
-         * kHoodAutoAimMap.put(new InterpolatingDouble(130.0), new
-         * InterpolatingDouble(54.0)); kHoodAutoAimMap.put(new
-         * InterpolatingDouble(140.0), new InterpolatingDouble(54.25));
-         * kHoodAutoAimMap.put(new InterpolatingDouble(150.0), new
-         * InterpolatingDouble(54.5)); kHoodAutoAimMap.put(new
-         * InterpolatingDouble(160.0), new InterpolatingDouble(55.0));
-         */
-
         /* Tune 4/23 with 6200 rpm setpoint */
         kHoodAutoAimMap.put(new InterpolatingDouble(60.0), new InterpolatingDouble(42.5));
         kHoodAutoAimMap.put(new InterpolatingDouble(70.0), new InterpolatingDouble(44.5));
@@ -271,10 +252,6 @@ public class Constants extends ConstantsBase {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFlywheelAutoAimMap = new InterpolatingTreeMap<>();
 
     static {
-        /*
-         * kFlywheelAutoAimMap.put(new InterpolatingDouble(70.0), new
-         * InterpolatingDouble(5800.0));
-         */
         kFlywheelAutoAimMap.put(new InterpolatingDouble(75.0),
                 new InterpolatingDouble(Constants.kFlywheelGoodBallRpmSetpoint));
         kFlywheelAutoAimMap.put(new InterpolatingDouble(Constants.kAutoAimMaxRange),

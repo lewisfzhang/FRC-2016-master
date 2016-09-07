@@ -3,6 +3,16 @@ package com.team254.lib.util;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Implements an adaptive pure pursuit controller. See:
+ * https://www.ri.cmu.edu/pub_files/pub1/kelly_alonzo_1994_4/kelly_alonzo_1994_4
+ * .pdf
+ * 
+ * Basically, we find a spot on the path we'd like to follow and calculate the
+ * wheel speeds necessary to make us land on that spot. The target spot is a
+ * specified distance ahead of us, and we look further ahead the greater our
+ * tracking error.
+ */
 public class AdaptivePurePursuitController {
     private static final double kEpsilon = 1E-9;
 
@@ -28,7 +38,6 @@ public class AdaptivePurePursuitController {
 
     public boolean isDone() {
         double remainingLength = mPath.getRemainingLength();
-        // SmartDashboard.putNumber("PATH_remainingLength", remainingLength);
         return remainingLength <= mPathCompletionTolerance;
     }
 
@@ -43,9 +52,7 @@ public class AdaptivePurePursuitController {
         if (this.isDone()) {
             return new RigidTransform2d.Delta(0, 0, 0);
         }
-        // System.out.println("Remaining path length: " +
-        // mPath.getRemainingLength() + ", robot pose " + robot_pose
-        // + ", distance from path " + distance_from_path);
+
         PathSegment.Sample lookahead_point = mPath.getLookaheadPoint(robot_pose.getTranslation(),
                 distance_from_path + mFixedLookahead);
         Optional<Circle> circle = joinPath(pose, lookahead_point.translation);
@@ -129,10 +136,7 @@ public class AdaptivePurePursuitController {
         double mx = (cross_product > 0 ? 1 : -1) * robot_pose.getRotation().sin();
 
         double cross_term = mx * dx + my * dy;
-        // System.out.println("center to right? " + (cross_product > 0) + ", dx
-        // " + dx + ", dy " + dy + ", cross term "
-        // + cross_term + ", pose " + robot_pose + ", lookahead " +
-        // lookahead_point);
+
         if (Math.abs(cross_term) < kEpsilon) {
             // Points are colinear
             return Optional.empty();

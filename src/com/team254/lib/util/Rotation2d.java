@@ -39,6 +39,11 @@ public class Rotation2d implements Interpolable<Rotation2d> {
         return fromRadians(Math.toRadians(angle_degrees));
     }
 
+    /**
+     * From trig, we know that sin^2 + cos^2 == 1, but as we do math on this
+     * object we might accumulate rounding errors. Normalizing forces us to
+     * re-scale the sin and cos to reset rounding errors.
+     */
     public void normalize() {
         double magnitude = Math.hypot(cos_angle_, sin_angle_);
         if (magnitude > kEpsilon) {
@@ -77,11 +82,25 @@ public class Rotation2d implements Interpolable<Rotation2d> {
         return Math.toDegrees(getRadians());
     }
 
+    /**
+     * We can rotate this Rotation2d by adding together the effects of it and
+     * another rotation.
+     * 
+     * @param other
+     *            The other rotation. See:
+     *            https://en.wikipedia.org/wiki/Rotation_matrix
+     * @return This rotation rotated by other.
+     */
     public Rotation2d rotateBy(Rotation2d other) {
         return new Rotation2d(cos_angle_ * other.cos_angle_ - sin_angle_ * other.sin_angle_,
                 cos_angle_ * other.sin_angle_ + sin_angle_ * other.cos_angle_, true);
     }
 
+    /**
+     * The inverse of a Rotation2d "undoes" the effect of this rotation.
+     * 
+     * @return The opposite of this rotation.
+     */
     public Rotation2d inverse() {
         return new Rotation2d(cos_angle_, -sin_angle_, false);
     }

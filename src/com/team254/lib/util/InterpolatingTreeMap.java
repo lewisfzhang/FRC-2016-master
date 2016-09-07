@@ -5,7 +5,8 @@ import java.util.Map;
 
 /**
  * Interpolating Tree Maps are used to get values at points that are not defined
- * by making a guess from points that are defined
+ * by making a guess from points that are defined. This uses linear
+ * interpolation.
  * 
  * @param <K>
  *            The type of the key (must implement InverseInterpolable)
@@ -63,12 +64,14 @@ public class InterpolatingTreeMap<K extends InverseInterpolable<K> & Comparable<
     public V getInterpolated(K key) {
         V gotval = get(key);
         if (gotval == null) {
-            // Get surrounding keys for interpolation
+            /** Get surrounding keys for interpolation */
             K topBound = ceilingKey(key);
             K bottomBound = floorKey(key);
 
-            // If attempting interpolation at ends of tree, return the nearest
-            // data point
+            /**
+             * If attempting interpolation at ends of tree, return the nearest
+             * data point
+             */
             if (topBound == null && bottomBound == null) {
                 return null;
             } else if (topBound == null) {
@@ -77,7 +80,7 @@ public class InterpolatingTreeMap<K extends InverseInterpolable<K> & Comparable<
                 return get(topBound);
             }
 
-            // Get surrounding values for interpolation
+            /** Get surrounding values for interpolation */
             V topElem = get(topBound);
             V bottomElem = get(bottomBound);
             return bottomElem.interpolate(topElem, bottomBound.inverseInterpolate(topBound, key));

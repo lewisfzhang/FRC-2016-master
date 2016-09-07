@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This mode goes over the rock wall and tries to 2 ball
+ * This mode goes over the rock wall and tries to fire two balls
  */
 public class TwoBallClassBDMode extends AutoModeBase {
     ShooterAimingParameters mHint;
@@ -76,8 +76,7 @@ public class TwoBallClassBDMode extends AutoModeBase {
 
         // Go over defenses again
         List<Path.Waypoint> second_shot_path = new ArrayList<>();
-        second_shot_path.add(
-                new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 120.0));
+        second_shot_path.add(new Path.Waypoint(new Translation2d(lineRobotPose.getTranslation().getX(), 0), 120.0));
         second_shot_path.add(new Path.Waypoint(
                 new Translation2d(DISTANCE_TO_SLOW_DOWN + lineRobotPose.getTranslation().getX(), 0), 72.0));
         second_shot_path.add(new Path.Waypoint(

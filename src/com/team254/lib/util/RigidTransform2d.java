@@ -9,8 +9,9 @@ package com.team254.lib.util;
 public class RigidTransform2d implements Interpolable<RigidTransform2d> {
     private final static double kEps = 1E-9;
 
-    // A tangent space velocity (e.g. movement along an arc at a constant local
-    // velocity)
+    // Movement along an arc at constant curvature and velocity. We can use
+    // ideas from "differential calculus" to create new RigidTransform2d's from
+    // a Delta.
     public static class Delta {
         public final double dx;
         public final double dy;
@@ -49,8 +50,10 @@ public class RigidTransform2d implements Interpolable<RigidTransform2d> {
         return new RigidTransform2d(new Translation2d(), rotation);
     }
 
-    // SE(2) exponential map
-    // https://github.com/strasdat/Sophus/blob/master/sophus/se2.hpp
+    /**
+     * Obtain a new RigidTransform2d from a (constant curvature) velocity. See:
+     * https://github.com/strasdat/Sophus/blob/master/sophus/se2.hpp
+     */
     public static RigidTransform2d fromVelocity(Delta delta) {
         double sin_theta = Math.sin(delta.dtheta);
         double cos_theta = Math.cos(delta.dtheta);
@@ -82,18 +85,34 @@ public class RigidTransform2d implements Interpolable<RigidTransform2d> {
         rotation_ = rotation;
     }
 
+    /**
+     * Transforming this RigidTransform2d means first translating by
+     * other.translation and then rotating by other.rotation
+     * 
+     * @param other
+     *            The other transform.
+     * @return This transform * other
+     */
     public RigidTransform2d transformBy(RigidTransform2d other) {
         return new RigidTransform2d(translation_.translateBy(other.translation_.rotateBy(rotation_)),
                 rotation_.rotateBy(other.rotation_));
     }
 
+    /**
+     * The inverse of this transform "undoes" the effect of translating by this
+     * transform.
+     * 
+     * @return The opposite of this transform.
+     */
     public RigidTransform2d inverse() {
         Rotation2d rotation_inverted = rotation_.inverse();
         return new RigidTransform2d(translation_.inverse().rotateBy(rotation_inverted), rotation_inverted);
     }
 
-    // This currently does Riemannian interpolation. We could do twist
-    // interpolation if necessary.
+    /**
+     * Do linear interpolation of this transform (there are more accurate ways
+     * using constant curvature, but this is good enough).
+     */
     @Override
     public RigidTransform2d interpolate(RigidTransform2d other, double x) {
         if (x <= 0) {

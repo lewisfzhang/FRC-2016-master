@@ -3,7 +3,7 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
-/* MODIFIED BY TEAM 254
+/* MODIFIED BY TEAM 254                                                       */
 /*----------------------------------------------------------------------------*/
 
 package com.team254.lib.util;
@@ -31,7 +31,10 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * determine the default offset. This is subtracted from each sample to
  * determine the heading.
  *
- * This class is for the digital ADXRS453 gyro sensor that connects via SPI.
+ * This class is for the digital ADXRS453 gyro sensor that connects via SPI. A
+ * datasheet can be found here:
+ * http://www.analog.com/media/en/technical-documentation/data-sheets/ADXRS453.
+ * pdf
  */
 public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
     public static final double kCalibrationSampleTime = 5.0;
@@ -39,15 +42,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     private static final double kSamplePeriod = 0.001;
     private static final double kDegreePerSecondPerLSB = -0.0125;
 
-    // private static final int kRateRegister = 0x00;
-    // private static final int kTemRegister = 0x02;
-    // private static final int kLoCSTRegister = 0x04;
-    // private static final int kHiCSTRegister = 0x06;
-    // private static final int kQuadRegister = 0x08;
-    // private static final int kFaultRegister = 0x0A;
     private static final int kPIDRegister = 0x0C;
-    // private static final int kSNHighRegister = 0x0E;
-    // private static final int kSNLowRegister = 0x10;
 
     private SPI m_spi;
 
@@ -65,7 +60,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
      * Constructor.
      *
      * @param port
-     *            The SPI port that the gyro is connected to
+     *            (the SPI port that the gyro is connected to)
      */
     public ADXRS453_Gyro(SPI.Port port) {
         m_spi = new SPI(port);
@@ -75,7 +70,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
         m_spi.setClockActiveHigh();
         m_spi.setChipSelectActiveLow();
 
-        // Validate the part ID
+        /** Validate the part ID */
         if ((readRegister(kPIDRegister) & 0xff00) != 0x5200) {
             m_spi.free();
             m_spi = null;
@@ -83,15 +78,12 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
             return;
         }
 
-        // http://www.analog.com/media/en/technical-documentation/data-sheets/ADXRS453.pdf
         m_spi.initAccumulator(kSamplePeriod, 0x20000000, 4, 0x0c00000E, 0x04000000, 10, 16, true, true);
-        // m_spi.initAccumulator(kSamplePeriod, 0x80000000, 4, 0xEFE00000,
-        // 0x4E000000, 5, 16, true, true);
 
         calibrate();
 
-        UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue()); // close
-                                                                                      // enough...
+        UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue());
+
         LiveWindow.addSensor("ADXRS453_Gyro", port.getValue(), this);
     }
 
@@ -103,7 +95,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
      */
     @Override
     public synchronized void calibrate() {
-        Timer.delay(0.1); // Wait for things to settle down
+        Timer.delay(0.1);
         startCalibrate();
         Timer.delay(kCalibrationSampleTime);
         endCalibrate();
@@ -165,7 +157,7 @@ public class ADXRS453_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
         m_spi.read(false, buf, 4);
 
         if ((buf.get(0) & 0xe0) == 0) {
-            return 0; // error, return 0
+            return 0;
         }
         return (buf.getInt(0) >> 5) & 0xffff;
     }

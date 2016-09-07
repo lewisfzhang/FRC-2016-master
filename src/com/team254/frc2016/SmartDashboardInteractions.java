@@ -10,9 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.json.simple.JSONArray;
 
 /**
- * Controls the interactive elements of smartdashboard.
+ * Controls the interactive elements of SmartDashboard.
  *
- * Keeps the network tables keys in one spot and enforces auton mode invariants.
+ * Keeps the network tables keys in one spot and enforces autonomous mode
+ * invariants.
  */
 public class SmartDashboardInteractions {
 
@@ -149,11 +150,11 @@ public class SmartDashboardInteractions {
         case GET_LOW_COME_BACK_RIGHT:
             return new GetLowOneBallMode(getAimingHintForLane(autonLane), true, true);
         case CDF_ONE_BALL:
-            return new ShovelTheFriesMode(getAimingHintForLane(autonLane), false, false);
+            return new ChevalDeFriseMode(getAimingHintForLane(autonLane), false, false);
         case CDF_COME_BACK_LEFT:
-            return new ShovelTheFriesMode(getAimingHintForLane(autonLane), true, false);
+            return new ChevalDeFriseMode(getAimingHintForLane(autonLane), true, false);
         case CDF_COME_BACK_RIGHT:
-            return new ShovelTheFriesMode(getAimingHintForLane(autonLane), true, true);
+            return new ChevalDeFriseMode(getAimingHintForLane(autonLane), true, true);
         case TWO_BALL_LOW_BAR:
             return new TwoBallLowBarMode();
         case TWO_BALL_CLASS_BD:
@@ -162,61 +163,7 @@ public class SmartDashboardInteractions {
             return new AutoModeBase() {
                 @Override
                 protected void routine() throws AutoModeEndedException {
-                    /*
-                     * final double kSpeed = 120.0;
-                     * 
-                     * { ArrayList<Waypoint> path = new ArrayList<>();
-                     * path.add(new Waypoint(new Translation2d(0, 0), kSpeed));
-                     * path.add(new Waypoint(new Translation2d(72, 0), kSpeed));
-                     * path.add(new Waypoint(new Translation2d(72, 120),
-                     * kSpeed));
-                     * 
-                     * ArrayList<Waypoint> reverse_path = new ArrayList<>();
-                     * reverse_path.add(new Waypoint(new Translation2d(72, 120),
-                     * kSpeed / 2)); reverse_path.add(new Waypoint(new
-                     * Translation2d(72, 0), kSpeed / 2)); reverse_path.add(new
-                     * Waypoint(new Translation2d(0, 0), kSpeed / 2));
-                     * 
-                     * runAction(new FollowPathAction(new Path(path), false));
-                     * runAction(new FollowPathAction(new Path(reverse_path),
-                     * true)); }
-                     * 
-                     * { ArrayList<Waypoint> path = new ArrayList<>();
-                     * path.add(new Waypoint(new Translation2d(0, 0), kSpeed));
-                     * path.add(new Waypoint(new Translation2d(72 - 24, 0),
-                     * kSpeed)); path.add(new Waypoint(new Translation2d(72,
-                     * 24), kSpeed)); path.add(new Waypoint(new
-                     * Translation2d(72, 120), kSpeed));
-                     * 
-                     * ArrayList<Waypoint> reverse_path = new ArrayList<>();
-                     * reverse_path.add(new Waypoint(new Translation2d(72, 120),
-                     * kSpeed / 2)); reverse_path.add(new Waypoint(new
-                     * Translation2d(72, 24), kSpeed / 2)); reverse_path.add(new
-                     * Waypoint(new Translation2d(72 - 24, 0), kSpeed / 2));
-                     * reverse_path.add(new Waypoint(new Translation2d(0, 0),
-                     * kSpeed / 2));
-                     * 
-                     * runAction(new FollowPathAction(new Path(path), false));
-                     * runAction(new FollowPathAction(new Path(reverse_path),
-                     * true)); }
-                     */
-
                     throw new RuntimeException("Expected exception!!!");
-                    /*
-                     * Superstructure.getInstance().deployIntake();
-                     * Superstructure.getInstance().setWantsToRunIntake();
-                     * Superstructure.getInstance().setWantedState(WantedState.
-                     * WANT_TO_STOW); runAction(new
-                     * ParallelAction(Arrays.asList(new GetLowAction(), new
-                     * WaitAction(0.75)))); ArrayList<Waypoint> path = new
-                     * ArrayList<>(); path.add(new Waypoint(new Translation2d(0,
-                     * 0), 120.0)); path.add(new Waypoint(new Translation2d(24,
-                     * 0), 120.0)); path.add(new Waypoint(new Translation2d(24,
-                     * 18), 120.0)); path.add(new Waypoint(new Translation2d(90,
-                     * 18), 120.0, "PopHood")); runAction(new
-                     * FollowPathAction(new Path(path), false));
-                     * Superstructure.getInstance().setWantsToStopIntake();
-                     */
                 }
             };
 

@@ -3,7 +3,7 @@ package com.team254.frc2016.auto.actions;
 import com.team254.frc2016.subsystems.Drive;
 
 /**
- * Completes when the drive is past some distance
+ * This action completes when the robot moves past a specified distance
  */
 public class WaitForDistanceAction implements Action {
     private final double mMinDistance;

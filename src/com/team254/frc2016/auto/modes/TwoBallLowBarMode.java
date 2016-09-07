@@ -17,6 +17,9 @@ import com.team254.lib.util.Path.Waypoint;
 import com.team254.lib.util.Rotation2d;
 import com.team254.lib.util.Translation2d;
 
+/**
+ * This routine goes under the low bar and attempts to fire two balls.
+ */
 public class TwoBallLowBarMode extends AutoModeBase {
     Superstructure mSuperstructure = Superstructure.getInstance();
     Drive mDrive = Drive.getInstance();
@@ -55,7 +58,6 @@ public class TwoBallLowBarMode extends AutoModeBase {
         runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(first_path), false),
                 new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"), new StartAutoAimingAction(),
                         new PointTurretAction(hint))))));
-        // RobotState.getInstance().resetVision();
         mSuperstructure.setWantsToStopIntake();
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(WantedState.WANT_TO_STOW);
@@ -64,7 +66,6 @@ public class TwoBallLowBarMode extends AutoModeBase {
         runAction(new ParallelAction(Arrays.asList(new FollowPathAction(new Path(third_path), false),
                 new SeriesAction(Arrays.asList(new WaitForPathMarkerAction("PopHood"), new StartAutoAimingAction(),
                         new PointTurretAction(hint))))));
-        // RobotState.getInstance().resetVision();
         runAction(new ShootWhenReadyAction());
         mSuperstructure.setWantedState(WantedState.WANT_TO_DEPLOY);
         mSuperstructure.setWantsToStopIntake();

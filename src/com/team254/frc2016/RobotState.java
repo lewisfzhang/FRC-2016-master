@@ -19,7 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * RobotState keeps track of the poses of various coordinate frames throughout
- * the match.
+ * the match. A coordinate frame is simply a point and direction in space that
+ * defines an (x,y) coordinate system. Transforms (or poses) keep track of the
+ * spatial relationship between different frames.
  * 
  * Robot frames of interest (from parent to child):
  * 
@@ -39,8 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 6. Goal frame: origin is the center of the goal (note that orientation in
  * this frame is arbitrary). Also note that there can be multiple goal frames.
  * 
- * As a simple kinematic chain with 6 frames, there are 5 transforms of
- * interest:
+ * As a kinematic chain with 6 frames, there are 5 transforms of interest:
  * 
  * 1. Field-to-vehicle: This is tracked over time by integrating encoder and
  * gyro measurements. It will inevitably drift, but is usually accurate over
@@ -56,6 +57,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 5. Camera-to-goal: This is a pure translation, and is measured by the vision
  * system.
  */
+
 public class RobotState {
     private static RobotState instance_ = new RobotState();
 
@@ -168,8 +170,6 @@ public class RobotState {
     }
 
     public synchronized void addFieldToVehicleObservation(double timestamp, RigidTransform2d observation) {
-        // System.out.println("addFieldToVehicleObservation " +
-        // observation);
         field_to_vehicle_.put(new InterpolatingDouble(timestamp), observation);
     }
 
@@ -185,8 +185,6 @@ public class RobotState {
     }
 
     public void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
-        // System.out.println("Start addVisionUpdate at " +
-        // Timer.getFPGATimestamp());
         List<Translation2d> field_to_goals = new ArrayList<>();
         RigidTransform2d field_to_camera = getFieldToCamera(timestamp);
         if (!(vision_update == null || vision_update.isEmpty())) {
@@ -219,8 +217,6 @@ public class RobotState {
         synchronized (this) {
             goal_tracker_.update(timestamp, field_to_goals);
         }
-        // System.out.println("Done addVisionUpdate at " +
-        // Timer.getFPGATimestamp());
     }
 
     public synchronized void resetVision() {

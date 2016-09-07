@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj.Notifier;
 /**
  * A 12-bit PWM MA3 absolute encoder.
  * http://cdn.usdigital.com/assets/datasheets/MA3_datasheet.pdf
- * 
- * @author jarussell
  */
 public class MA3Encoder {
     static final double kNominalPeriodS = 4098 * 1E-6;
@@ -56,12 +54,8 @@ public class MA3Encoder {
                         + rotation_.inverse().rotateBy(new_rotation).getRadians();
                 if (relative_angle > Math.PI) {
                     ++num_rotations_;
-                    // System.out.println("Num rotations " + num_rotations_ + "
-                    // angle " + new_rotation.getDegrees());
                 } else if (relative_angle < -Math.PI) {
                     --num_rotations_;
-                    // System.out.println("Num rotations " + num_rotations_ + "
-                    // angle " + new_rotation.getDegrees());
                 }
                 rotation_ = new_rotation;
             }

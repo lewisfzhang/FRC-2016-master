@@ -2,6 +2,11 @@ package com.team254.frc2016;
 
 import edu.wpi.first.wpilibj.Joystick;
 
+/**
+ * A basic framework for the control board Like the drive code, one instance of
+ * the ControlBoard object is created upon startup, then other methods request
+ * the singleton ControlBoard instance.
+ */
 public class ControlBoard {
     private static ControlBoard mInstance = new ControlBoard();
 

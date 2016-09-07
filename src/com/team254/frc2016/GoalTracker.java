@@ -7,9 +7,20 @@ import java.util.List;
 
 import com.team254.lib.util.Translation2d;
 
+/**
+ * This is used in the event that multiple goals are detected to judge all goals
+ * based on timestamp, stability, and continuation of previous goals (i.e. if a
+ * goal was detected earlier and has changed locations). This allows the robot
+ * to make consistent decisions about which goal to aim at and to smooth out
+ * jitter from vibration of the camera.
+ * 
+ * @see GoalTrack.java
+ */
 public class GoalTracker {
-    // Track reports contain all of the relevant information about a given goal
-    // track.
+    /**
+     * Track reports contain all of the relevant information about a given goal
+     * track.
+     */
     public static class TrackReport {
         // Translation from the field frame to the goal
         public Translation2d field_to_goal;
@@ -32,10 +43,12 @@ public class GoalTracker {
         }
     }
 
-    // TrackReportComparators are used in the case that multiple tracks are
-    // active (e.g. we see or have recently seen multiple goals).
-    // They contain heuristics used to pick which track we should aim at by
-    // calculating a score for each track (highest score wins).
+    /**
+     * TrackReportComparators are used in the case that multiple tracks are
+     * active (e.g. we see or have recently seen multiple goals). They contain
+     * heuristics used to pick which track we should aim at by calculating a
+     * score for each track (highest score wins).
+     */
     public static class TrackReportComparator implements Comparator<TrackReport> {
         // Reward tracks for being more stable (seen in more frames)
         double mStabilityWeight;
@@ -68,7 +81,7 @@ public class GoalTracker {
         @Override
         public int compare(TrackReport o1, TrackReport o2) {
             double diff = score(o1) - score(o2);
-            // <0 if o1 is better than o2
+            // Greater than 0 if o1 is better than o2
             if (diff < 0) {
                 return 1;
             } else if (diff > 0) {
@@ -90,25 +103,16 @@ public class GoalTracker {
     }
 
     public void update(double timestamp, List<Translation2d> field_to_goals) {
-        // System.out.println("START GoalTracker::Update");
-        // System.out.println("Current number of tracks: " +
-        // mCurrentTracks.size());
         boolean hasUpdatedTrack = false;
         // Try to update existing tracks
         for (Translation2d target : field_to_goals) {
-            // System.out.println("Trying target " + target.toString());
             for (GoalTrack track : mCurrentTracks) {
-                // System.out.println("Trying track " + track.getId());
                 if (!hasUpdatedTrack) {
                     if (track.tryUpdate(timestamp, target)) {
                         hasUpdatedTrack = true;
-                        // System.out.println("UPDATED TRACK");
-                    } else {
-                        // System.out.println("COULD NOT UPDATE TRACK");
                     }
                 } else {
                     track.emptyUpdate();
-                    // System.out.println("SKIPPING TRACK");
                 }
             }
         }
@@ -117,18 +121,15 @@ public class GoalTracker {
             GoalTrack track = it.next();
             if (!track.isAlive()) {
                 it.remove();
-                // System.out.println("KILLED OLD TRACK");
             }
         }
         // If all tracks are dead, start new tracks for any detections
         if (mCurrentTracks.isEmpty()) {
             for (Translation2d target : field_to_goals) {
-                // System.out.println("STARTING NEW TRACK");
                 mCurrentTracks.add(GoalTrack.makeNewTrack(timestamp, target, mNextId));
                 ++mNextId;
             }
         }
-        // System.out.println("End GoalTracker::Update");
     }
 
     public boolean hasTracks() {

@@ -1,5 +1,8 @@
 package com.team254.frc2016.vision;
 
+/**
+ * Tests the vision system by getting targets
+ */
 public class VisionServerTest {
     public static class TestReceiver implements VisionUpdateReceiver {
         @Override

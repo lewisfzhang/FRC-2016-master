@@ -8,6 +8,16 @@ import com.team254.lib.util.Translation2d;
 
 import edu.wpi.first.wpilibj.Timer;
 
+/**
+ * A class that is used to keep track of all goals detected by the vision
+ * system. As goals are detected/not detected anymore by the vision system,
+ * function calls will be made to create, destroy, or update a goal track.
+ * 
+ * This helps in the goal ranking process that determines which goal to fire
+ * into, and helps to smooth measurements of the goal's location over time.
+ * 
+ * @see GoalTracker.java
+ */
 public class GoalTrack {
     Map<Double, Translation2d> mObservedPositions = new TreeMap<>();
     Translation2d mSmoothedPosition = null;
@@ -16,12 +26,14 @@ public class GoalTrack {
     private GoalTrack() {
     }
 
+    /**
+     * Makes a new track based on the timestamp and the goal's coordinates (from
+     * vision)
+     */
     public static GoalTrack makeNewTrack(double timestamp, Translation2d first_observation, int id) {
         GoalTrack rv = new GoalTrack();
         rv.mObservedPositions.put(timestamp, first_observation);
         rv.mSmoothedPosition = first_observation;
-        // System.out.println("Set smoothed position to " +
-        // first_observation.toString());
         rv.mId = id;
         return rv;
     }
@@ -30,7 +42,11 @@ public class GoalTrack {
         pruneByTime();
     }
 
-    // Returns true if the track was updated
+    /**
+     * Attempts to update the track with a new observation.
+     * 
+     * @return True if the track was updated
+     */
     public boolean tryUpdate(double timestamp, Translation2d new_observation) {
         if (!isAlive()) {
             return false;
@@ -50,6 +66,12 @@ public class GoalTrack {
         return mObservedPositions.size() > 0;
     }
 
+    /**
+     * Removes the track if it is older than the set "age" described in the
+     * Constants file.
+     * 
+     * @see Constants.java
+     */
     void pruneByTime() {
         double delete_before = Timer.getFPGATimestamp() - Constants.kMaxGoalTrackAge;
         for (Iterator<Map.Entry<Double, Translation2d>> it = mObservedPositions.entrySet().iterator(); it.hasNext();) {
@@ -65,6 +87,9 @@ public class GoalTrack {
         }
     }
 
+    /**
+     * Averages out the observed positions based on an set of observed positions
+     */
     void smooth() {
         if (isAlive()) {
             double x = 0;

@@ -3,6 +3,12 @@ package com.team254.frc2016.auto.actions;
 import com.team254.frc2016.subsystems.Drive;
 import com.team254.lib.util.Path;
 
+/**
+ * Action for following a path defined by a Path object.
+ * 
+ * @see Drive
+ * @see Path
+ */
 public class FollowPathAction implements Action {
 
     private Drive mDrive = Drive.getInstance();

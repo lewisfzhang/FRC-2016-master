@@ -3,6 +3,9 @@ package com.team254.frc2016.auto.actions;
 import com.team254.frc2016.subsystems.ShooterAimingParameters;
 import com.team254.frc2016.subsystems.Superstructure;
 
+/**
+ * Action for aiming the turret at a specified target
+ */
 public class PointTurretAction implements Action {
     private ShooterAimingParameters mHint;
     private boolean mIsDone;

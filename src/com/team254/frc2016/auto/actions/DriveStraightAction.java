@@ -4,8 +4,9 @@ import com.team254.frc2016.subsystems.Drive;
 import com.team254.lib.util.Rotation2d;
 
 /**
- * DriveStraightAction drives the robot straight at a settable angle, distance, and velocity.
- * This action begins by setting the drive controller, and then waits until the distance is reached.
+ * DriveStraightAction drives the robot straight at a settable angle, distance,
+ * and velocity. This action begins by setting the drive controller, and then
+ * waits until the distance is reached.
  *
  * @see Action
  * @see Drive
@@ -56,8 +57,6 @@ public class DriveStraightAction implements Action {
 
     @Override
     public void done() {
-        // System.out.println("Drive done, Setting drive to neutral");
-        // mDrive.setOpenLoop(DriveSignal.NEUTRAL);
         mDrive.setVelocitySetpoint(0, 0);
     }
 

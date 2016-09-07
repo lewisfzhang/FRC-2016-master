@@ -4,6 +4,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * Used to convert Strings into OffWireMessage objects, which can be interpreted
+ * as generic VisionMessages.
+ */
 public class OffWireMessage extends VisionMessage {
 
     private boolean mValid = false;
